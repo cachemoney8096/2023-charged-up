@@ -52,4 +52,14 @@ public class Scorer extends SubsystemBase {
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
   }
+
+  //These functions were all made because of things this vague subsystem will "probably" have according to Jay
+  /** Extend scorer */
+  public void extend(){}
+
+  /** Retract scorer */
+  public void retract(){}
+
+  /** Grab object with scorer */
+  public void grab(){}
 }
