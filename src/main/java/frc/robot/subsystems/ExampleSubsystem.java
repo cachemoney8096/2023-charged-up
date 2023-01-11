@@ -7,7 +7,14 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import com.ctre.phoenix.sensors.Pigeon2;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 public class ExampleSubsystem extends SubsystemBase {
+  Pigeon2 pigeon = new Pigeon2(1);
+  CANSparkMax spark = new CANSparkMax(2, MotorType.kBrushless);
+
   /** Creates a new ExampleSubsystem. */
   public ExampleSubsystem() {}
 
