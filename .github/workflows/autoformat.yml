@@ -1,4 +1,3 @@
-# From https://github.com/marketplace/actions/google-java-format
 name: Format
 
 on:
@@ -6,28 +5,13 @@ on:
     branches:
       - main
 
-# Use a stronger token to get around branch protection on main
-# See https://til.cazzulino.com/devops-ci-cd/push-to-protected-branch-from-github-actions
-env:
-  GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
 jobs:
   formatting:
     runs-on: ubuntu-latest
     steps:
-      - name: Try to get GH_TOKEN
-        if: env.GH_TOKEN == ''
-        env: 
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: echo "GH_TOKEN=${GITHUB_TOKEN}" >> $GITHUB_ENV
-
       - uses: actions/checkout@v2 # v2 minimum required
-        with:
-          fetch-depth: 0
-          ref: main
-          token: ${{ env.GH_TOKEN }}
-
       - uses: axel-op/googlejavaformat-action@v3
         with:
           args: "--skip-sorting-imports --replace"
-          github-token: ${{ env.GH_TOKEN }}
+          # Recommended if you use MacOS:
+          # githubToken: ${{ secrets.GITHUB_TOKEN }}
