@@ -30,4 +30,7 @@ public final class Calibrations {
     public static final double TURNING_MIN_OUTPUT = -1;
     public static final double TURNING_MAX_OUTPUT = 1;
   }
+
+  public static final double INTAKE_INTAKING_POWER = 1.0;
+  public static final double INTAKE_EJECTION_POWER = -1.0;
 }
