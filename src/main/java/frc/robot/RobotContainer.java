@@ -23,7 +23,7 @@ public class RobotContainer {
   private final Intake intake = new Intake();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
+  private final CommandXboxController driverController =
       new CommandXboxController(RobotMap.DRIVER_CONTROLLER_PORT);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -42,6 +42,10 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    m_driverController.a().whileTrue(new InstantCommand(intake::deploy, intake));
+    driverController
+      .a()
+      .whileTrue(
+        new InstantCommand(intake::deploy, intake)
+      );
   }
 }
