@@ -18,14 +18,14 @@ public final class RobotMap {
 
   /** Intake deployment pneumatic channels */
   public static final int INTAKE_DEPLOY_LEFT_FORWARD_CHANNEL = 0, 
-  INTAKE_DEPLOY_LEFT_REVERSE_CHANNEL = 1, 
-  INTAKE_DEPLOY_RIGHT_FORWARD_CHANNEL = 2, 
-  INTAKE_DEPLOY_RIGHT_REVERSE_CHANNEL = 3;
+    INTAKE_DEPLOY_LEFT_REVERSE_CHANNEL = 1, 
+    INTAKE_DEPLOY_RIGHT_FORWARD_CHANNEL = 2, 
+    INTAKE_DEPLOY_RIGHT_REVERSE_CHANNEL = 3;
 
   
   /** Intake Spark MAX CAN IDs */
   public static final int INTAKE_LEFT_MOTOR_CAN_ID = 22,
-  INTAKE_RIGHT_MOTOR_CAN_ID = 23;
-  
-  public static final int PIGEON_CAN_ID = 1;
+    INTAKE_RIGHT_MOTOR_CAN_ID = 23;
+    
+    public static final int PIGEON_CAN_ID = 1;
 }
