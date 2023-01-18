@@ -27,5 +27,5 @@ public final class RobotMap {
   public static final int INTAKE_LEFT_MOTOR_CAN_ID = 22,
     INTAKE_RIGHT_MOTOR_CAN_ID = 23;
     
-    public static final int PIGEON_CAN_ID = 1;
+  public static final int PIGEON_CAN_ID = 1;
 }
