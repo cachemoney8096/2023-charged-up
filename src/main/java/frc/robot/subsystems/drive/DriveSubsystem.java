@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.drive;
 
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -12,54 +13,57 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import com.ctre.phoenix.sensors.WPI_Pigeon2;
-import frc.robot.Calibrations;
-import frc.robot.RobotMap;
-import frc.robot.Constants.SwerveDriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Calibrations;
+import frc.robot.Constants.SwerveDriveConstants;
+import frc.robot.RobotMap;
 
 public class DriveSubsystem extends SubsystemBase {
   private double targetHeadingDegrees;
 
   // Create SwerveModules
-  //TODO: add angular offsets specific to the position of the module
-  private final SwerveModule frontLeft = new SwerveModule(
-      RobotMap.FRONT_LEFT_DRIVING_CAN_ID,
-      RobotMap.FRONT_LEFT_TURNING_CAN_ID,
-      SwerveDriveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET);
+  // TODO: add angular offsets specific to the position of the module
+  private final SwerveModule frontLeft =
+      new SwerveModule(
+          RobotMap.FRONT_LEFT_DRIVING_CAN_ID,
+          RobotMap.FRONT_LEFT_TURNING_CAN_ID,
+          SwerveDriveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET);
 
-  private final SwerveModule frontRight = new SwerveModule(
-      RobotMap.FRONT_RIGHT_DRIVING_CAN_ID,
-      RobotMap.FRONT_RIGHT_TURNING_CAN_ID,
-      SwerveDriveConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET);
+  private final SwerveModule frontRight =
+      new SwerveModule(
+          RobotMap.FRONT_RIGHT_DRIVING_CAN_ID,
+          RobotMap.FRONT_RIGHT_TURNING_CAN_ID,
+          SwerveDriveConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
-  private final SwerveModule rearLeft = new SwerveModule(
-      RobotMap.REAR_LEFT_DRIVING_CAN_ID,
-      RobotMap.REAR_LEFT_TURNING_CAN_ID,
-      SwerveDriveConstants.BACK_LEFT_CHASSIS_ANGULAR_OFFSET);
+  private final SwerveModule rearLeft =
+      new SwerveModule(
+          RobotMap.REAR_LEFT_DRIVING_CAN_ID,
+          RobotMap.REAR_LEFT_TURNING_CAN_ID,
+          SwerveDriveConstants.BACK_LEFT_CHASSIS_ANGULAR_OFFSET);
 
-  private final SwerveModule rearRight = new SwerveModule(
-      RobotMap.REAR_RIGHT_DRIVING_CAN_ID,
-      RobotMap.REAR_RIGHT_TURNING_CAN_ID,
-      SwerveDriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
+  private final SwerveModule rearRight =
+      new SwerveModule(
+          RobotMap.REAR_RIGHT_DRIVING_CAN_ID,
+          RobotMap.REAR_RIGHT_TURNING_CAN_ID,
+          SwerveDriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
   // The gyro sensor
   private final WPI_Pigeon2 gyro = new WPI_Pigeon2(RobotMap.PIGEON_CAN_ID);
 
   // Odometry class for tracking robot pose
-  SwerveDriveOdometry odometry = new SwerveDriveOdometry(
-      SwerveDriveConstants.DRIVE_KINEMATICS,
-      Rotation2d.fromDegrees(gyro.getAngle()),
-      new SwerveModulePosition[] {
-          frontLeft.getPosition(),
-          frontRight.getPosition(),
-          rearLeft.getPosition(),
-          rearRight.getPosition()
-      });
+  SwerveDriveOdometry odometry =
+      new SwerveDriveOdometry(
+          SwerveDriveConstants.DRIVE_KINEMATICS,
+          Rotation2d.fromDegrees(gyro.getAngle()),
+          new SwerveModulePosition[] {
+            frontLeft.getPosition(),
+            frontRight.getPosition(),
+            rearLeft.getPosition(),
+            rearRight.getPosition()
+          });
 
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {
-  }
+  public DriveSubsystem() {}
 
   @Override
   public void periodic() {
@@ -67,10 +71,10 @@ public class DriveSubsystem extends SubsystemBase {
     odometry.update(
         Rotation2d.fromDegrees(gyro.getAngle()),
         new SwerveModulePosition[] {
-            frontLeft.getPosition(),
-            frontRight.getPosition(),
-            rearLeft.getPosition(),
-            rearRight.getPosition()
+          frontLeft.getPosition(),
+          frontRight.getPosition(),
+          rearLeft.getPosition(),
+          rearRight.getPosition()
         });
   }
 
@@ -92,10 +96,10 @@ public class DriveSubsystem extends SubsystemBase {
     odometry.resetPosition(
         Rotation2d.fromDegrees(gyro.getAngle()),
         new SwerveModulePosition[] {
-            frontLeft.getPosition(),
-            frontRight.getPosition(),
-            rearLeft.getPosition(),
-            rearRight.getPosition()
+          frontLeft.getPosition(),
+          frontRight.getPosition(),
+          rearLeft.getPosition(),
+          rearRight.getPosition()
         },
         pose);
   }
@@ -103,11 +107,10 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Method to drive the robot using joystick info.
    *
-   * @param xSpeed        Desired speed of the robot in the x direction (forward), [-1,1].
-   * @param ySpeed        Desired speed of the robot in the y direction (sideways), [-1,1].
-   * @param rot           Desired angular rate of the robot, [-1,1].
-   * @param fieldRelative Whether the provided x and y speeds are relative to the
-   *                      field.
+   * @param xSpeed Desired speed of the robot in the x direction (forward), [-1,1].
+   * @param ySpeed Desired speed of the robot in the y direction (sideways), [-1,1].
+   * @param rot Desired angular rate of the robot, [-1,1].
+   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     // Adjust input based on max speed
@@ -115,10 +118,12 @@ public class DriveSubsystem extends SubsystemBase {
     ySpeed *= SwerveDriveConstants.MAX_SPEED_METERS_PER_SECOND;
     rot *= SwerveDriveConstants.MAX_ANGULAR_SPEED_RAD_PER_SECONDS;
 
-    var swerveModuleStates = SwerveDriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
-        fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, Rotation2d.fromDegrees(gyro.getAngle()))
-            : new ChassisSpeeds(xSpeed, ySpeed, rot));
+    var swerveModuleStates =
+        SwerveDriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
+            fieldRelative
+                ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                    xSpeed, ySpeed, rot, Rotation2d.fromDegrees(gyro.getAngle()))
+                : new ChassisSpeeds(xSpeed, ySpeed, rot));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, SwerveDriveConstants.MAX_SPEED_METERS_PER_SECOND);
     frontLeft.setDesiredState(swerveModuleStates[0]);
@@ -127,9 +132,7 @@ public class DriveSubsystem extends SubsystemBase {
     rearRight.setDesiredState(swerveModuleStates[3]);
   }
 
-  /**
-   * Sets the wheels into an X formation to prevent movement.
-   */
+  /** Sets the wheels into an X formation to prevent movement. */
   public void setX() {
     frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
     frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
@@ -183,35 +186,40 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Keeps the heading of the robot when the driver is not turning, by using PID to keep the distance between the actual heading and the last intended heading to 0.
-   * 
-   * @param x    Desired speed of the robot in the x direction (forward), [-1,1].
-   * @param y    Desired speed of the robot in the y direction (sideways), [-1,1].
-   * @param fieldRelative    Whether the provided x and y speeds are relative to the field.
+   * Keeps the heading of the robot when the driver is not turning, by using PID to keep the
+   * distance between the actual heading and the last intended heading to 0.
+   *
+   * @param x Desired speed of the robot in the x direction (forward), [-1,1].
+   * @param y Desired speed of the robot in the y direction (sideways), [-1,1].
+   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
-  public void keepHeading(double x, double y, boolean fieldRelative){
+  public void keepHeading(double x, double y, boolean fieldRelative) {
     double currentHeadingDegrees = getHeadingDegrees();
     double headingDifferenceDegrees = currentHeadingDegrees - targetHeadingDegrees;
     double offsetHeadingDegrees = MathUtil.inputModulus(headingDifferenceDegrees, -180, 180);
 
-    double desiredRotation = Calibrations.ROTATE_TO_TARGET_PID_CONTROLLER.calculate(offsetHeadingDegrees, 0.0) + Math.signum(offsetHeadingDegrees) * Calibrations.ROTATE_TO_TARGET_FF;
+    double desiredRotation =
+        Calibrations.ROTATE_TO_TARGET_PID_CONTROLLER.calculate(offsetHeadingDegrees, 0.0)
+            + Math.signum(offsetHeadingDegrees) * Calibrations.ROTATE_TO_TARGET_FF;
 
     drive(x, y, desiredRotation, fieldRelative);
   }
 
   /**
-   * Determines whether to rotate according to input or to run the keep heading code, by checking if the (already deadbanded) rotation input is equal to 0.
-   * 
-   * @param x    Desired speed of the robot in the x direction (forward), [-1,1].
-   * @param y    Desired speed of the robot in the y direction (sideways), [-1,1].
-   * @param rot    Desired angular rate of the robot, [-1,1].
-   * @param fieldRelative    Whether the provided x and y speeds are relative to the field.
+   * Determines whether to rotate according to input or to run the keep heading code, by checking if
+   * the (already deadbanded) rotation input is equal to 0.
+   *
+   * @param x Desired speed of the robot in the x direction (forward), [-1,1].
+   * @param y Desired speed of the robot in the y direction (sideways), [-1,1].
+   * @param rot Desired angular rate of the robot, [-1,1].
+   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
-  public void rotateOrKeepHeading(double x, double y, double rot, boolean fieldRelative){
-    // x, y, and rot are all being deadbanded from 0.1 to 0.0, so checking if they're equal to 0 does account for controller deadzones.
-    if (x == 0 && y == 0 && rot == 0){
+  public void rotateOrKeepHeading(double x, double y, double rot, boolean fieldRelative) {
+    // x, y, and rot are all being deadbanded from 0.1 to 0.0, so checking if they're equal to 0
+    // does account for controller deadzones.
+    if (x == 0 && y == 0 && rot == 0) {
       setX();
-    } else if (rot == 0){
+    } else if (rot == 0) {
       keepHeading(x, y, fieldRelative);
     } else {
       targetHeadingDegrees = getHeadingDegrees();
