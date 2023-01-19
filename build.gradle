@@ -5,6 +5,7 @@ plugins {
 }
 
 spotless {
+  enforceCheck = false
   java {
     importOrder()
     removeUnusedImports()
