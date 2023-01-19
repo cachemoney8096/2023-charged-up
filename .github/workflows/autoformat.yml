@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+env:
+  FORMATTER_PAT: ${{ secrets.FORMATTER_PAT }}
+
 jobs:
   formatting:
     runs-on: ubuntu-latest
@@ -14,4 +17,4 @@ jobs:
         with:
           args: "--skip-sorting-imports --replace"
           # Recommended if you use MacOS:
-          # githubToken: ${{ secrets.GITHUB_TOKEN }}
+          githubToken: ${{ env.FORMATTER_PAT }}
