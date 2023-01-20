@@ -6,26 +6,24 @@ public final class RobotMap {
 
   /** Driving SPARK MAX CAN IDs */
   public static final int FRONT_LEFT_DRIVING_CAN_ID = 11,
-    REAR_LEFT_DRIVING_CAN_ID = 13,
-    FRONT_RIGHT_DRIVING_CAN_ID = 15,
-    REAR_RIGHT_DRIVING_CAN_ID = 17;
+      REAR_LEFT_DRIVING_CAN_ID = 13,
+      FRONT_RIGHT_DRIVING_CAN_ID = 15,
+      REAR_RIGHT_DRIVING_CAN_ID = 17;
 
   /** Turning SPARK MAX CAN IDs */
   public static final int FRONT_LEFT_TURNING_CAN_ID = 10,
-    REAR_LEFT_TURNING_CAN_ID = 12,
-    FRONT_RIGHT_TURNING_CAN_ID = 14,
-    REAR_RIGHT_TURNING_CAN_ID = 16;
+      REAR_LEFT_TURNING_CAN_ID = 12,
+      FRONT_RIGHT_TURNING_CAN_ID = 14,
+      REAR_RIGHT_TURNING_CAN_ID = 16;
 
   /** Intake deployment pneumatic channels */
-  public static final int INTAKE_DEPLOY_LEFT_FORWARD_CHANNEL = 0, 
-    INTAKE_DEPLOY_LEFT_REVERSE_CHANNEL = 1, 
-    INTAKE_DEPLOY_RIGHT_FORWARD_CHANNEL = 2, 
-    INTAKE_DEPLOY_RIGHT_REVERSE_CHANNEL = 3;
+  public static final int INTAKE_DEPLOY_LEFT_FORWARD_CHANNEL = 0,
+      INTAKE_DEPLOY_LEFT_REVERSE_CHANNEL = 1,
+      INTAKE_DEPLOY_RIGHT_FORWARD_CHANNEL = 2,
+      INTAKE_DEPLOY_RIGHT_REVERSE_CHANNEL = 3;
 
-  
   /** Intake Spark MAX CAN IDs */
-  public static final int INTAKE_LEFT_MOTOR_CAN_ID = 22,
-    INTAKE_RIGHT_MOTOR_CAN_ID = 23;
-    
+  public static final int INTAKE_LEFT_MOTOR_CAN_ID = 22, INTAKE_RIGHT_MOTOR_CAN_ID = 23;
+
   public static final int PIGEON_CAN_ID = 1;
 }

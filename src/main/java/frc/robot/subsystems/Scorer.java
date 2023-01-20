@@ -4,14 +4,16 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-/** This will be renamed once we know what it looks like more becauses the "rer" at the end of the word is not pleasant */
+/**
+ * This will be renamed once we know what it looks like more becauses the "rer" at the end of the
+ * word is not pleasant
+ */
 public class Scorer extends SubsystemBase {
   Pigeon2 pigeon = new Pigeon2(1);
   CANSparkMax spark = new CANSparkMax(2, MotorType.kBrushless);
@@ -53,13 +55,14 @@ public class Scorer extends SubsystemBase {
     // This method will be called once per scheduler run during simulation
   }
 
-  //These functions were all made because of things this vague subsystem will "probably" have according to Jay
+  // These functions were all made because of things this vague subsystem will "probably" have
+  // according to Jay
   /** Extend scorer */
-  public void extend(){}
+  public void extend() {}
 
   /** Retract scorer */
-  public void retract(){}
+  public void retract() {}
 
   /** Grab object with scorer */
-  public void grab(){}
+  public void grab() {}
 }
