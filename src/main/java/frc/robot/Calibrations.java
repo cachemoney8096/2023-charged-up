@@ -43,7 +43,7 @@ public final class Calibrations {
   ELEVATOR_I = PLACEHOLDER_DOUBLE,
   ELEVATOR_D = PLACEHOLDER_DOUBLE;
 
-  /** Input rotations, output [0,1] */
+  /** Input degrees, output [0,1] */
   public static final double ARM_P = PLACEHOLDER_DOUBLE,
   ARM_I = PLACEHOLDER_DOUBLE,
   ARM_D = PLACEHOLDER_DOUBLE;
