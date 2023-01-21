@@ -5,13 +5,17 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
+
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Calibrations;
+import frc.robot.Constants;
 import frc.robot.RobotMap;
 
 /**
@@ -22,17 +26,14 @@ import frc.robot.RobotMap;
  */
 public class Intake extends SubsystemBase {
 
-  private DoubleSolenoid deployLeft =
-      new DoubleSolenoid(
-          PneumaticsModuleType.CTREPCM,
-          RobotMap.INTAKE_DEPLOY_LEFT_FORWARD_CHANNEL,
-          RobotMap.INTAKE_DEPLOY_LEFT_REVERSE_CHANNEL);
-  private DoubleSolenoid deployRight =
-      new DoubleSolenoid(
-          PneumaticsModuleType.CTREPCM,
-          RobotMap.INTAKE_DEPLOY_RIGHT_FORWARD_CHANNEL,
-          RobotMap.INTAKE_DEPLOY_RIGHT_REVERSE_CHANNEL);
+  // Sensors
+  private final DigitalInput gamePieceSensor;
 
+  private CANSparkMax deployMotor =
+      new CANSparkMax(RobotMap.DEPLOY_MOTOR_CAN_ID, MotorType.kBrushless);
+  private SparkMaxPIDController deployMotorPID = deployMotor.getPIDController();
+
+  private final RelativeEncoder deployMotorEncoder;
   private Solenoid clamp =
       new Solenoid(
           PneumaticsModuleType.CTREPCM,
@@ -47,16 +48,26 @@ public class Intake extends SubsystemBase {
 
   /** Creates a new Intake. */
   public Intake() {
+    deployMotor.restoreFactoryDefaults();
+    deployMotorEncoder = deployMotor.getEncoder();
+    deployMotorEncoder.setPositionConversionFactor(Constants.DEPLOY_MOTOR_ENCODER_SCALAR);
+    deployMotorEncoder.setVelocityConversionFactor(Constants.DEPLOY_MOTOR_ENCODER_VELOCITY_SCALAR);
+
+    deployMotorPID.setP(Calibrations.DEPLOY_MOTOR_P);
+    deployMotorPID.setI(Calibrations.DEPLOY_MOTOR_I);
+    deployMotorPID.setD(Calibrations.DEPLOY_MOTOR_D);
+
     intakeLeft.restoreFactoryDefaults();
 
     intakeRight.restoreFactoryDefaults();
     intakeRight.follow(intakeLeft, true);
+
+    gamePieceSensor = new DigitalInput(RobotMap.INTAKE_GAME_PIECE_DIO);
   }
 
   /** Deploys the intake out */
   public void deploy() {
-    deployLeft.set(DoubleSolenoid.Value.kForward);
-    deployRight.set(DoubleSolenoid.Value.kForward);
+    deployMotorPID.setReference(Calibrations.INTAKE_DEPLOYING_POSITION_DEGREES, CANSparkMax.ControlType.kPosition);
     clampTimer.reset();
     clampTimer.start();
   }
@@ -64,8 +75,7 @@ public class Intake extends SubsystemBase {
   /** Brings the intake back in */
   public void retract() {
     unclampIntake();
-    deployLeft.set(DoubleSolenoid.Value.kReverse);
-    deployRight.set(DoubleSolenoid.Value.kReverse);
+    deployMotorPID.setReference(Calibrations.INTAKE_STARTING_POSITION_DEGREES, CANSparkMax.ControlType.kPosition);
   }
 
   /** Runs the intake wheels inward */
@@ -84,6 +94,12 @@ public class Intake extends SubsystemBase {
 
   public void unclampIntake() {
     clamp.set(true);
+  }
+
+  /** Returns true if the game piece sensor sees a game piece */
+  public boolean seeGamePiece() {
+    // Sensor is false if there's a game piece
+    return !gamePieceSensor.get();
   }
 
   @Override

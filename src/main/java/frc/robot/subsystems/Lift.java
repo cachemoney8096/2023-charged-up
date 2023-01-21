@@ -116,9 +116,9 @@ public class Lift extends SubsystemBase {
     grabber.set(DoubleSolenoid.Value.kReverse);
   }
 
-  /** Returns true if the cargo sensor see a cargo */
-  public boolean seeCargo() {
-    // Sensor is false if there's a ball
+  /** Returns true if the game piece sensor sees a game piece */
+  public boolean seeGamePiece() {
+    // Sensor is false if there's a game piece
     return !gamePieceSensor.get();
   }
 
