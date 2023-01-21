@@ -38,7 +38,7 @@ public class Lift extends SubsystemBase {
           RobotMap.LIFT_GRABBING_REVERSE_CHANNEL);
 
   // Sensors
-  private final DigitalInput cargoSensor;
+  private final DigitalInput gamePieceSensor;
 
   /** Indicates the elevator and arm positions at each position of the lift.
    * The first value indicates the elevator position in inches
@@ -90,7 +90,7 @@ public class Lift extends SubsystemBase {
         LiftPosition.STARTING,
         new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
 
-    cargoSensor = new DigitalInput(RobotMap.LIFT_CARGO_DIO);
+    gamePieceSensor = new DigitalInput(RobotMap.LIFT_CARGO_DIO);
   }
 
   public enum LiftPosition {
@@ -118,7 +118,7 @@ public class Lift extends SubsystemBase {
   /** Returns true if the cargo sensor see a cargo */
   public boolean seeCargo() {
     // Sensor is false if there's a ball
-    return !cargoSensor.get();
+    return !gamePieceSensor.get();
   }
 
   @Override
