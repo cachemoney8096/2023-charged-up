@@ -40,9 +40,10 @@ public class Lift extends SubsystemBase {
   // Sensors
   private final DigitalInput gamePieceSensor;
 
-  /** Indicates the elevator and arm positions at each position of the lift.
-   * The first value indicates the elevator position in inches
-   * and the second value indicates the arm position in degrees
+  /**
+   * Indicates the elevator and arm positions at each position of the lift. The first value
+   * indicates the elevator position in inches and the second value indicates the arm position in
+   * degrees
    */
   TreeMap<LiftPosition, Pair<Double, Double>> liftPositionMap;
 
