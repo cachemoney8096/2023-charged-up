@@ -36,8 +36,8 @@ public final class RobotMap {
     ARM_MOTOR_CAN_ID = 38;
 
   /** Lift grabbing pneumatic channels */
-  public static final int LIFT_GRABBING_FORWARD_CHANNEL = 0,
-    LIFT_GRABBING_REVERSE_CHANNEL = 1;
+  public static final int LIFT_GRABBING_FORWARD_CHANNEL = 40,
+    LIFT_GRABBING_REVERSE_CHANNEL = 41;
     
   public static final int PIGEON_CAN_ID = 1;
 }
