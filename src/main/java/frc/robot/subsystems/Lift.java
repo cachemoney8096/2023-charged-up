@@ -9,6 +9,9 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Calibrations;
 import frc.robot.Constants;
@@ -27,6 +30,15 @@ public class Lift extends SubsystemBase {
 
   private CANSparkMax arm = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
   private SparkMaxPIDController armPID = arm.getPIDController();
+
+  private DoubleSolenoid grabber =
+      new DoubleSolenoid(
+          PneumaticsModuleType.CTREPCM,
+          RobotMap.LIFT_GRABBING_FORWARD_CHANNEL,
+          RobotMap.LIFT_GRABBING_REVERSE_CHANNEL);
+
+  // Sensors
+  private final DigitalInput gamePieceSensor;
 
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
@@ -78,6 +90,8 @@ public class Lift extends SubsystemBase {
     liftPositionMap.put(
         LiftPosition.STARTING,
         new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
+
+    gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
   }
 
   public enum LiftPosition {
@@ -92,6 +106,20 @@ public class Lift extends SubsystemBase {
     elevatorPID.setReference(
         liftPositionMap.get(pos).getFirst(), CANSparkMax.ControlType.kPosition);
     armPID.setReference(liftPositionMap.get(pos).getSecond(), CANSparkMax.ControlType.kPosition);
+  }
+
+  public void grab() {
+    grabber.set(DoubleSolenoid.Value.kForward);
+  }
+
+  public void drop() {
+    grabber.set(DoubleSolenoid.Value.kReverse);
+  }
+
+  /** Returns true if the cargo sensor see a cargo */
+  public boolean seeCargo() {
+    // Sensor is false if there's a ball
+    return !gamePieceSensor.get();
   }
 
   @Override
