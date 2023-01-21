@@ -31,7 +31,7 @@ public class Intake extends SubsystemBase {
           PneumaticsModuleType.CTREPCM,
           RobotMap.INTAKE_DEPLOY_RIGHT_FORWARD_CHANNEL,
           RobotMap.INTAKE_DEPLOY_RIGHT_REVERSE_CHANNEL);
-  
+
   private DoubleSolenoid clampLeft =
       new DoubleSolenoid(
           PneumaticsModuleType.CTREPCM,
@@ -41,13 +41,13 @@ public class Intake extends SubsystemBase {
       new DoubleSolenoid(
           PneumaticsModuleType.CTREPCM,
           RobotMap.INTAKE_CLAMP_RIGHT_FORWARD_CHANNEL,
-          RobotMap.INTAKE_CLAMP_RIGHT_REVERSE_CHANNEL); 
+          RobotMap.INTAKE_CLAMP_RIGHT_REVERSE_CHANNEL);
 
   private CANSparkMax intakeLeft =
       new CANSparkMax(RobotMap.INTAKE_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
   private CANSparkMax intakeRight =
       new CANSparkMax(RobotMap.INTAKE_RIGHT_MOTOR_CAN_ID, MotorType.kBrushless);
-  
+
   private Timer clampTimer = new Timer();
 
   /** Creates a new Intake. */
@@ -83,19 +83,19 @@ public class Intake extends SubsystemBase {
     intakeLeft.set(Calibrations.INTAKE_EJECTION_POWER);
   }
 
-  public void clampIntake(){
+  public void clampIntake() {
     clampLeft.set(DoubleSolenoid.Value.kForward);
     clampRight.set(DoubleSolenoid.Value.kForward);
   }
 
-  public void unclampIntake(){
+  public void unclampIntake() {
     clampLeft.set(DoubleSolenoid.Value.kReverse);
     clampRight.set(DoubleSolenoid.Value.kReverse);
   }
 
   @Override
   public void periodic() {
-    if (clampTimer.hasElapsed(Calibrations.AUTO_CLAMP_WAIT_TIME_SECONDS)){
+    if (clampTimer.hasElapsed(Calibrations.AUTO_CLAMP_WAIT_TIME_SECONDS)) {
       clampLeft.set(DoubleSolenoid.Value.kForward);
       clampTimer.stop();
       clampTimer.reset();
