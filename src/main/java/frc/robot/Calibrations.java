@@ -40,7 +40,7 @@ public final class Calibrations {
   /** This should be [0,1] */
   public static final double MAX_CHARGE_STATION_CLIMB_SPEED = 0.5 / Constants.SwerveDrive.MAX_SPEED_METERS_PER_SECOND;
   /** Conversion factor between the robot pitch (in degrees) to a velocity (in [0,1]) for balancing on the charge station */
-  public static final double CHARGE_STATION_PITCH_DEGREES_TO_VELOCITY = Constants.MAX_PITCH_DEGREES / MAX_CHARGE_STATION_CLIMB_SPEED;
+  public static final double CHARGE_STATION_PITCH_DEGREES_TO_VELOCITY = -1 * Constants.MAX_PITCH_DEGREES / MAX_CHARGE_STATION_CLIMB_SPEED;
   /** Maximum pitch to deadband at */
   public static final double CHARGE_STATION_DEADBAND_PITCH_DEGREES = 0.5;
 
