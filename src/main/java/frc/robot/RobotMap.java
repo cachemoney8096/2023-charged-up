@@ -40,7 +40,7 @@ public final class RobotMap {
     LIFT_GRABBING_REVERSE_CHANNEL = 41;
 
   /** Sensor DIO */
-  public static final int LIFT_CARGO_DIO = 42;
+  public static final int LIFT_GAME_PIECE_DIO = 42;
     
   public static final int PIGEON_CAN_ID = 1;
 }
