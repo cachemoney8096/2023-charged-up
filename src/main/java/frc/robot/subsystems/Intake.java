@@ -27,7 +27,7 @@ import frc.robot.RobotMap;
 public class Intake extends SubsystemBase {
 
   // Sensors
-  private final DigitalInput gamePieceSensor;
+  private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.INTAKE_GAME_PIECE_DIO);;
 
   private CANSparkMax deployMotor =
       new CANSparkMax(RobotMap.INTAKE_DEPLOY_MOTOR_CAN_ID, MotorType.kBrushless);
@@ -60,8 +60,6 @@ public class Intake extends SubsystemBase {
 
     intakeRight.restoreFactoryDefaults();
     intakeRight.follow(intakeLeft, true);
-
-    gamePieceSensor = new DigitalInput(RobotMap.INTAKE_GAME_PIECE_DIO);
   }
 
   /** Deploys the intake out */
