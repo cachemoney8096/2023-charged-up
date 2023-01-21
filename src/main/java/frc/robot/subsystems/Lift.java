@@ -29,7 +29,7 @@ public class Lift extends SubsystemBase {
   private CANSparkMax arm = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
   private SparkMaxPIDController armPID =  arm.getPIDController();
 
-  TreeMap<LiftPositions, Pair<Double, Double>> liftPositionsMap;
+  TreeMap<LiftPosition, Pair<Double, Double>> liftPositionMap;
 
 
   /** Creates a new Lift */
@@ -37,11 +37,12 @@ public class Lift extends SubsystemBase {
     elevator.restoreFactoryDefaults();
     arm.restoreFactoryDefaults();
 
-    /* Get positions and degrees of elevator through encoder*/
+    /* Get positions and degrees of elevator through encoder in inches*/
     elevatorEncoder = elevator.getEncoder();
     elevatorEncoder.setPositionConversionFactor(Constants.ELEVATOR_MOTOR_ENCODER_SCALAR);
     elevatorEncoder.setVelocityConversionFactor(Constants.ELEVATOR_MOTOR_ENCODER_VELOCITY_SCALAR);
-    /* Get positions and degrees of arm through encoder*/
+    
+    /* Get positions and degrees of arm through encoder in inches*/
     armEncoder = arm.getEncoder();
     armEncoder.setPositionConversionFactor(Constants.ARM_MOTOR_ENCODER_SCALAR);
     armEncoder.setVelocityConversionFactor(Constants.ARM_MOTOR_ENCODER_VELOCITY_SCALAR);
@@ -56,48 +57,28 @@ public class Lift extends SubsystemBase {
     armPID.setI(Calibrations.ARM_I);
     armPID.setD(Calibrations.ARM_D);
 
-    /* Map of all LiftPositions with according values */
+    /* Map of all LiftPosition with according values */
 
-    liftPositionsMap = new TreeMap<LiftPositions, Pair<Double, Double>>();
-    liftPositionsMap.put(LiftPositions.GRAB_FROM_INTAKE, new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
-    liftPositionsMap.put(LiftPositions.SHELF, new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
-    liftPositionsMap.put(LiftPositions.SCORE_MID, new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
-    liftPositionsMap.put(LiftPositions.SCORE_HIGH, new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
-    liftPositionsMap.put(LiftPositions.STOWED, new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
+    liftPositionMap = new TreeMap<LiftPosition, Pair<Double, Double>>();
+    liftPositionMap.put(LiftPosition.GRAB_FROM_INTAKE, new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
+    liftPositionMap.put(LiftPosition.SHELF, new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
+    liftPositionMap.put(LiftPosition.SCORE_MID, new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
+    liftPositionMap.put(LiftPosition.SCORE_HIGH, new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
+    liftPositionMap.put(LiftPosition.STARTING, new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
   }
 
 
-  public enum LiftPositions {
+  public enum LiftPosition {
     GRAB_FROM_INTAKE,
     SHELF,
     SCORE_MID,
     SCORE_HIGH,
-    STOWED
+    STARTING
   }
 
-  public void goToPosition(LiftPositions pos) {
-    elevatorPID.setReference(liftPositionsMap.get(pos).getFirst(), CANSparkMax.ControlType.kPosition);
-    armPID.setReference(liftPositionsMap.get(pos).getSecond(), CANSparkMax.ControlType.kPosition);
-  }
-
-  /** Pushes the lift up */
-  public void deployElevator() {
-    elevatorPID.setReference(Calibrations.ELEVATOR_DEPLOYING_POWER, CANSparkMax.ControlType.kVelocity);
-  }
-
-  /** Pushes the lift down */
-  public void retractElevator() {
-    elevatorPID.setReference(Calibrations.ELEVATOR_RETRACTING_POWER, CANSparkMax.ControlType.kVelocity);
-  }
-
-  /** Unfolds the arm */
-  public void unfoldArm() {
-    armPID.setReference(Calibrations.ARM_UNFOLDING_POWER, CANSparkMax.ControlType.kVelocity);
-  }
-
-  /** Folds the arm */
-  public void foldArm() {
-    armPID.setReference(Calibrations.ARM_FOLDING_POWER, CANSparkMax.ControlType.kVelocity);
+  public void goToPosition(LiftPosition pos) {
+    elevatorPID.setReference(liftPositionMap.get(pos).getFirst(), CANSparkMax.ControlType.kPosition);
+    armPID.setReference(liftPositionMap.get(pos).getSecond(), CANSparkMax.ControlType.kPosition);
   }
 
   @Override
