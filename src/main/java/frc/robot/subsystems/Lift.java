@@ -9,6 +9,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -35,6 +36,9 @@ public class Lift extends SubsystemBase {
           PneumaticsModuleType.CTREPCM,
           RobotMap.LIFT_GRABBING_FORWARD_CHANNEL,
           RobotMap.LIFT_GRABBING_REVERSE_CHANNEL);
+
+  // Sensors
+  private final DigitalInput cargoSensor;
 
   /** Indicates the elevator and arm positions at each position of the lift.
    * The first value indicates the elevator position in inches
@@ -85,6 +89,8 @@ public class Lift extends SubsystemBase {
     liftPositionMap.put(
         LiftPosition.STARTING,
         new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
+
+    cargoSensor = new DigitalInput(RobotMap.LIFT_CARGO_DIO);
   }
 
   public enum LiftPosition {
@@ -107,6 +113,12 @@ public class Lift extends SubsystemBase {
 
   public void drop() {
     grabber.set(DoubleSolenoid.Value.kReverse);
+  }
+
+  /** Returns true if the cargo sensor see a cargo */
+  public boolean seeCargo() {
+    // Sensor is false if there's a ball
+    return !cargoSensor.get();
   }
 
   @Override
