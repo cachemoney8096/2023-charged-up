@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Calibrations;
@@ -32,16 +33,10 @@ public class Intake extends SubsystemBase {
           RobotMap.INTAKE_DEPLOY_RIGHT_FORWARD_CHANNEL,
           RobotMap.INTAKE_DEPLOY_RIGHT_REVERSE_CHANNEL);
 
-  private DoubleSolenoid clampLeft =
-      new DoubleSolenoid(
+  private Solenoid clamp =
+      new Solenoid(
           PneumaticsModuleType.CTREPCM,
-          RobotMap.INTAKE_CLAMP_LEFT_FORWARD_CHANNEL,
-          RobotMap.INTAKE_CLAMP_LEFT_REVERSE_CHANNEL);
-  private DoubleSolenoid clampRight =
-      new DoubleSolenoid(
-          PneumaticsModuleType.CTREPCM,
-          RobotMap.INTAKE_CLAMP_RIGHT_FORWARD_CHANNEL,
-          RobotMap.INTAKE_CLAMP_RIGHT_REVERSE_CHANNEL);
+          RobotMap.INTAKE_CLAMP_FORWARD_CHANNEL);
 
   private CANSparkMax intakeLeft =
       new CANSparkMax(RobotMap.INTAKE_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
@@ -84,19 +79,17 @@ public class Intake extends SubsystemBase {
   }
 
   public void clampIntake() {
-    clampLeft.set(DoubleSolenoid.Value.kForward);
-    clampRight.set(DoubleSolenoid.Value.kForward);
+    clamp.set(false);
   }
 
   public void unclampIntake() {
-    clampLeft.set(DoubleSolenoid.Value.kReverse);
-    clampRight.set(DoubleSolenoid.Value.kReverse);
+    clamp.set(true);
   }
 
   @Override
   public void periodic() {
     if (clampTimer.hasElapsed(Calibrations.AUTO_CLAMP_WAIT_TIME_SECONDS)) {
-      clampLeft.set(DoubleSolenoid.Value.kForward);
+      clamp.set(false);
       clampTimer.stop();
       clampTimer.reset();
     }
