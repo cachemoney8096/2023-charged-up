@@ -24,8 +24,8 @@ public final class RobotMap {
   
   /** Intake clamp pneumatic channels */
   public static final int INTAKE_CLAMP_LEFT_FORWARD_CHANNEL = 4,
-      INTAKE_CLAMP_RIGHT_FORWARD_CHANNEL = 5,
-      INTAKE_CLAMP_LEFT_REVERSE_CHANNEL = 6,
+      INTAKE_CLAMP_LEFT_REVERSE_CHANNEL = 5,
+      INTAKE_CLAMP_RIGHT_FORWARD_CHANNEL = 6,
       INTAKE_CLAMP_RIGHT_REVERSE_CHANNEL = 7;
   
   /** Intake Spark MAX CAN IDs */
