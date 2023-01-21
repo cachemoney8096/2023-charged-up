@@ -90,7 +90,7 @@ public class Lift extends SubsystemBase {
         LiftPosition.STARTING,
         new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
 
-    gamePieceSensor = new DigitalInput(RobotMap.LIFT_CARGO_DIO);
+    gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
   }
 
   public enum LiftPosition {
