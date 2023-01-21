@@ -38,13 +38,7 @@ public final class Calibrations {
   public static final double INTAKE_EJECTION_POWER = -1.0;
   public static final double AUTO_CLAMP_WAIT_TIME_SECONDS = 0.5;
 
-  public static final double ELEVATOR_DEPLOYING_POWER = 1.0;
-  public static final double ELEVATOR_RETRACTING_POWER = -1.0;
-
-  public static final double ARM_UNFOLDING_POWER = 1.0;
-  public static final double ARM_FOLDING_POWER = -1.0;
-
-  /** Input rotations, output [0,1] */
+  /** Input inches, output [0,1] */
   public static final double ELEVATOR_P = PLACEHOLDER_DOUBLE,
   ELEVATOR_I = PLACEHOLDER_DOUBLE,
   ELEVATOR_D = PLACEHOLDER_DOUBLE;
