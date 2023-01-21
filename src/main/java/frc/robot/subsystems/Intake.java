@@ -5,10 +5,9 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -27,7 +26,8 @@ import frc.robot.RobotMap;
 public class Intake extends SubsystemBase {
 
   // Sensors
-  private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.INTAKE_GAME_PIECE_DIO);;
+  private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.INTAKE_GAME_PIECE_DIO);
+  ;
 
   private CANSparkMax deployMotor =
       new CANSparkMax(RobotMap.INTAKE_DEPLOY_MOTOR_CAN_ID, MotorType.kBrushless);
@@ -35,9 +35,7 @@ public class Intake extends SubsystemBase {
 
   private final RelativeEncoder deployMotorEncoder = deployMotor.getEncoder();
   private Solenoid clamp =
-      new Solenoid(
-          PneumaticsModuleType.CTREPCM,
-          RobotMap.INTAKE_CLAMP_FORWARD_CHANNEL);
+      new Solenoid(PneumaticsModuleType.CTREPCM, RobotMap.INTAKE_CLAMP_FORWARD_CHANNEL);
 
   private CANSparkMax intakeLeft =
       new CANSparkMax(RobotMap.INTAKE_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
@@ -64,7 +62,8 @@ public class Intake extends SubsystemBase {
 
   /** Deploys the intake out */
   public void deploy() {
-    deployMotorPID.setReference(Calibrations.INTAKE_DEPLOYED_POSITION_DEGREES, CANSparkMax.ControlType.kPosition);
+    deployMotorPID.setReference(
+        Calibrations.INTAKE_DEPLOYED_POSITION_DEGREES, CANSparkMax.ControlType.kPosition);
     clampTimer.reset();
     clampTimer.start();
   }
@@ -72,7 +71,8 @@ public class Intake extends SubsystemBase {
   /** Brings the intake back in */
   public void retract() {
     unclampIntake();
-    deployMotorPID.setReference(Calibrations.INTAKE_STARTING_POSITION_DEGREES, CANSparkMax.ControlType.kPosition);
+    deployMotorPID.setReference(
+        Calibrations.INTAKE_STARTING_POSITION_DEGREES, CANSparkMax.ControlType.kPosition);
   }
 
   /** Runs the intake wheels inward */

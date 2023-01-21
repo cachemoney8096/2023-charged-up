@@ -109,4 +109,3 @@ public final class Constants {
   /* Scalar for arm motor encoder from rotations to real degrees */
   public static final double DEPLOY_MOTOR_ENCODER_SCALAR = PLACEHOLDER_DOUBLE;
 }
-

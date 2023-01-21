@@ -33,8 +33,8 @@ public final class RobotMap {
 
   /** Sensor DIO */
   public static final int LIFT_GAME_PIECE_DIO = 0;
+
   public static final int INTAKE_GAME_PIECE_DIO = 1;
 
   public static final int PIGEON_CAN_ID = 1;
-
 }

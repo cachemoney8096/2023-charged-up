@@ -23,14 +23,15 @@ public class Lift extends SubsystemBase {
   private CANSparkMax elevator =
       new CANSparkMax(RobotMap.ELEVATOR_MOTOR_CAN_ID, MotorType.kBrushless);
 
-  private final RelativeEncoder elevatorEncoder = elevator.getEncoder();;
+  private final RelativeEncoder elevatorEncoder = elevator.getEncoder();
+  ;
 
   private SparkMaxPIDController elevatorPID = elevator.getPIDController();
 
-  private CANSparkMax arm = 
-      new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
+  private CANSparkMax arm = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
 
-  private final RelativeEncoder armEncoder = arm.getEncoder();;
+  private final RelativeEncoder armEncoder = arm.getEncoder();
+  ;
 
   private SparkMaxPIDController armPID = arm.getPIDController();
 
@@ -41,7 +42,8 @@ public class Lift extends SubsystemBase {
           RobotMap.LIFT_GRABBING_REVERSE_CHANNEL);
 
   // Sensors
-  private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);;
+  private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
+  ;
 
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
