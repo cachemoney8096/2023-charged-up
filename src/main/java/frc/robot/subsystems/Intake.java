@@ -30,10 +30,10 @@ public class Intake extends SubsystemBase {
   private final DigitalInput gamePieceSensor;
 
   private CANSparkMax deployMotor =
-      new CANSparkMax(RobotMap.DEPLOY_MOTOR_CAN_ID, MotorType.kBrushless);
+      new CANSparkMax(RobotMap.INTAKE_DEPLOY_MOTOR_CAN_ID, MotorType.kBrushless);
   private SparkMaxPIDController deployMotorPID = deployMotor.getPIDController();
 
-  private final RelativeEncoder deployMotorEncoder;
+  private final RelativeEncoder deployMotorEncoder = deployMotor.getEncoder();
   private Solenoid clamp =
       new Solenoid(
           PneumaticsModuleType.CTREPCM,
@@ -49,13 +49,12 @@ public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
   public Intake() {
     deployMotor.restoreFactoryDefaults();
-    deployMotorEncoder = deployMotor.getEncoder();
     deployMotorEncoder.setPositionConversionFactor(Constants.DEPLOY_MOTOR_ENCODER_SCALAR);
     deployMotorEncoder.setVelocityConversionFactor(Constants.DEPLOY_MOTOR_ENCODER_VELOCITY_SCALAR);
 
-    deployMotorPID.setP(Calibrations.DEPLOY_MOTOR_P);
-    deployMotorPID.setI(Calibrations.DEPLOY_MOTOR_I);
-    deployMotorPID.setD(Calibrations.DEPLOY_MOTOR_D);
+    deployMotorPID.setP(Calibrations.INTAKE_DEPLOY_MOTOR_P);
+    deployMotorPID.setI(Calibrations.INTAKE_DEPLOY_MOTOR_I);
+    deployMotorPID.setD(Calibrations.INTAKE_DEPLOY_MOTOR_D);
 
     intakeLeft.restoreFactoryDefaults();
 
@@ -67,7 +66,7 @@ public class Intake extends SubsystemBase {
 
   /** Deploys the intake out */
   public void deploy() {
-    deployMotorPID.setReference(Calibrations.INTAKE_DEPLOYING_POSITION_DEGREES, CANSparkMax.ControlType.kPosition);
+    deployMotorPID.setReference(Calibrations.INTAKE_DEPLOYED_POSITION_DEGREES, CANSparkMax.ControlType.kPosition);
     clampTimer.reset();
     clampTimer.start();
   }
@@ -105,7 +104,7 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     if (clampTimer.hasElapsed(Calibrations.AUTO_CLAMP_WAIT_TIME_SECONDS)) {
-      clamp.set(false);
+      clampIntake();
       clampTimer.stop();
       clampTimer.reset();
     }
