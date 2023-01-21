@@ -19,7 +19,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 
 public class Lift extends SubsystemBase {
-  private CANSparkMax elevator = new CANSparkMax(RobotMap.LIFT_MOTOR_CAN_ID, MotorType.kBrushless);
+  private CANSparkMax elevator = new CANSparkMax(RobotMap.ELEVATOR_MOTOR_CAN_ID, MotorType.kBrushless);
 
   private final RelativeEncoder elevatorEncoder;
   private final RelativeEncoder armEncoder;
@@ -41,7 +41,7 @@ public class Lift extends SubsystemBase {
     elevatorEncoder = elevator.getEncoder();
     elevatorEncoder.setPositionConversionFactor(Constants.ELEVATOR_MOTOR_ENCODER_SCALAR);
     elevatorEncoder.setVelocityConversionFactor(Constants.ELEVATOR_MOTOR_ENCODER_VELOCITY_SCALAR);
-    
+
     /* Get positions and degrees of arm through encoder in inches*/
     armEncoder = arm.getEncoder();
     armEncoder.setPositionConversionFactor(Constants.ARM_MOTOR_ENCODER_SCALAR);
