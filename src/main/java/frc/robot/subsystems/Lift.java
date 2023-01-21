@@ -23,12 +23,16 @@ public class Lift extends SubsystemBase {
   private CANSparkMax elevator =
       new CANSparkMax(RobotMap.ELEVATOR_MOTOR_CAN_ID, MotorType.kBrushless);
 
-  private final RelativeEncoder elevatorEncoder;
-  private final RelativeEncoder armEncoder;
+  private final RelativeEncoder elevatorEncoder = elevator.getEncoder();
+  ;
 
   private SparkMaxPIDController elevatorPID = elevator.getPIDController();
 
   private CANSparkMax arm = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
+
+  private final RelativeEncoder armEncoder = arm.getEncoder();
+  ;
+
   private SparkMaxPIDController armPID = arm.getPIDController();
 
   private DoubleSolenoid grabber =
@@ -38,7 +42,8 @@ public class Lift extends SubsystemBase {
           RobotMap.LIFT_GRABBING_REVERSE_CHANNEL);
 
   // Sensors
-  private final DigitalInput gamePieceSensor;
+  private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
+  ;
 
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
@@ -53,12 +58,10 @@ public class Lift extends SubsystemBase {
     arm.restoreFactoryDefaults();
 
     /* Get positions and degrees of elevator through encoder in inches*/
-    elevatorEncoder = elevator.getEncoder();
     elevatorEncoder.setPositionConversionFactor(Constants.ELEVATOR_MOTOR_ENCODER_SCALAR);
     elevatorEncoder.setVelocityConversionFactor(Constants.ELEVATOR_MOTOR_ENCODER_VELOCITY_SCALAR);
 
     /* Get positions and degrees of arm through encoder in degrees*/
-    armEncoder = arm.getEncoder();
     armEncoder.setPositionConversionFactor(Constants.ARM_MOTOR_ENCODER_SCALAR);
     armEncoder.setVelocityConversionFactor(Constants.ARM_MOTOR_ENCODER_VELOCITY_SCALAR);
 
@@ -90,8 +93,6 @@ public class Lift extends SubsystemBase {
     liftPositionMap.put(
         LiftPosition.STARTING,
         new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
-
-    gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
   }
 
   public enum LiftPosition {
@@ -116,9 +117,9 @@ public class Lift extends SubsystemBase {
     grabber.set(DoubleSolenoid.Value.kReverse);
   }
 
-  /** Returns true if the cargo sensor see a cargo */
-  public boolean seeCargo() {
-    // Sensor is false if there's a ball
+  /** Returns true if the game piece sensor sees a game piece */
+  public boolean seeGamePiece() {
+    // Sensor is false if there's a game piece
     return !gamePieceSensor.get();
   }
 

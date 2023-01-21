@@ -47,4 +47,13 @@ public final class Calibrations {
   public static final double ARM_P = PLACEHOLDER_DOUBLE,
       ARM_I = PLACEHOLDER_DOUBLE,
       ARM_D = PLACEHOLDER_DOUBLE;
+
+  /** Input degrees, output [0,1] */
+  public static final double INTAKE_DEPLOY_MOTOR_P = PLACEHOLDER_DOUBLE,
+      INTAKE_DEPLOY_MOTOR_I = PLACEHOLDER_DOUBLE,
+      INTAKE_DEPLOY_MOTOR_D = PLACEHOLDER_DOUBLE;
+
+  /** Intake positions in degrees */
+  public static final double INTAKE_STARTING_POSITION_DEGREES = PLACEHOLDER_DOUBLE,
+      INTAKE_DEPLOYED_POSITION_DEGREES = PLACEHOLDER_DOUBLE;
 }

@@ -6,11 +6,15 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Calibrations;
+import frc.robot.Constants;
 import frc.robot.RobotMap;
 
 /**
@@ -21,27 +25,17 @@ import frc.robot.RobotMap;
  */
 public class Intake extends SubsystemBase {
 
-  private DoubleSolenoid deployLeft =
-      new DoubleSolenoid(
-          PneumaticsModuleType.CTREPCM,
-          RobotMap.INTAKE_DEPLOY_LEFT_FORWARD_CHANNEL,
-          RobotMap.INTAKE_DEPLOY_LEFT_REVERSE_CHANNEL);
-  private DoubleSolenoid deployRight =
-      new DoubleSolenoid(
-          PneumaticsModuleType.CTREPCM,
-          RobotMap.INTAKE_DEPLOY_RIGHT_FORWARD_CHANNEL,
-          RobotMap.INTAKE_DEPLOY_RIGHT_REVERSE_CHANNEL);
+  // Sensors
+  private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.INTAKE_GAME_PIECE_DIO);
+  ;
 
-  private DoubleSolenoid clampLeft =
-      new DoubleSolenoid(
-          PneumaticsModuleType.CTREPCM,
-          RobotMap.INTAKE_CLAMP_LEFT_FORWARD_CHANNEL,
-          RobotMap.INTAKE_CLAMP_LEFT_REVERSE_CHANNEL);
-  private DoubleSolenoid clampRight =
-      new DoubleSolenoid(
-          PneumaticsModuleType.CTREPCM,
-          RobotMap.INTAKE_CLAMP_RIGHT_FORWARD_CHANNEL,
-          RobotMap.INTAKE_CLAMP_RIGHT_REVERSE_CHANNEL);
+  private CANSparkMax deployMotor =
+      new CANSparkMax(RobotMap.INTAKE_DEPLOY_MOTOR_CAN_ID, MotorType.kBrushless);
+  private SparkMaxPIDController deployMotorPID = deployMotor.getPIDController();
+
+  private final RelativeEncoder deployMotorEncoder = deployMotor.getEncoder();
+  private Solenoid clamp =
+      new Solenoid(PneumaticsModuleType.CTREPCM, RobotMap.INTAKE_CLAMP_FORWARD_CHANNEL);
 
   private CANSparkMax intakeLeft =
       new CANSparkMax(RobotMap.INTAKE_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
@@ -52,6 +46,14 @@ public class Intake extends SubsystemBase {
 
   /** Creates a new Intake. */
   public Intake() {
+    deployMotor.restoreFactoryDefaults();
+    deployMotorEncoder.setPositionConversionFactor(Constants.DEPLOY_MOTOR_ENCODER_SCALAR);
+    deployMotorEncoder.setVelocityConversionFactor(Constants.DEPLOY_MOTOR_ENCODER_VELOCITY_SCALAR);
+
+    deployMotorPID.setP(Calibrations.INTAKE_DEPLOY_MOTOR_P);
+    deployMotorPID.setI(Calibrations.INTAKE_DEPLOY_MOTOR_I);
+    deployMotorPID.setD(Calibrations.INTAKE_DEPLOY_MOTOR_D);
+
     intakeLeft.restoreFactoryDefaults();
 
     intakeRight.restoreFactoryDefaults();
@@ -60,8 +62,8 @@ public class Intake extends SubsystemBase {
 
   /** Deploys the intake out */
   public void deploy() {
-    deployLeft.set(DoubleSolenoid.Value.kForward);
-    deployRight.set(DoubleSolenoid.Value.kForward);
+    deployMotorPID.setReference(
+        Calibrations.INTAKE_DEPLOYED_POSITION_DEGREES, CANSparkMax.ControlType.kPosition);
     clampTimer.reset();
     clampTimer.start();
   }
@@ -69,8 +71,8 @@ public class Intake extends SubsystemBase {
   /** Brings the intake back in */
   public void retract() {
     unclampIntake();
-    deployLeft.set(DoubleSolenoid.Value.kReverse);
-    deployRight.set(DoubleSolenoid.Value.kReverse);
+    deployMotorPID.setReference(
+        Calibrations.INTAKE_STARTING_POSITION_DEGREES, CANSparkMax.ControlType.kPosition);
   }
 
   /** Runs the intake wheels inward */
@@ -84,19 +86,23 @@ public class Intake extends SubsystemBase {
   }
 
   public void clampIntake() {
-    clampLeft.set(DoubleSolenoid.Value.kForward);
-    clampRight.set(DoubleSolenoid.Value.kForward);
+    clamp.set(false);
   }
 
   public void unclampIntake() {
-    clampLeft.set(DoubleSolenoid.Value.kReverse);
-    clampRight.set(DoubleSolenoid.Value.kReverse);
+    clamp.set(true);
+  }
+
+  /** Returns true if the game piece sensor sees a game piece */
+  public boolean seeGamePiece() {
+    // Sensor is false if there's a game piece
+    return !gamePieceSensor.get();
   }
 
   @Override
   public void periodic() {
     if (clampTimer.hasElapsed(Calibrations.AUTO_CLAMP_WAIT_TIME_SECONDS)) {
-      clampLeft.set(DoubleSolenoid.Value.kForward);
+      clampIntake();
       clampTimer.stop();
       clampTimer.reset();
     }

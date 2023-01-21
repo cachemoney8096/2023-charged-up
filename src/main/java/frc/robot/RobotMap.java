@@ -16,17 +16,11 @@ public final class RobotMap {
       FRONT_RIGHT_TURNING_CAN_ID = 14,
       REAR_RIGHT_TURNING_CAN_ID = 16;
 
-  /** Intake deployment pneumatic channels */
-  public static final int INTAKE_DEPLOY_LEFT_FORWARD_CHANNEL = 0,
-      INTAKE_DEPLOY_LEFT_REVERSE_CHANNEL = 1,
-      INTAKE_DEPLOY_RIGHT_FORWARD_CHANNEL = 2,
-      INTAKE_DEPLOY_RIGHT_REVERSE_CHANNEL = 3;
+  /** Intake deployment SPARK MAX CAN IDs */
+  public static final int INTAKE_DEPLOY_MOTOR_CAN_ID = 0;
 
   /** Intake clamp pneumatic channels */
-  public static final int INTAKE_CLAMP_LEFT_FORWARD_CHANNEL = 4,
-      INTAKE_CLAMP_LEFT_REVERSE_CHANNEL = 5,
-      INTAKE_CLAMP_RIGHT_FORWARD_CHANNEL = 6,
-      INTAKE_CLAMP_RIGHT_REVERSE_CHANNEL = 7;
+  public static final int INTAKE_CLAMP_FORWARD_CHANNEL = 4;
 
   /** Intake Spark MAX CAN IDs */
   public static final int INTAKE_LEFT_MOTOR_CAN_ID = 22, INTAKE_RIGHT_MOTOR_CAN_ID = 23;
@@ -38,7 +32,9 @@ public final class RobotMap {
   public static final int LIFT_GRABBING_FORWARD_CHANNEL = 40, LIFT_GRABBING_REVERSE_CHANNEL = 41;
 
   /** Sensor DIO */
-  public static final int LIFT_GAME_PIECE_DIO = 42;
+  public static final int LIFT_GAME_PIECE_DIO = 0;
+
+  public static final int INTAKE_GAME_PIECE_DIO = 1;
 
   public static final int PIGEON_CAN_ID = 1;
 }
