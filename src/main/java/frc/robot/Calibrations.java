@@ -42,6 +42,6 @@ public final class Calibrations {
   /** Conversion factor between the robot pitch (in degrees) to a velocity (in [0,1]) for balancing on the charge station */
   public static final double CHARGE_STATION_PITCH_DEGREES_TO_VELOCITY = -1 * Constants.MAX_PITCH_DEGREES / MAX_CHARGE_STATION_CLIMB_SPEED;
   /** Maximum pitch to deadband at */
-  public static final double CHARGE_STATION_DEADBAND_PITCH_DEGREES = 0.5;
+  public static final double CHARGE_STATION_DEADBAND_VELOCITY = 0.5;
 
 }

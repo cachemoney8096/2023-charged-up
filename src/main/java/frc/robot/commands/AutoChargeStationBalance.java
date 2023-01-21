@@ -25,15 +25,11 @@ public class AutoChargeStationBalance extends CommandBase{
     public void execute() {
         double angle = gyro.getPitch();
 
-        angle = MathUtil.applyDeadband(angle, Calibrations.CHARGE_STATION_DEADBAND_PITCH_DEGREES);
-
         double velocityFromAngle = angle * Calibrations.CHARGE_STATION_PITCH_DEGREES_TO_VELOCITY;
 
-        drive.drive(velocityFromAngle, 0, 0, false);
-        
-        if (angle == 0){
-            drive.setX();
-        }
+        double deadbandedVelocityFromAngle = MathUtil.applyDeadband(velocityFromAngle, Calibrations.CHARGE_STATION_DEADBAND_VELOCITY);
+
+        drive.drive(deadbandedVelocityFromAngle, 0, 0, false);
     }  
 
     // Called once the command ends or is interrupted.
