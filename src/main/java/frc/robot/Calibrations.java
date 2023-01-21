@@ -36,4 +36,5 @@ public final class Calibrations {
 
   public static final double INTAKE_INTAKING_POWER = 1.0;
   public static final double INTAKE_EJECTION_POWER = -1.0;
+  public static final double AUTO_CLAMP_WAIT_TIME_SECONDS = 0.5;
 }
