@@ -30,8 +30,8 @@ public class Lift extends SubsystemBase {
   private SparkMaxPIDController armPID =  arm.getPIDController();
 
   /** Indicates the elevator and arm positions at each position of the lift.
-   * The first value indicates the elevator position
-   * and the second value indicates the arm position
+   * The first value indicates the elevator position in inches
+   * and the second value indicates the arm position in degrees
    */
   TreeMap<LiftPosition, Pair<Double, Double>> liftPositionMap;
 
@@ -45,7 +45,7 @@ public class Lift extends SubsystemBase {
     elevatorEncoder.setPositionConversionFactor(Constants.ELEVATOR_MOTOR_ENCODER_SCALAR);
     elevatorEncoder.setVelocityConversionFactor(Constants.ELEVATOR_MOTOR_ENCODER_VELOCITY_SCALAR);
 
-    /* Get positions and degrees of arm through encoder in inches*/
+    /* Get positions and degrees of arm through encoder in degrees*/
     armEncoder = arm.getEncoder();
     armEncoder.setPositionConversionFactor(Constants.ARM_MOTOR_ENCODER_SCALAR);
     armEncoder.setVelocityConversionFactor(Constants.ARM_MOTOR_ENCODER_VELOCITY_SCALAR);
