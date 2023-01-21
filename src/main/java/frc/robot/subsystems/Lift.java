@@ -36,12 +36,6 @@ public class Lift extends SubsystemBase {
           RobotMap.LIFT_GRABBING_FORWARD_CHANNEL,
           RobotMap.LIFT_GRABBING_REVERSE_CHANNEL);
 
-  private DoubleSolenoid grabber =
-      new DoubleSolenoid(
-          PneumaticsModuleType.CTREPCM,
-          RobotMap.LIFT_GRABBING_FORWARD_CHANNEL,
-          RobotMap.LIFT_GRABBING_REVERSE_CHANNEL);
-
   /** Indicates the elevator and arm positions at each position of the lift.
    * The first value indicates the elevator position in inches
    * and the second value indicates the arm position in degrees
