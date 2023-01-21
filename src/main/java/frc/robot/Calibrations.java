@@ -40,11 +40,11 @@ public final class Calibrations {
 
   /** Input inches, output [0,1] */
   public static final double ELEVATOR_P = PLACEHOLDER_DOUBLE,
-  ELEVATOR_I = PLACEHOLDER_DOUBLE,
-  ELEVATOR_D = PLACEHOLDER_DOUBLE;
+      ELEVATOR_I = PLACEHOLDER_DOUBLE,
+      ELEVATOR_D = PLACEHOLDER_DOUBLE;
 
   /** Input degrees, output [0,1] */
   public static final double ARM_P = PLACEHOLDER_DOUBLE,
-  ARM_I = PLACEHOLDER_DOUBLE,
-  ARM_D = PLACEHOLDER_DOUBLE;
+      ARM_I = PLACEHOLDER_DOUBLE,
+      ARM_D = PLACEHOLDER_DOUBLE;
 }

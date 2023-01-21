@@ -4,34 +4,34 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Calibrations;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
-
 import java.util.TreeMap;
-
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 /** Contains code for elevator, arm, and game piece grabber */
 public class Lift extends SubsystemBase {
-  private CANSparkMax elevator = new CANSparkMax(RobotMap.ELEVATOR_MOTOR_CAN_ID, MotorType.kBrushless);
+  private CANSparkMax elevator =
+      new CANSparkMax(RobotMap.ELEVATOR_MOTOR_CAN_ID, MotorType.kBrushless);
 
   private final RelativeEncoder elevatorEncoder;
   private final RelativeEncoder armEncoder;
 
-  private SparkMaxPIDController elevatorPID =  elevator.getPIDController();
+  private SparkMaxPIDController elevatorPID = elevator.getPIDController();
 
   private CANSparkMax arm = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
-  private SparkMaxPIDController armPID =  arm.getPIDController();
+  private SparkMaxPIDController armPID = arm.getPIDController();
 
-  /** Indicates the elevator and arm positions at each position of the lift.
-   * The first value indicates the elevator position in inches
-   * and the second value indicates the arm position in degrees
+  /**
+   * Indicates the elevator and arm positions at each position of the lift. The first value
+   * indicates the elevator position in inches and the second value indicates the arm position in
+   * degrees
    */
   TreeMap<LiftPosition, Pair<Double, Double>> liftPositionMap;
 
@@ -63,13 +63,22 @@ public class Lift extends SubsystemBase {
     /* Map of all LiftPosition with according values */
 
     liftPositionMap = new TreeMap<LiftPosition, Pair<Double, Double>>();
-    liftPositionMap.put(LiftPosition.GRAB_FROM_INTAKE, new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
-    liftPositionMap.put(LiftPosition.SHELF, new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
-    liftPositionMap.put(LiftPosition.SCORE_MID, new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
-    liftPositionMap.put(LiftPosition.SCORE_HIGH, new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
-    liftPositionMap.put(LiftPosition.STARTING, new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
+    liftPositionMap.put(
+        LiftPosition.GRAB_FROM_INTAKE,
+        new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
+    liftPositionMap.put(
+        LiftPosition.SHELF,
+        new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
+    liftPositionMap.put(
+        LiftPosition.SCORE_MID,
+        new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
+    liftPositionMap.put(
+        LiftPosition.SCORE_HIGH,
+        new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
+    liftPositionMap.put(
+        LiftPosition.STARTING,
+        new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
   }
-
 
   public enum LiftPosition {
     GRAB_FROM_INTAKE,
@@ -80,7 +89,8 @@ public class Lift extends SubsystemBase {
   }
 
   public void goToPosition(LiftPosition pos) {
-    elevatorPID.setReference(liftPositionMap.get(pos).getFirst(), CANSparkMax.ControlType.kPosition);
+    elevatorPID.setReference(
+        liftPositionMap.get(pos).getFirst(), CANSparkMax.ControlType.kPosition);
     armPID.setReference(liftPositionMap.get(pos).getSecond(), CANSparkMax.ControlType.kPosition);
   }
 
