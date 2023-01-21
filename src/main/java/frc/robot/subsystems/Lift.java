@@ -17,7 +17,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-
+/** Contains code for elevator, arm, and game piece grabber */
 public class Lift extends SubsystemBase {
   private CANSparkMax elevator = new CANSparkMax(RobotMap.ELEVATOR_MOTOR_CAN_ID, MotorType.kBrushless);
 
@@ -29,8 +29,11 @@ public class Lift extends SubsystemBase {
   private CANSparkMax arm = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
   private SparkMaxPIDController armPID =  arm.getPIDController();
 
+  /** Indicates the elevator and arm positions at each position of the lift.
+   * The first value indicates the elevator position
+   * and the second value indicates the arm position
+   */
   TreeMap<LiftPosition, Pair<Double, Double>> liftPositionMap;
-
 
   /** Creates a new Lift */
   public Lift() {
