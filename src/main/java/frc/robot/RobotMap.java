@@ -29,8 +29,7 @@ public final class RobotMap {
       INTAKE_CLAMP_RIGHT_REVERSE_CHANNEL = 7;
 
   /** Intake Spark MAX CAN IDs */
-  public static final int INTAKE_LEFT_MOTOR_CAN_ID = 22,
-    INTAKE_RIGHT_MOTOR_CAN_ID = 23;
+  public static final int INTAKE_LEFT_MOTOR_CAN_ID = 22, INTAKE_RIGHT_MOTOR_CAN_ID = 23;
 
   /** Lift Spark MAX CAN IDs */
   public static final int ELEVATOR_MOTOR_CAN_ID = 37,
