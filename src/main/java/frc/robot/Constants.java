@@ -21,7 +21,7 @@ public final class Constants {
   public static final double PLACEHOLDER_DOUBLE = 1.0;
   public static final int PLACEHOLDER_INT = 1;
 
-  public static final class SwerveModuleConstants {
+  public static final class SwerveModule {
 
     /**
      * Invert the turning encoder, since the output shaft rotates in the opposite direction of the
@@ -30,7 +30,7 @@ public final class Constants {
     public static final boolean TURNING_ENCODER_INVERTED = true;
 
     /** Calculations required for driving motor conversion factors and feed forward */
-    public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.FREE_SPEED_RPM / 60,
+    public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotor.FREE_SPEED_RPM / 60,
         WHEEL_DIAMETER_METERS = Units.inchesToMeters(3),
         WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
 
@@ -61,11 +61,11 @@ public final class Constants {
     public static final int TURNING_MOTOR_CURRENT_LIMIT_AMPS = 20; // amps
   }
 
-  public static final class NeoMotorConstants {
+  public static final class NeoMotor {
     public static final double FREE_SPEED_RPM = 5676;
   }
 
-  public static final class SwerveDriveConstants {
+  public static final class SwerveDrive {
     /**
      * Driving Parameters - Note that these are not the maximum capable speeds of the robot, rather
      * the allowed maximum speeds
@@ -93,4 +93,5 @@ public final class Constants {
 
     public static final boolean GYRO_REVERSED = false;
   }
+  public static final double MAX_PITCH_DEGREES = 15;
 }

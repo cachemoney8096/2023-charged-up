@@ -1,7 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.math.controller.PIDController;
-import frc.robot.Constants.SwerveModuleConstants;
 
 /** This class provides a place for arbitrary but tuned values, like PID values. */
 public final class Calibrations {
@@ -19,7 +18,7 @@ public final class Calibrations {
     public static final double DRIVING_P = PLACEHOLDER_DOUBLE,
         DRIVING_I = PLACEHOLDER_DOUBLE,
         DRIVING_D = PLACEHOLDER_DOUBLE,
-        DRIVING_FF = 1 / SwerveModuleConstants.DRIVE_WHEEL_FREE_SPEED_METERS_PER_SECOND;
+        DRIVING_FF = 1 / Constants.SwerveModule.DRIVE_WHEEL_FREE_SPEED_METERS_PER_SECOND;
 
     public static final double DRIVING_MIN_OUTPUT = -1;
     public static final double DRIVING_MAX_OUTPUT = 1;
@@ -37,4 +36,12 @@ public final class Calibrations {
   public static final double INTAKE_INTAKING_POWER = 1.0;
   public static final double INTAKE_EJECTION_POWER = -1.0;
   public static final double AUTO_CLAMP_WAIT_TIME_SECONDS = 0.5;
+
+  /** This should be [0,1] */
+  public static final double MAX_CHARGE_STATION_CLIMB_SPEED = 0.5 / Constants.SwerveDrive.MAX_SPEED_METERS_PER_SECOND;
+  /** Conversion factor between the robot pitch (in degrees) to a velocity (in [0,1]) for balancing on the charge station */
+  public static final double CHARGE_STATION_PITCH_DEGREES_TO_VELOCITY = Constants.MAX_PITCH_DEGREES / MAX_CHARGE_STATION_CLIMB_SPEED;
+  /** Maximum pitch to deadband at */
+  public static final double CHARGE_STATION_DEADBAND_PITCH_DEGREES = 0.5;
+
 }
