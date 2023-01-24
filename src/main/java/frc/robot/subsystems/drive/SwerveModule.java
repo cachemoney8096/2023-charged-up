@@ -14,7 +14,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Calibrations.SwerveModuleCalibrations;
-import frc.robot.Constants.SwerveModuleConstants;
+import frc.robot.Constants;
 
 public class SwerveModule {
   private final CANSparkMax drivingSparkMax;
@@ -56,21 +56,21 @@ public class SwerveModule {
     // native units for position and velocity are rotations and RPM, respectively,
     // but we want meters and meters per second to use with WPILib's swerve APIs.
     drivingEncoder.setPositionConversionFactor(
-        SwerveModuleConstants.DRIVING_ENCODER_POSITION_FACTOR_METERS);
+        Constants.SwerveModule.DRIVING_ENCODER_POSITION_FACTOR_METERS);
     drivingEncoder.setVelocityConversionFactor(
-        SwerveModuleConstants.DRIVING_ENCODER_VELOCITY_FACTOR_METERS_PER_SECOND);
+        Constants.SwerveModule.DRIVING_ENCODER_VELOCITY_FACTOR_METERS_PER_SECOND);
 
     // Apply position and velocity conversion factors for the turning encoder. We
     // want these in radians and radians per second to use with WPILib's swerve
     // APIs.
     turningEncoder.setPositionConversionFactor(
-        SwerveModuleConstants.TURNING_ENCODER_POSITION_FACTOR_RADIANS);
+        Constants.SwerveModule.TURNING_ENCODER_POSITION_FACTOR_RADIANS);
     turningEncoder.setVelocityConversionFactor(
-        SwerveModuleConstants.TURNING_ENCODER_VELOCITY_FACTOR_RAD_PER_SEC);
+        Constants.SwerveModule.TURNING_ENCODER_VELOCITY_FACTOR_RAD_PER_SEC);
 
     // Invert the turning encoder, since the output shaft rotates in the opposite direction of
     // the steering motor in the Swerve Module.
-    turningEncoder.setInverted(SwerveModuleConstants.TURNING_ENCODER_INVERTED);
+    turningEncoder.setInverted(Constants.SwerveModule.TURNING_ENCODER_INVERTED);
 
     // Enable PID wrap around for the turning motor. This will allow the PID
     // controller to go through 0 to get to the setpoint i.e. going from 350 degrees
@@ -78,9 +78,9 @@ public class SwerveModule {
     // longer route.
     turningPIDController.setPositionPIDWrappingEnabled(true);
     turningPIDController.setPositionPIDWrappingMinInput(
-        SwerveModuleConstants.TURNING_ENCODER_POSITION_PID_MIN_INPUT_RADIANS);
+        Constants.SwerveModule.TURNING_ENCODER_POSITION_PID_MIN_INPUT_RADIANS);
     turningPIDController.setPositionPIDWrappingMaxInput(
-        SwerveModuleConstants.TURNING_ENCODER_POSITION_PID_MAX_INPUT_RADIANS);
+        Constants.SwerveModule.TURNING_ENCODER_POSITION_PID_MAX_INPUT_RADIANS);
 
     // Set the PID gains for the driving motor.
     drivingPIDController.setP(SwerveModuleCalibrations.DRIVING_P);
@@ -98,10 +98,10 @@ public class SwerveModule {
     turningPIDController.setOutputRange(
         SwerveModuleCalibrations.TURNING_MIN_OUTPUT, SwerveModuleCalibrations.TURNING_MAX_OUTPUT);
 
-    drivingSparkMax.setIdleMode(SwerveModuleConstants.DRIVING_MOTOR_IDLE_MODE);
-    turningSparkMax.setIdleMode(SwerveModuleConstants.TURNING_MOTOR_IDLE_MODE);
-    drivingSparkMax.setSmartCurrentLimit(SwerveModuleConstants.DRIVING_MOTOR_CURRENT_LIMIT_AMPS);
-    turningSparkMax.setSmartCurrentLimit(SwerveModuleConstants.TURNING_MOTOR_CURRENT_LIMIT_AMPS);
+    drivingSparkMax.setIdleMode(Constants.SwerveModule.DRIVING_MOTOR_IDLE_MODE);
+    turningSparkMax.setIdleMode(Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
+    drivingSparkMax.setSmartCurrentLimit(Constants.SwerveModule.DRIVING_MOTOR_CURRENT_LIMIT_AMPS);
+    turningSparkMax.setSmartCurrentLimit(Constants.SwerveModule.TURNING_MOTOR_CURRENT_LIMIT_AMPS);
 
     // Save the SPARK MAX configurations. If a SPARK MAX browns out during
     // operation, it will maintain the above configurations.

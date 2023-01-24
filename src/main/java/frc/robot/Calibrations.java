@@ -1,7 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.math.controller.PIDController;
-import frc.robot.Constants.SwerveModuleConstants;
 
 /** This class provides a place for arbitrary but tuned values, like PID values. */
 public final class Calibrations {
@@ -19,7 +18,7 @@ public final class Calibrations {
     public static final double DRIVING_P = PLACEHOLDER_DOUBLE,
         DRIVING_I = PLACEHOLDER_DOUBLE,
         DRIVING_D = PLACEHOLDER_DOUBLE,
-        DRIVING_FF = 1 / SwerveModuleConstants.DRIVE_WHEEL_FREE_SPEED_METERS_PER_SECOND;
+        DRIVING_FF = 1 / Constants.SwerveModule.DRIVE_WHEEL_FREE_SPEED_METERS_PER_SECOND;
 
     public static final double DRIVING_MIN_OUTPUT = -1;
     public static final double DRIVING_MAX_OUTPUT = 1;
@@ -37,6 +36,23 @@ public final class Calibrations {
   public static final double INTAKE_INTAKING_POWER = 1.0;
   public static final double INTAKE_EJECTION_POWER = -1.0;
   public static final double AUTO_CLAMP_WAIT_TIME_SECONDS = 0.5;
+
+  /** Max speed to go on charge station in meters per second */
+  public static final double MAX_CHARGE_STATION_CLIMB_SPEED_MPS = 0.5;
+  /** Max speed to go on charge station in [-1,1] */
+  public static final double MAX_CHARGE_STATION_CLIMB_NORM_SPEED =
+      MAX_CHARGE_STATION_CLIMB_SPEED_MPS / Constants.SwerveDrive.MAX_SPEED_METERS_PER_SECOND;
+  /**
+   * Conversion factor between the robot pitch (in degrees) to a velocity (in [-1,1]) for balancing
+   * on the charge station
+   */
+  public static final double CHARGE_STATION_PITCH_DEGREES_TO_NORM_VELOCITY =
+      -1 * Constants.MAX_PITCH_DEGREES / MAX_CHARGE_STATION_CLIMB_NORM_SPEED;
+  /**
+   * Maximum speed to deadband at (that is to say, it won't auto-balance if the velocity is <= 0.05,
+   * for a velocity of [-1,1])
+   */
+  public static final double CHARGE_STATION_DEADBAND_NORM_VELOCITY = 0.05;
 
   /** Input inches, output [0,1] */
   public static final double ELEVATOR_P = PLACEHOLDER_DOUBLE,
