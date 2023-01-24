@@ -93,5 +93,7 @@ public final class Constants {
 
     public static final boolean GYRO_REVERSED = false;
   }
+
+  /** This is the maximum pitch of the charge station in degrees. */
   public static final double MAX_PITCH_DEGREES = 15;
 }
