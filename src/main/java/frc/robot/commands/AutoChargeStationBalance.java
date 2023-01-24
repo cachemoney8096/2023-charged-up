@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Calibrations;
 import frc.robot.subsystems.drive.DriveSubsystem;
 
+/** Command to automatically remain balanced on the charge station during autonomous, using the gyroscope. */
 public class AutoChargeStationBalance extends CommandBase{
     private final DriveSubsystem drive;
     private final WPI_Pigeon2 gyro;
@@ -32,14 +33,15 @@ public class AutoChargeStationBalance extends CommandBase{
         double pitchDeg = gyro.getPitch();
 
         /** Velocity is [-1,1] */
-        double velocityFromAngleDeg = pitchDeg * Calibrations.CHARGE_STATION_PITCH_DEGREES_TO_VELOCITY;
+        double normVelocityFromAngleDeg = pitchDeg * Calibrations.CHARGE_STATION_PITCH_DEGREES_TO_NORM_VELOCITY;
 
-        double deadbandedVelocityFromAngleDeg = MathUtil.applyDeadband(velocityFromAngleDeg, Calibrations.CHARGE_STATION_DEADBAND_VELOCITY);
+        double deadbandedNormVelocityFromAngleDeg = MathUtil.applyDeadband(normVelocityFromAngleDeg, Calibrations.CHARGE_STATION_DEADBAND_NORM_VELOCITY);
 
+        /** Time remaining in current match period (auto or teleop) in seconds */
         double matchTime = DriverStation.getMatchTime();
         
         // stop driving (and thus set x) if there is less than one second left in auton
-        drive.drive(matchTime > 1 ? deadbandedVelocityFromAngleDeg : 0, NOT_MOVING_IN_Y, NOT_ROTATING, ROBOT_RELATIVE);
+        drive.drive(matchTime > 1 ? deadbandedNormVelocityFromAngleDeg : 0, NOT_MOVING_IN_Y, NOT_ROTATING, ROBOT_RELATIVE);
     }  
 
     // Called once the command ends or is interrupted.
