@@ -119,7 +119,7 @@ public class DriveSubsystem extends SubsystemBase {
     rot *= Constants.SwerveDrive.MAX_ANGULAR_SPEED_RAD_PER_SECONDS;
 
     var swerveModuleStates =
-    Constants.SwerveDrive.DRIVE_KINEMATICS.toSwerveModuleStates(
+        Constants.SwerveDrive.DRIVE_KINEMATICS.toSwerveModuleStates(
             fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(
                     xSpeed, ySpeed, rot, Rotation2d.fromDegrees(gyro.getAngle()))
@@ -227,7 +227,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
-  public WPI_Pigeon2 getGyro(){
+  public WPI_Pigeon2 getGyro() {
     return gyro;
   }
 }

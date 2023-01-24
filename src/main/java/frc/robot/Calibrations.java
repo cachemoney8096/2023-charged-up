@@ -37,13 +37,20 @@ public final class Calibrations {
   public static final double INTAKE_EJECTION_POWER = -1.0;
   public static final double AUTO_CLAMP_WAIT_TIME_SECONDS = 0.5;
 
-
   /** Max speed to go on charge station in meters per second */
   public static final double MAX_CHARGE_STATION_CLIMB_SPEED_MPS = 0.5;
   /** Max speed to go on charge station in [-1,1] */
-  public static final double MAX_CHARGE_STATION_CLIMB_NORM_SPEED = MAX_CHARGE_STATION_CLIMB_SPEED_MPS / Constants.SwerveDrive.MAX_SPEED_METERS_PER_SECOND;
-  /** Conversion factor between the robot pitch (in degrees) to a velocity (in [-1,1]) for balancing on the charge station */
-  public static final double CHARGE_STATION_PITCH_DEGREES_TO_NORM_VELOCITY = -1 * Constants.MAX_PITCH_DEGREES / MAX_CHARGE_STATION_CLIMB_NORM_SPEED;
-  /** Maximum speed to deadband at (that is to say, it won't auto-balance if the velocity is <= 0.05, for a velocity of [-1,1]) */
+  public static final double MAX_CHARGE_STATION_CLIMB_NORM_SPEED =
+      MAX_CHARGE_STATION_CLIMB_SPEED_MPS / Constants.SwerveDrive.MAX_SPEED_METERS_PER_SECOND;
+  /**
+   * Conversion factor between the robot pitch (in degrees) to a velocity (in [-1,1]) for balancing
+   * on the charge station
+   */
+  public static final double CHARGE_STATION_PITCH_DEGREES_TO_NORM_VELOCITY =
+      -1 * Constants.MAX_PITCH_DEGREES / MAX_CHARGE_STATION_CLIMB_NORM_SPEED;
+  /**
+   * Maximum speed to deadband at (that is to say, it won't auto-balance if the velocity is <= 0.05,
+   * for a velocity of [-1,1])
+   */
   public static final double CHARGE_STATION_DEADBAND_NORM_VELOCITY = 0.05;
 }
