@@ -72,4 +72,7 @@ public final class Calibrations {
   /** Intake positions in degrees */
   public static final double INTAKE_STARTING_POSITION_DEGREES = PLACEHOLDER_DOUBLE,
       INTAKE_DEPLOYED_POSITION_DEGREES = PLACEHOLDER_DOUBLE;
+
+  /** Time to drive the robot to approach the charging station in auto in seconds */    
+  public static final double DRIVE_TIME_AUTO_SECONDS = PLACEHOLDER_DOUBLE;
 }
