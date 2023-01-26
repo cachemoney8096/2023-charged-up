@@ -4,9 +4,6 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -48,7 +45,7 @@ public class RobotContainer {
     driverController.a().whileTrue(new InstantCommand(intake::deploy, intake));
   }
 
-  public Command getAutonomousCommand(){
+  public Command getAutonomousCommand() {
     boolean isFirstPath = true;
     return new AutoChargeStationSequence(isFirstPath, drive);
   }
