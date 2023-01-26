@@ -37,7 +37,7 @@ public class Lift extends SubsystemBase {
 
   private DoubleSolenoid grabber =
       new DoubleSolenoid(
-          PneumaticsModuleType.CTREPCM,
+          PneumaticsModuleType.REVPH,
           RobotMap.LIFT_GRABBING_FORWARD_CHANNEL,
           RobotMap.LIFT_GRABBING_REVERSE_CHANNEL);
 
