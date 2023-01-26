@@ -23,7 +23,6 @@ import frc.robot.subsystems.drive.DriveSubsystem;
  */
 public class RobotContainer {
   private final Intake intake = new Intake();
-  private final DriveSubsystem drive = new DriveSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverController =
@@ -49,6 +48,6 @@ public class RobotContainer {
   }
 
   public static Command getAutonomousCommand(){
-    return new AutoChargeStationSequence(true, drive);
+    return new AutoChargeStationSequence(true, new DriveSubsystem());
   }
 }
