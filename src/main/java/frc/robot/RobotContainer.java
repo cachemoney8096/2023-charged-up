@@ -4,10 +4,16 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.AutoChargeStationSequence;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.drive.DriveSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -17,6 +23,7 @@ import frc.robot.subsystems.Intake;
  */
 public class RobotContainer {
   private final Intake intake = new Intake();
+  private final DriveSubsystem drive = new DriveSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverController =
@@ -39,5 +46,9 @@ public class RobotContainer {
    */
   private void configureBindings() {
     driverController.a().whileTrue(new InstantCommand(intake::deploy, intake));
+  }
+
+  public static Command getAutonomousCommand(){
+    return new AutoChargeStationSequence(true, drive);
   }
 }

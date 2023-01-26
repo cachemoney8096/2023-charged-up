@@ -4,38 +4,25 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Calibrations;
 import frc.robot.subsystems.drive.DriveSubsystem;
 
-public class AutoChargeStationSequence extends CommandBase {
-  private final DriveSubsystem drive;
-  private final double MOVING_X = Calibrations.PLACEHOLDER_DOUBLE;
-  private final double NOT_MOVING_IN_Y = 0;
-  private final double NOT_ROTATING = 0;
-  private final boolean FIELD_RELATIVE = false;
+public class AutoChargeStationSequence extends SequentialCommandGroup {
 
-  public AutoChargeStationSequence(DriveSubsystem drive){
-        this.drive = drive;
+  private PathPlannerTrajectory traj = PathPlanner.loadPath("Trajectory", new PathConstraints(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
+
+  public AutoChargeStationSequence(boolean isFirstPath, DriveSubsystem drive) {
+    addCommands(
+        drive.followTrajectoryCommand(traj, isFirstPath),
+        new AutoChargeStationBalance(drive));
   }
 
-  @Override
-  public void initialize(){
-    Timer timer = new Timer();
-    timer.start();
-    while (timer.get() < Calibrations.DRIVE_TIME_AUTO_SECONDS) {
-        drive.drive(MOVING_X, NOT_MOVING_IN_Y, NOT_ROTATING, FIELD_RELATIVE);
-    }
-    drive.drive(0, NOT_MOVING_IN_Y, NOT_ROTATING, FIELD_RELATIVE);
-  }
-
-  @Override
-  public void execute() {
-    AutoChargeStationBalance balanceAuto = new AutoChargeStationBalance(drive);
-    while (Timer.getMatchTime() > 1){
-        balanceAuto.execute();
-    }
+  public PathPlannerTrajectory getTrajectory() {
+    return this.traj;
   }
 }
