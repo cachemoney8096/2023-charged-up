@@ -72,4 +72,11 @@ public final class Calibrations {
   /** Intake positions in degrees */
   public static final double INTAKE_STARTING_POSITION_DEGREES = PLACEHOLDER_DOUBLE,
       INTAKE_DEPLOYED_POSITION_DEGREES = PLACEHOLDER_DOUBLE;
+
+  /** Auton path finding controllers */
+  public static final PIDController PATH_X_CONTROLLER = new PIDController(0.100506, 0.0, 0.0),
+      PATH_Y_CONTROLLER = new PIDController(0.1, 0.0, 0.0);
+
+  /** High profile constraints = pure P controller */
+  public static final PIDController PATH_THETA_CONTROLLER = new PIDController(9.0, 0.0, 0.80);
 }
