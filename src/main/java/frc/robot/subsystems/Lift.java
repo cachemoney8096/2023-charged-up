@@ -123,6 +123,11 @@ public class Lift extends SubsystemBase {
     return !gamePieceSensor.get();
   }
 
+  /** Scores the currently loaded game piece 
+   * Currently empty because we don't know exactly what it will do
+  */
+  public void scoreGamePiece() {}
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
