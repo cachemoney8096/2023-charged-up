@@ -73,9 +73,6 @@ public final class Calibrations {
   public static final double INTAKE_STARTING_POSITION_DEGREES = PLACEHOLDER_DOUBLE,
       INTAKE_DEPLOYED_POSITION_DEGREES = PLACEHOLDER_DOUBLE;
 
-  /** Time to drive the robot to approach the charging station in auto in seconds */
-  public static final double DRIVE_TIME_AUTO_SECONDS = PLACEHOLDER_DOUBLE;
-
   /** Auton path finding controllers */
   public static final PIDController PATH_X_CONTROLLER = new PIDController(0.100506, 0.0, 0.0),
       PATH_Y_CONTROLLER = new PIDController(0.1, 0.0, 0.0);
