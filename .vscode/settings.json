@@ -28,6 +28,6 @@
   "java.test.defaultConfig": "WPIlibUnitTests",
   "[java]": {
     "spotlessGradle.format.enable": true,
-    "spotlessGradle.diagnostics.enable": true
+    "spotlessGradle.diagnostics.enable": false
   },
 }
