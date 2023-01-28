@@ -4,12 +4,16 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoChargeStationSequence;
+import frc.robot.commands.AutoScoreAndBalance;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.drive.DriveSubsystem;
 
 /**
@@ -21,6 +25,10 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 public class RobotContainer {
   private final Intake intake = new Intake();
   private final DriveSubsystem drive = new DriveSubsystem();
+  private final Lift lift = new Lift();
+
+  // A chooser for autonomous commands
+  private static SendableChooser<Command> autonChooser = new SendableChooser<>();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverController =
@@ -30,6 +38,15 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+  }
+
+  public void initialize() {
+    // autons
+    autonChooser.setDefaultOption("Balance", new AutoChargeStationSequence(true, drive));
+    autonChooser.addOption("Score, balance", new AutoScoreAndBalance(true, lift, drive));
+
+    // Put the chooser on the dashboard
+    SmartDashboard.putData(autonChooser);
   }
 
   /**
@@ -45,8 +62,7 @@ public class RobotContainer {
     driverController.a().whileTrue(new InstantCommand(intake::deploy, intake));
   }
 
-  public Command getAutonomousCommand() {
-    boolean isFirstPath = true;
-    return new AutoChargeStationSequence(isFirstPath, drive);
+  public static Command getAutonomousCommand() {
+    return autonChooser.getSelected();
   }
 }

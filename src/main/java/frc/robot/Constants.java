@@ -20,6 +20,7 @@ import edu.wpi.first.math.util.Units;
 public final class Constants {
   public static final double PLACEHOLDER_DOUBLE = 1.0;
   public static final int PLACEHOLDER_INT = 1;
+  public static final String PLACEHOLDER_STRING = "";
 
   public static final class SwerveModule {
 
