@@ -45,6 +45,8 @@ public class Intake extends SubsystemBase {
 
   private Timer clampTimer = new Timer();
 
+  private final int SMART_MOTION_SLOT = 0;
+
   /** Creates a new Intake. */
   public Intake() {
     deployMotor.restoreFactoryDefaults();
@@ -65,8 +67,8 @@ public class Intake extends SubsystemBase {
   public void deploy() {
     deployMotorPID.setReference(
         Calibrations.INTAKE_DEPLOYED_POSITION_DEGREES,
-        CANSparkMax.ControlType.kPosition,
-        Calibrations.SMART_MOTION_SLOT,
+        CANSparkMax.ControlType.kSmartMotion,
+        SMART_MOTION_SLOT,
         Calibrations.ARBITRARY_INTAKE_FEED_FORWARD_VOLTS * getCosineIntakeAngle(),
         ArbFFUnits.kVoltage);
     clampTimer.reset();
@@ -78,8 +80,8 @@ public class Intake extends SubsystemBase {
     unclampIntake();
     deployMotorPID.setReference(
         Calibrations.INTAKE_STARTING_POSITION_DEGREES,
-        CANSparkMax.ControlType.kPosition,
-        Calibrations.SMART_MOTION_SLOT,
+        CANSparkMax.ControlType.kSmartMotion,
+        SMART_MOTION_SLOT,
         Calibrations.ARBITRARY_INTAKE_FEED_FORWARD_VOLTS * getCosineIntakeAngle(),
         ArbFFUnits.kVoltage);
   }
@@ -110,7 +112,7 @@ public class Intake extends SubsystemBase {
 
   /** Returns the cosine of the intake angle in degrees off of the horizontal. */
   public double getCosineIntakeAngle() {
-    return Math.cos(deployMotorEncoder.getPosition() + 180);
+    return Math.cos(deployMotorEncoder.getPosition() - Constants.INTAKE_POSITION_WHEN_HORIZONTAL_DEGREES);
   }
 
   @Override

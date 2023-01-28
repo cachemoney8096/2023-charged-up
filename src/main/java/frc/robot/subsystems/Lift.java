@@ -34,6 +34,8 @@ public class Lift extends SubsystemBase {
 
   private SparkMaxPIDController armPID = arm.getPIDController();
 
+  private final int SMART_MOTION_SLOT = 0;
+
   private DoubleSolenoid grabber =
       new DoubleSolenoid(
           PneumaticsModuleType.REVPH,
@@ -104,14 +106,14 @@ public class Lift extends SubsystemBase {
   public void goToPosition(LiftPosition pos) {
     elevatorPID.setReference(
         liftPositionMap.get(pos).getFirst(),
-        CANSparkMax.ControlType.kPosition,
-        Calibrations.SMART_MOTION_SLOT,
+        CANSparkMax.ControlType.kSmartMotion,
+        SMART_MOTION_SLOT,
         Calibrations.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle(),
         ArbFFUnits.kVoltage);
     armPID.setReference(
         liftPositionMap.get(pos).getSecond(),
-        CANSparkMax.ControlType.kPosition,
-        Calibrations.SMART_MOTION_SLOT,
+        CANSparkMax.ControlType.kSmartMotion,
+        SMART_MOTION_SLOT,
         Calibrations.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle(),
         ArbFFUnits.kVoltage);
   }
@@ -146,7 +148,7 @@ public class Lift extends SubsystemBase {
 
   /** Returns the cosine of the arm angle in degrees off of the horizontal. */
   public double getCosineArmAngle() {
-    return Math.cos(armEncoder.getPosition() - 90);
+    return Math.cos(armEncoder.getPosition() - Constants.ARM_POSITION_WHEN_HORIZONTAL_DEGREES);
   }
 
   @Override

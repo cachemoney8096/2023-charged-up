@@ -83,8 +83,7 @@ public final class Calibrations {
   /** High profile constraints = pure P controller */
   public static final PIDController PATH_THETA_CONTROLLER = new PIDController(9.0, 0.0, 0.80);
 
+  /** Voltage required to hold the mechanism in horizontal position */
   public static final double ARBITRARY_ARM_FEED_FORWARD_VOLTS = PLACEHOLDER_DOUBLE,
       ARBITRARY_INTAKE_FEED_FORWARD_VOLTS = PLACEHOLDER_DOUBLE;
-
-  public static final int SMART_MOTION_SLOT = 0;
 }
