@@ -58,13 +58,13 @@ public class Intake extends SubsystemBase {
     deployMotorPID.setD(Calibrations.INTAKE_DEPLOY_MOTOR_D);
 
     deployMotorPID.setSmartMotionMaxAccel(
-        Calibrations.INTAKE_DEPLOY_MAX_ACCELERATION_RPM, SMART_MOTION_SLOT);
+        Calibrations.INTAKE_DEPLOY_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED, SMART_MOTION_SLOT);
     deployMotorPID.setSmartMotionMaxVelocity(
-        Calibrations.INTAKE_DEPLOY_MAX_VELOCITY_RPM, SMART_MOTION_SLOT);
+        Calibrations.INTAKE_DEPLOY_MAX_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT);
     deployMotorPID.setSmartMotionMinOutputVelocity(
-        Calibrations.INTAKE_DEPLOY_MIN_OUTPUT_VELOCITY_RPM, SMART_MOTION_SLOT);
+        Calibrations.INTAKE_DEPLOY_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT);
     deployMotorPID.setSmartMotionAllowedClosedLoopError(
-        Calibrations.INTAKE_DEPLOY_ALLOWED_CLOSED_LOOP_ERROR, SMART_MOTION_SLOT);
+        Calibrations.INTAKE_DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG, SMART_MOTION_SLOT);
 
     intakeLeft.restoreFactoryDefaults();
 
