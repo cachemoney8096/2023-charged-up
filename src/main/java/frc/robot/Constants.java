@@ -115,11 +115,4 @@ public final class Constants {
 
   public static final double ARM_POSITION_WHEN_HORIZONTAL_DEGREES = 90,
       INTAKE_POSITION_WHEN_HORIZONTAL_DEGREES = 180;
-
-  /*Revolutions to Degrees */
-  public static final double REVOLUTIONS_TO_DEGREES = 360.0;
-
-  /** Scalar for the difference in the elevator's absolute encoders in inches per degree */
-  public static final double ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE =
-      PLACEHOLDER_DOUBLE;
 }

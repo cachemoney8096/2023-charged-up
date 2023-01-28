@@ -99,9 +99,4 @@ public final class Calibrations {
       ARM_MAX_VELOCITY_DEG_PER_SECOND = PLACEHOLDER_DOUBLE,
       ARM_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND = PLACEHOLDER_DOUBLE,
       ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG = PLACEHOLDER_DOUBLE;
-
-  /** Difference in what the intake absolute encoder says is 0 and what is actually 0 */
-  public static final double INTAKE_ABSOLUTE_ENCODER_OFFSET_DEG = PLACEHOLDER_DOUBLE;
-  /** Difference in what the arm absolute encoder says is 0 and what is actually 0 */
-  public static final double ARM_ABSOLUTE_ENCODER_OFFSET_DEG = PLACEHOLDER_DOUBLE;
 }
