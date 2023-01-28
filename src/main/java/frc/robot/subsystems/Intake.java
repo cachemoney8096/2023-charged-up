@@ -54,6 +54,7 @@ public class Intake extends SubsystemBase {
     deployMotor.restoreFactoryDefaults();
     deployMotorEncoder.setPositionConversionFactor(Constants.DEPLOY_MOTOR_ENCODER_SCALAR);
     deployMotorEncoder.setVelocityConversionFactor(Constants.DEPLOY_MOTOR_ENCODER_VELOCITY_SCALAR);
+    deployMotorAbsoluteEncoder.setPositionConversionFactor(Constants.REVOLUTIONS_TO_DEGREES);
 
     deployMotorPID.setP(Calibrations.INTAKE_DEPLOY_MOTOR_P);
     deployMotorPID.setI(Calibrations.INTAKE_DEPLOY_MOTOR_I);
@@ -106,7 +107,7 @@ public class Intake extends SubsystemBase {
 
   public void initialize() {
     deployMotorEncoder.setPosition(
-        deployMotorAbsoluteEncoder.getPosition() + Calibrations.ABSOLUTE_ENCODER_OFFSET);
+        deployMotorAbsoluteEncoder.getPosition() + Calibrations.INTAKE_ABSOLUTE_ENCODER_OFFSET_DEG);
   }
 
   @Override

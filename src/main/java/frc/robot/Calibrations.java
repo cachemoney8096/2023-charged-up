@@ -83,6 +83,8 @@ public final class Calibrations {
   /** High profile constraints = pure P controller */
   public static final PIDController PATH_THETA_CONTROLLER = new PIDController(9.0, 0.0, 0.80);
 
-  /** Difference in what the absolute encoder says is 0 and what is actually 0 */
-  public static final double ABSOLUTE_ENCODER_OFFSET = PLACEHOLDER_DOUBLE;
+  /** Difference in what the intake absolute encoder says is 0 and what is actually 0 */
+  public static final double INTAKE_ABSOLUTE_ENCODER_OFFSET_DEG = PLACEHOLDER_DOUBLE;
+  /** Difference in what the arm absolute encoder says is 0 and what is actually 0 */
+  public static final double ARM_ABSOLUTE_ENCODER_OFFSET_DEG = PLACEHOLDER_DOUBLE;
 }

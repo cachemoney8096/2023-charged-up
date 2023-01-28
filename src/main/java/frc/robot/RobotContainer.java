@@ -28,7 +28,7 @@ public class RobotContainer {
   private final Lift lift = new Lift();
 
   // A chooser for autonomous commands
-  private static SendableChooser<Command> autonChooser = new SendableChooser<>();
+  private SendableChooser<Command> autonChooser = new SendableChooser<>();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverController =
@@ -66,7 +66,7 @@ public class RobotContainer {
     driverController.a().whileTrue(new InstantCommand(intake::deploy, intake));
   }
 
-  public static Command getAutonomousCommand() {
+  public Command getAutonomousCommand() {
     return autonChooser.getSelected();
   }
 }

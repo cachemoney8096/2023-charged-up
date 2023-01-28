@@ -66,6 +66,7 @@ public class Lift extends SubsystemBase {
     /* Get positions and degrees of arm through encoder in degrees*/
     armEncoder.setPositionConversionFactor(Constants.ARM_MOTOR_ENCODER_SCALAR);
     armEncoder.setVelocityConversionFactor(Constants.ARM_MOTOR_ENCODER_VELOCITY_SCALAR);
+    armAbsoluteEncoder.setPositionConversionFactor(Constants.REVOLUTIONS_TO_DEGREES);
 
     /* Set PID of Elevator */
     elevatorPID.setP(Calibrations.ELEVATOR_P);
@@ -140,7 +141,8 @@ public class Lift extends SubsystemBase {
   }
 
   public void initialize() {
-    armEncoder.setPosition(armAbsoluteEncoder.getPosition() + Calibrations.ABSOLUTE_ENCODER_OFFSET);
+    armEncoder.setPosition(
+        armAbsoluteEncoder.getPosition() + Calibrations.ARM_ABSOLUTE_ENCODER_OFFSET_DEG);
   }
 
   @Override
