@@ -63,7 +63,10 @@ public class Intake extends SubsystemBase {
   /** Deploys the intake out */
   public void deploy() {
     deployMotorPID.setReference(
-        Calibrations.INTAKE_DEPLOYED_POSITION_DEGREES, CANSparkMax.ControlType.kPosition, Calibrations.SMART_MOTION_SLOT, Calibrations.ARBITRARY_INTAKE_FEED_FORWARD * getCosineIntakeAngle());
+        Calibrations.INTAKE_DEPLOYED_POSITION_DEGREES,
+        CANSparkMax.ControlType.kPosition,
+        Calibrations.SMART_MOTION_SLOT,
+        Calibrations.ARBITRARY_INTAKE_FEED_FORWARD * getCosineIntakeAngle());
     clampTimer.reset();
     clampTimer.start();
   }
@@ -72,7 +75,10 @@ public class Intake extends SubsystemBase {
   public void retract() {
     unclampIntake();
     deployMotorPID.setReference(
-        Calibrations.INTAKE_STARTING_POSITION_DEGREES, CANSparkMax.ControlType.kPosition, Calibrations.SMART_MOTION_SLOT, Calibrations.ARBITRARY_INTAKE_FEED_FORWARD * getCosineIntakeAngle());
+        Calibrations.INTAKE_STARTING_POSITION_DEGREES,
+        CANSparkMax.ControlType.kPosition,
+        Calibrations.SMART_MOTION_SLOT,
+        Calibrations.ARBITRARY_INTAKE_FEED_FORWARD * getCosineIntakeAngle());
   }
 
   /** Runs the intake wheels inward */
@@ -99,9 +105,7 @@ public class Intake extends SubsystemBase {
     return !gamePieceSensor.get();
   }
 
-   /**
-   * Returns the cosine of the intake angle in degrees off of the horizontal.
-   */
+  /** Returns the cosine of the intake angle in degrees off of the horizontal. */
   public double getCosineIntakeAngle() {
     return Math.cos(deployMotorEncoder.getPosition() + 180);
   }

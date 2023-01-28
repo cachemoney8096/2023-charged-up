@@ -87,5 +87,4 @@ public final class Calibrations {
   public static final double ARBITRARY_INTAKE_FEED_FORWARD = PLACEHOLDER_DOUBLE;
 
   public static final int SMART_MOTION_SLOT = 0;
-
 }

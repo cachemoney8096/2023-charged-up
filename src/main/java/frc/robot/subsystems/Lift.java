@@ -20,7 +20,8 @@ import java.util.TreeMap;
 
 /** Contains code for elevator, arm, and game piece grabber */
 public class Lift extends SubsystemBase {
-  private CANSparkMax elevator = new CANSparkMax(RobotMap.ELEVATOR_MOTOR_CAN_ID, MotorType.kBrushless);
+  private CANSparkMax elevator =
+      new CANSparkMax(RobotMap.ELEVATOR_MOTOR_CAN_ID, MotorType.kBrushless);
 
   private final RelativeEncoder elevatorEncoder = elevator.getEncoder();
 
@@ -32,19 +33,19 @@ public class Lift extends SubsystemBase {
 
   private SparkMaxPIDController armPID = arm.getPIDController();
 
-  private DoubleSolenoid grabber = new DoubleSolenoid(
-      PneumaticsModuleType.REVPH,
-      RobotMap.LIFT_GRABBING_FORWARD_CHANNEL,
-      RobotMap.LIFT_GRABBING_REVERSE_CHANNEL);
+  private DoubleSolenoid grabber =
+      new DoubleSolenoid(
+          PneumaticsModuleType.REVPH,
+          RobotMap.LIFT_GRABBING_FORWARD_CHANNEL,
+          RobotMap.LIFT_GRABBING_REVERSE_CHANNEL);
 
   // Sensors
-  private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);;
+  private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
+  ;
 
   /**
-   * Indicates the elevator and arm positions at each position of the lift. The
-   * first value
-   * indicates the elevator position in inches and the second value indicates the
-   * arm position in
+   * Indicates the elevator and arm positions at each position of the lift. The first value
+   * indicates the elevator position in inches and the second value indicates the arm position in
    * degrees
    */
   TreeMap<LiftPosition, Pair<Double, Double>> liftPositionMap;
@@ -102,10 +103,15 @@ public class Lift extends SubsystemBase {
 
   public void goToPosition(LiftPosition pos) {
     elevatorPID.setReference(
-        liftPositionMap.get(pos).getFirst(), CANSparkMax.ControlType.kPosition, Calibrations.SMART_MOTION_SLOT,
+        liftPositionMap.get(pos).getFirst(),
+        CANSparkMax.ControlType.kPosition,
+        Calibrations.SMART_MOTION_SLOT,
         Calibrations.ARBITRARY_ARM_FEED_FORWARD * getCosineArmAngle());
-    armPID.setReference(liftPositionMap.get(pos).getSecond(), CANSparkMax.ControlType.kPosition,
-        Calibrations.SMART_MOTION_SLOT, Calibrations.ARBITRARY_ARM_FEED_FORWARD * getCosineArmAngle());
+    armPID.setReference(
+        liftPositionMap.get(pos).getSecond(),
+        CANSparkMax.ControlType.kPosition,
+        Calibrations.SMART_MOTION_SLOT,
+        Calibrations.ARBITRARY_ARM_FEED_FORWARD * getCosineArmAngle());
   }
 
   public void grab() {
@@ -123,25 +129,20 @@ public class Lift extends SubsystemBase {
   }
 
   /**
-   * Scores the currently loaded game piece Currently empty because we don't know
-   * exactly what it
+   * Scores the currently loaded game piece Currently empty because we don't know exactly what it
    * will do
    */
-  public void scoreGamePiece() {
-  }
+  public void scoreGamePiece() {}
 
   /**
-   * Says whether or not the robot is done scoring a game piece Currently empty
-   * because we don't
+   * Says whether or not the robot is done scoring a game piece Currently empty because we don't
    * know exactly what it will look like
    */
   public boolean doneScoring() {
     return true; // Placeholder until logic is made
   }
 
-  /**
-   * Returns the cosine of the arm angle in degrees off of the horizontal.
-   */
+  /** Returns the cosine of the arm angle in degrees off of the horizontal. */
   public double getCosineArmAngle() {
     return Math.cos(armEncoder.getPosition() - 90);
   }
