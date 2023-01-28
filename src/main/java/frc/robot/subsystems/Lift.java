@@ -82,6 +82,15 @@ public class Lift extends SubsystemBase {
     elevatorPID.setI(Calibrations.ELEVATOR_I);
     elevatorPID.setD(Calibrations.ELEVATOR_D);
 
+    elevatorPID.setSmartMotionMaxAccel(
+        Calibrations.ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED, SMART_MOTION_SLOT);
+    elevatorPID.setSmartMotionMaxVelocity(
+        Calibrations.ELEVATOR_MAX_VELOCITY_IN_PER_SECOND, SMART_MOTION_SLOT);
+    elevatorPID.setSmartMotionMinOutputVelocity(
+        Calibrations.ELEVATOR_MIN_OUTPUT_VELOCITY_IN_PER_SECOND, SMART_MOTION_SLOT);
+    elevatorPID.setSmartMotionAllowedClosedLoopError(
+        Calibrations.ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN, SMART_MOTION_SLOT);
+
     /* Set PID of Arm */
     armPID.setP(Calibrations.ARM_P);
     armPID.setI(Calibrations.ARM_I);
@@ -97,7 +106,6 @@ public class Lift extends SubsystemBase {
         Calibrations.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG, SMART_MOTION_SLOT);
 
     /* Map of all LiftPosition with according values */
-
     liftPositionMap = new TreeMap<LiftPosition, Pair<Double, Double>>();
     liftPositionMap.put(
         LiftPosition.GRAB_FROM_INTAKE,
@@ -126,7 +134,11 @@ public class Lift extends SubsystemBase {
 
   public void goToPosition(LiftPosition pos) {
     elevatorPID.setReference(
-        liftPositionMap.get(pos).getFirst(), CANSparkMax.ControlType.kPosition);
+        liftPositionMap.get(pos).getFirst(),
+        CANSparkMax.ControlType.kSmartMotion,
+        SMART_MOTION_SLOT,
+        Calibrations.ARBITRARY_ELEVATOR_FEED_FORWARD_VOLTS,
+        ArbFFUnits.kVoltage);
     armPID.setReference(
         liftPositionMap.get(pos).getSecond(),
         CANSparkMax.ControlType.kSmartMotion,
