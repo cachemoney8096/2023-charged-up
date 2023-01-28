@@ -150,14 +150,15 @@ public class Lift extends SubsystemBase {
     armEncoder.setPosition(
         armAbsoluteEncoder.getPosition() + Calibrations.ARM_ABSOLUTE_ENCODER_OFFSET_DEG);
 
-    double elevatorDutyCycleEncodersDifference =
-        elevatorDutyCycleEncoderOne.getAbsolutePosition() * Constants.REVOLUTIONS_TO_DEGREES
-            - elevatorDutyCycleEncoderTwo.getAbsolutePosition() * Constants.REVOLUTIONS_TO_DEGREES;
-    if (elevatorDutyCycleEncodersDifference < 0) {
-      elevatorDutyCycleEncodersDifference += 360;
+    double elevatorDutyCycleEncodersDifferenceDegrees =
+        (elevatorDutyCycleEncoderOne.getAbsolutePosition()
+                - elevatorDutyCycleEncoderTwo.getAbsolutePosition())
+            * Constants.REVOLUTIONS_TO_DEGREES;
+    if (elevatorDutyCycleEncodersDifferenceDegrees < 0.0) {
+      elevatorDutyCycleEncodersDifferenceDegrees += Constants.REVOLUTIONS_TO_DEGREES;
     }
     elevatorEncoder.setPosition(
-        elevatorDutyCycleEncodersDifference
+        elevatorDutyCycleEncodersDifferenceDegrees
             * Constants.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE);
   }
 
