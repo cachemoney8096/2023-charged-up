@@ -4,9 +4,11 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -34,6 +36,9 @@ public class Intake extends SubsystemBase {
   private SparkMaxPIDController deployMotorPID = deployMotor.getPIDController();
 
   private final RelativeEncoder deployMotorEncoder = deployMotor.getEncoder();
+  private final AbsoluteEncoder deployMotorAbsoluteEncoder =
+      deployMotor.getAbsoluteEncoder(Type.kDutyCycle);
+
   private Solenoid clamp =
       new Solenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_CLAMP_FORWARD_CHANNEL);
 
@@ -97,6 +102,11 @@ public class Intake extends SubsystemBase {
   public boolean seeGamePiece() {
     // Sensor is false if there's a game piece
     return !gamePieceSensor.get();
+  }
+
+  public void initialize() {
+    deployMotorEncoder.setPosition(
+        deployMotorAbsoluteEncoder.getPosition() + Calibrations.ABSOLUTE_ENCODER_OFFSET);
   }
 
   @Override
