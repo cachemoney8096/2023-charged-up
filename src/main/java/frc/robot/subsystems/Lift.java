@@ -75,6 +75,13 @@ public class Lift extends SubsystemBase {
     armPID.setI(Calibrations.ARM_I);
     armPID.setD(Calibrations.ARM_D);
 
+    armPID.setSmartMotionMaxAccel(Calibrations.ARM_MAX_ACCELERATION_RPM, SMART_MOTION_SLOT);
+    armPID.setSmartMotionMaxVelocity(Calibrations.ARM_MAX_VELOCITY_RPM, SMART_MOTION_SLOT);
+    armPID.setSmartMotionMinOutputVelocity(
+        Calibrations.ARM_MIN_OUTPUT_VELOCITY_RPM, SMART_MOTION_SLOT);
+    armPID.setSmartMotionAllowedClosedLoopError(
+        Calibrations.ARM_ALLOWED_CLOSED_LOOP_ERROR, SMART_MOTION_SLOT);
+
     /* Map of all LiftPosition with according values */
 
     liftPositionMap = new TreeMap<LiftPosition, Pair<Double, Double>>();

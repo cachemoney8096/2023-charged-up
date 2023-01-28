@@ -57,6 +57,15 @@ public class Intake extends SubsystemBase {
     deployMotorPID.setI(Calibrations.INTAKE_DEPLOY_MOTOR_I);
     deployMotorPID.setD(Calibrations.INTAKE_DEPLOY_MOTOR_D);
 
+    deployMotorPID.setSmartMotionMaxAccel(
+        Calibrations.INTAKE_DEPLOY_MAX_ACCELERATION_RPM, SMART_MOTION_SLOT);
+    deployMotorPID.setSmartMotionMaxVelocity(
+        Calibrations.INTAKE_DEPLOY_MAX_VELOCITY_RPM, SMART_MOTION_SLOT);
+    deployMotorPID.setSmartMotionMinOutputVelocity(
+        Calibrations.INTAKE_DEPLOY_MIN_OUTPUT_VELOCITY_RPM, SMART_MOTION_SLOT);
+    deployMotorPID.setSmartMotionAllowedClosedLoopError(
+        Calibrations.INTAKE_DEPLOY_ALLOWED_CLOSED_LOOP_ERROR, SMART_MOTION_SLOT);
+
     intakeLeft.restoreFactoryDefaults();
 
     intakeRight.restoreFactoryDefaults();
@@ -112,7 +121,8 @@ public class Intake extends SubsystemBase {
 
   /** Returns the cosine of the intake angle in degrees off of the horizontal. */
   public double getCosineIntakeAngle() {
-    return Math.cos(deployMotorEncoder.getPosition() - Constants.INTAKE_POSITION_WHEN_HORIZONTAL_DEGREES);
+    return Math.cos(
+        deployMotorEncoder.getPosition() - Constants.INTAKE_POSITION_WHEN_HORIZONTAL_DEGREES);
   }
 
   @Override
