@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -44,6 +45,8 @@ public class Lift extends SubsystemBase {
 
   private SparkMaxPIDController armPID = arm.getPIDController();
 
+  private final int SMART_MOTION_SLOT = 0;
+
   private DoubleSolenoid grabber =
       new DoubleSolenoid(
           PneumaticsModuleType.REVPH,
@@ -65,11 +68,11 @@ public class Lift extends SubsystemBase {
     elevator.restoreFactoryDefaults();
     arm.restoreFactoryDefaults();
 
-    /* Get positions and degrees of elevator through encoder in inches*/
+    /* Get positions and degrees of elevator through encoder in inches */
     elevatorEncoder.setPositionConversionFactor(Constants.ELEVATOR_MOTOR_ENCODER_SCALAR);
     elevatorEncoder.setVelocityConversionFactor(Constants.ELEVATOR_MOTOR_ENCODER_VELOCITY_SCALAR);
 
-    /* Get positions and degrees of arm through encoder in degrees*/
+    /* Get positions and degrees of arm through encoder in degrees */
     armEncoder.setPositionConversionFactor(Constants.ARM_MOTOR_ENCODER_SCALAR);
     armEncoder.setVelocityConversionFactor(Constants.ARM_MOTOR_ENCODER_VELOCITY_SCALAR);
     armAbsoluteEncoder.setPositionConversionFactor(Constants.REVOLUTIONS_TO_DEGREES);
@@ -83,6 +86,15 @@ public class Lift extends SubsystemBase {
     armPID.setP(Calibrations.ARM_P);
     armPID.setI(Calibrations.ARM_I);
     armPID.setD(Calibrations.ARM_D);
+
+    armPID.setSmartMotionMaxAccel(
+        Calibrations.ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED, SMART_MOTION_SLOT);
+    armPID.setSmartMotionMaxVelocity(
+        Calibrations.ARM_MAX_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT);
+    armPID.setSmartMotionMinOutputVelocity(
+        Calibrations.ARM_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT);
+    armPID.setSmartMotionAllowedClosedLoopError(
+        Calibrations.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG, SMART_MOTION_SLOT);
 
     /* Map of all LiftPosition with according values */
 
@@ -115,7 +127,12 @@ public class Lift extends SubsystemBase {
   public void goToPosition(LiftPosition pos) {
     elevatorPID.setReference(
         liftPositionMap.get(pos).getFirst(), CANSparkMax.ControlType.kPosition);
-    armPID.setReference(liftPositionMap.get(pos).getSecond(), CANSparkMax.ControlType.kPosition);
+    armPID.setReference(
+        liftPositionMap.get(pos).getSecond(),
+        CANSparkMax.ControlType.kSmartMotion,
+        SMART_MOTION_SLOT,
+        Calibrations.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle(),
+        ArbFFUnits.kVoltage);
   }
 
   public void grab() {
@@ -144,6 +161,11 @@ public class Lift extends SubsystemBase {
    */
   public boolean doneScoring() {
     return true; // Placeholder until logic is made
+  }
+
+  /** Returns the cosine of the arm angle in degrees off of the horizontal. */
+  public double getCosineArmAngle() {
+    return Math.cos(armEncoder.getPosition() - Constants.ARM_POSITION_WHEN_HORIZONTAL_DEGREES);
   }
 
   public void initialize() {
