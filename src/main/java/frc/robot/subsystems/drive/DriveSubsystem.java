@@ -218,15 +218,16 @@ public class DriveSubsystem extends SubsystemBase {
    * @param y Desired speed of the robot in the y direction (sideways), [-1,1].
    * @param rot Desired angular rate of the robot, [-1,1].
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
+   * @param POVangle Get the angle in degrees of the D-pad (right is 90).
    */
   public void rotateOrKeepHeading(
-      double x, double y, double rot, boolean fieldRelative, double POVangle) {
+      double x, double y, double rot, boolean fieldRelative, int povAngleDeg) {
     // x, y, and rot are all being deadbanded from 0.1 to 0.0, so checking if they're equal to 0
     // does account for controller deadzones.
-    if (x == 0 && y == 0 && rot == 0 && POVangle == -1) {
+    if (x == 0 && y == 0 && rot == 0 && povAngleDeg == -1) {
       setX();
-    } else if (POVangle != -1) {
-      targetHeadingDegrees = POVangle;
+    } else if (povAngleDeg != -1) {
+      targetHeadingDegrees = 360 - povAngleDeg;
       keepHeading(x, y, fieldRelative);
     } else if (rot == 0) {
       keepHeading(x, y, fieldRelative);
