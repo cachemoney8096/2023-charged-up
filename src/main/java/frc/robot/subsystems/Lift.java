@@ -25,28 +25,21 @@ import java.util.TreeMap;
 /** Contains code for elevator, arm, and game piece grabber */
 public class Lift extends SubsystemBase {
 
+  /** Overall position of the lift including both elevator and arm */
+  public enum LiftPosition {
+    GRAB_FROM_INTAKE,
+    SHELF,
+    SCORE_MID,
+    SCORE_HIGH,
+    STARTING
+  }
+
+  // Actuators
   private CANSparkMax elevator =
       new CANSparkMax(RobotMap.ELEVATOR_MOTOR_CAN_ID, MotorType.kBrushless);
-
-  private final RelativeEncoder elevatorEncoder = elevator.getEncoder();
-
-  /* Returns [0,1] in revolutions */
-  private final DutyCycleEncoder elevatorDutyCycleEncoderOne =
-      new DutyCycleEncoder(RobotMap.ELEVATOR_ENCODER_ONE_DIO);
-  private final DutyCycleEncoder elevatorDutyCycleEncoderTwo =
-      new DutyCycleEncoder(RobotMap.ELEVATOR_ENCODER_TWO_DIO);
-
   private SparkMaxPIDController elevatorPID = elevator.getPIDController();
-
   private CANSparkMax arm = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
-
-  private final RelativeEncoder armEncoder = arm.getEncoder();
-  private final AbsoluteEncoder armAbsoluteEncoder = arm.getAbsoluteEncoder(Type.kDutyCycle);
-
   private SparkMaxPIDController armPID = arm.getPIDController();
-
-  private final int SMART_MOTION_SLOT = 0;
-
   private DoubleSolenoid grabber =
       new DoubleSolenoid(
           PneumaticsModuleType.REVPH,
@@ -54,7 +47,19 @@ public class Lift extends SubsystemBase {
           RobotMap.LIFT_GRABBING_REVERSE_CHANNEL);
 
   // Sensors
+  private final RelativeEncoder elevatorEncoder = elevator.getEncoder();
+  /* Returns [0,1] in revolutions */
+  private final DutyCycleEncoder elevatorDutyCycleEncoderOne =
+      new DutyCycleEncoder(RobotMap.ELEVATOR_ENCODER_ONE_DIO);
+  /* Returns [0,1] in revolutions */
+  private final DutyCycleEncoder elevatorDutyCycleEncoderTwo =
+      new DutyCycleEncoder(RobotMap.ELEVATOR_ENCODER_TWO_DIO);
+  private final RelativeEncoder armEncoder = arm.getEncoder();
+  private final AbsoluteEncoder armAbsoluteEncoder = arm.getAbsoluteEncoder(Type.kDutyCycle);
   private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
+
+  // Members
+  private final int SMART_MOTION_SLOT = 0;
 
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
@@ -66,23 +71,16 @@ public class Lift extends SubsystemBase {
   /** Creates a new Lift */
   public Lift() {
     elevator.restoreFactoryDefaults();
-    arm.restoreFactoryDefaults();
 
-    /* Get positions and degrees of elevator through encoder in inches */
+    // Get positions and degrees of elevator through encoder in inches
     elevatorEncoder.setPositionConversionFactor(Constants.Lift.ELEVATOR_MOTOR_ENCODER_SCALAR);
     elevatorEncoder.setVelocityConversionFactor(
         Constants.Lift.ELEVATOR_MOTOR_ENCODER_VELOCITY_SCALAR);
 
-    /* Get positions and degrees of arm through encoder in degrees */
-    armEncoder.setPositionConversionFactor(Constants.Lift.ARM_MOTOR_ENCODER_SCALAR);
-    armEncoder.setVelocityConversionFactor(Constants.Lift.ARM_MOTOR_ENCODER_VELOCITY_SCALAR);
-    armAbsoluteEncoder.setPositionConversionFactor(Constants.REVOLUTIONS_TO_DEGREES);
-
-    /* Set PID of Elevator */
+    // Set PID of Elevator
     elevatorPID.setP(Calibrations.Lift.ELEVATOR_P);
     elevatorPID.setI(Calibrations.Lift.ELEVATOR_I);
     elevatorPID.setD(Calibrations.Lift.ELEVATOR_D);
-
     elevatorPID.setSmartMotionMaxAccel(
         Calibrations.Lift.ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED, SMART_MOTION_SLOT);
     elevatorPID.setSmartMotionMaxVelocity(
@@ -92,11 +90,12 @@ public class Lift extends SubsystemBase {
     elevatorPID.setSmartMotionAllowedClosedLoopError(
         Calibrations.Lift.ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN, SMART_MOTION_SLOT);
 
-    /* Set PID of Arm */
+    arm.restoreFactoryDefaults();
+
+    // Set PID of Arm
     armPID.setP(Calibrations.Lift.ARM_P);
     armPID.setI(Calibrations.Lift.ARM_I);
     armPID.setD(Calibrations.Lift.ARM_D);
-
     armPID.setSmartMotionMaxAccel(
         Calibrations.Lift.ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED, SMART_MOTION_SLOT);
     armPID.setSmartMotionMaxVelocity(
@@ -106,7 +105,12 @@ public class Lift extends SubsystemBase {
     armPID.setSmartMotionAllowedClosedLoopError(
         Calibrations.Lift.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG, SMART_MOTION_SLOT);
 
-    /* Map of all LiftPosition with according values */
+    // Get positions and degrees of arm through encoder in degrees /
+    armEncoder.setPositionConversionFactor(Constants.Lift.ARM_MOTOR_ENCODER_SCALAR);
+    armEncoder.setVelocityConversionFactor(Constants.Lift.ARM_MOTOR_ENCODER_VELOCITY_SCALAR);
+    armAbsoluteEncoder.setPositionConversionFactor(Constants.REVOLUTIONS_TO_DEGREES);
+
+    // Map of all LiftPosition with according values
     liftPositionMap = new TreeMap<LiftPosition, Pair<Double, Double>>();
     liftPositionMap.put(
         LiftPosition.GRAB_FROM_INTAKE,
@@ -123,14 +127,6 @@ public class Lift extends SubsystemBase {
     liftPositionMap.put(
         LiftPosition.STARTING,
         new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
-  }
-
-  public enum LiftPosition {
-    GRAB_FROM_INTAKE,
-    SHELF,
-    SCORE_MID,
-    SCORE_HIGH,
-    STARTING
   }
 
   public void goToPosition(LiftPosition pos) {
@@ -182,9 +178,11 @@ public class Lift extends SubsystemBase {
   }
 
   public void initialize() {
+    // Set arm encoder position from absolute
     armEncoder.setPosition(
         armAbsoluteEncoder.getPosition() + Calibrations.Lift.ARM_ABSOLUTE_ENCODER_OFFSET_DEG);
 
+    // Set elevator encoder position from absolute encoders
     double elevatorDutyCycleEncodersDifferenceDegrees =
         ((elevatorDutyCycleEncoderOne.getAbsolutePosition()
                     - elevatorDutyCycleEncoderTwo.getAbsolutePosition())
