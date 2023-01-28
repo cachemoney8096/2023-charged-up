@@ -112,4 +112,7 @@ public final class Constants {
   public static final double DEPLOY_MOTOR_ENCODER_VELOCITY_SCALAR = PLACEHOLDER_DOUBLE;
   /* Scalar for arm motor encoder from rotations to real degrees */
   public static final double DEPLOY_MOTOR_ENCODER_SCALAR = PLACEHOLDER_DOUBLE;
+
+  /*Revolutions to Degrees */
+  public static final double REVOLUTIONS_TO_DEGREES = 360.0;
 }
