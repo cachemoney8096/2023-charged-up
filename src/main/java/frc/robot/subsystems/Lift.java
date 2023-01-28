@@ -155,7 +155,8 @@ public class Lift extends SubsystemBase {
                 - elevatorDutyCycleEncoderTwo.getAbsolutePosition())
             * Constants.REVOLUTIONS_TO_DEGREES;
     if (elevatorDutyCycleEncodersDifferenceDegrees < 0.0) {
-      elevatorDutyCycleEncodersDifferenceDegrees += Constants.REVOLUTIONS_TO_DEGREES;
+      elevatorDutyCycleEncodersDifferenceDegrees =
+          elevatorDutyCycleEncodersDifferenceDegrees % 360 + Constants.REVOLUTIONS_TO_DEGREES;
     }
     elevatorEncoder.setPosition(
         elevatorDutyCycleEncodersDifferenceDegrees
