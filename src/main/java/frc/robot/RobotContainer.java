@@ -4,10 +4,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoChargeStationSequence;
@@ -15,6 +17,7 @@ import frc.robot.commands.AutoScoreAndBalance;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.utils.JoystickUtil;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -28,7 +31,7 @@ public class RobotContainer {
   private final Lift lift = new Lift();
 
   // A chooser for autonomous commands
-  private static SendableChooser<Command> autonChooser = new SendableChooser<>();
+  private SendableChooser<Command> autonChooser = new SendableChooser<>();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverController =
@@ -47,6 +50,10 @@ public class RobotContainer {
 
     // Put the chooser on the dashboard
     SmartDashboard.putData(autonChooser);
+
+    // Encoder offset stuff
+    intake.initialize();
+    lift.initialize();
   }
 
   /**
@@ -60,9 +67,22 @@ public class RobotContainer {
    */
   private void configureBindings() {
     driverController.a().whileTrue(new InstantCommand(intake::deploy, intake));
+    // Drive controls
+    drive.setDefaultCommand(
+        new RunCommand(
+                () ->
+                    drive.rotateOrKeepHeading(
+                        MathUtil.applyDeadband(-driverController.getLeftY(), 0.1),
+                        MathUtil.applyDeadband(-driverController.getLeftX(), 0.1),
+                        JoystickUtil.squareAxis(
+                            MathUtil.applyDeadband(-driverController.getRightX(), 0.1)),
+                        driverController.getHID().getLeftBumper(),
+                        driverController.getHID().getPOV()),
+                drive)
+            .withName("Manual Drive"));
   }
 
-  public static Command getAutonomousCommand() {
+  public Command getAutonomousCommand() {
     return autonChooser.getSelected();
   }
 }

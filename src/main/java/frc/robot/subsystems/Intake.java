@@ -4,9 +4,11 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -35,6 +37,9 @@ public class Intake extends SubsystemBase {
   private SparkMaxPIDController deployMotorPID = deployMotor.getPIDController();
 
   private final RelativeEncoder deployMotorEncoder = deployMotor.getEncoder();
+  private final AbsoluteEncoder deployMotorAbsoluteEncoder =
+      deployMotor.getAbsoluteEncoder(Type.kDutyCycle);
+
   private Solenoid clamp =
       new Solenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_CLAMP_FORWARD_CHANNEL);
 
@@ -52,6 +57,7 @@ public class Intake extends SubsystemBase {
     deployMotor.restoreFactoryDefaults();
     deployMotorEncoder.setPositionConversionFactor(Constants.DEPLOY_MOTOR_ENCODER_SCALAR);
     deployMotorEncoder.setVelocityConversionFactor(Constants.DEPLOY_MOTOR_ENCODER_VELOCITY_SCALAR);
+    deployMotorAbsoluteEncoder.setPositionConversionFactor(Constants.REVOLUTIONS_TO_DEGREES);
 
     deployMotorPID.setP(Calibrations.INTAKE_DEPLOY_MOTOR_P);
     deployMotorPID.setI(Calibrations.INTAKE_DEPLOY_MOTOR_I);
@@ -123,6 +129,10 @@ public class Intake extends SubsystemBase {
   public double getCosineIntakeAngle() {
     return Math.cos(
         deployMotorEncoder.getPosition() - Constants.INTAKE_POSITION_WHEN_HORIZONTAL_DEGREES);
+
+  public void initialize() {
+    deployMotorEncoder.setPosition(
+        deployMotorAbsoluteEncoder.getPosition() + Calibrations.INTAKE_ABSOLUTE_ENCODER_OFFSET_DEG);
   }
 
   @Override

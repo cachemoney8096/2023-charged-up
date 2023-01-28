@@ -4,14 +4,17 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Calibrations;
@@ -21,16 +24,24 @@ import java.util.TreeMap;
 
 /** Contains code for elevator, arm, and game piece grabber */
 public class Lift extends SubsystemBase {
+
   private CANSparkMax elevator =
       new CANSparkMax(RobotMap.ELEVATOR_MOTOR_CAN_ID, MotorType.kBrushless);
 
   private final RelativeEncoder elevatorEncoder = elevator.getEncoder();
+
+  /* Returns [0,1] in revolutions */
+  private final DutyCycleEncoder elevatorDutyCycleEncoderOne =
+      new DutyCycleEncoder(RobotMap.ELEVATOR_ENCODER_ONE_DIO);
+  private final DutyCycleEncoder elevatorDutyCycleEncoderTwo =
+      new DutyCycleEncoder(RobotMap.ELEVATOR_ENCODER_TWO_DIO);
 
   private SparkMaxPIDController elevatorPID = elevator.getPIDController();
 
   private CANSparkMax arm = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
 
   private final RelativeEncoder armEncoder = arm.getEncoder();
+  private final AbsoluteEncoder armAbsoluteEncoder = arm.getAbsoluteEncoder(Type.kDutyCycle);
 
   private SparkMaxPIDController armPID = arm.getPIDController();
 
@@ -64,6 +75,7 @@ public class Lift extends SubsystemBase {
     /* Get positions and degrees of arm through encoder in degrees */
     armEncoder.setPositionConversionFactor(Constants.ARM_MOTOR_ENCODER_SCALAR);
     armEncoder.setVelocityConversionFactor(Constants.ARM_MOTOR_ENCODER_VELOCITY_SCALAR);
+    armAbsoluteEncoder.setPositionConversionFactor(Constants.REVOLUTIONS_TO_DEGREES);
 
     /* Set PID of Elevator */
     elevatorPID.setP(Calibrations.ELEVATOR_P);
@@ -158,6 +170,22 @@ public class Lift extends SubsystemBase {
   /** Returns the cosine of the arm angle in degrees off of the horizontal. */
   public double getCosineArmAngle() {
     return Math.cos(armEncoder.getPosition() - Constants.ARM_POSITION_WHEN_HORIZONTAL_DEGREES);
+
+  public void initialize() {
+    armEncoder.setPosition(
+        armAbsoluteEncoder.getPosition() + Calibrations.ARM_ABSOLUTE_ENCODER_OFFSET_DEG);
+
+    double elevatorDutyCycleEncodersDifferenceDegrees =
+        ((elevatorDutyCycleEncoderOne.getAbsolutePosition()
+                    - elevatorDutyCycleEncoderTwo.getAbsolutePosition())
+                * Constants.REVOLUTIONS_TO_DEGREES)
+            % 360;
+    if (elevatorDutyCycleEncodersDifferenceDegrees < 0.0) {
+      elevatorDutyCycleEncodersDifferenceDegrees += Constants.REVOLUTIONS_TO_DEGREES;
+    }
+    elevatorEncoder.setPosition(
+        elevatorDutyCycleEncodersDifferenceDegrees
+            * Constants.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE);
   }
 
   @Override
