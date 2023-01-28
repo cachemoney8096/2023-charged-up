@@ -14,7 +14,6 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 
 /** Drives onto the charge station and balances */
 public class AutoChargeStationSequence extends SequentialCommandGroup {
-
   private PathPlannerTrajectory traj =
       PathPlanner.loadPath(
           Constants.PLACEHOLDER_STRING,

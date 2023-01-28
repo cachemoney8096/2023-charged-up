@@ -35,7 +35,7 @@ public class Intake extends SubsystemBase {
 
   private final RelativeEncoder deployMotorEncoder = deployMotor.getEncoder();
   private Solenoid clamp =
-      new Solenoid(PneumaticsModuleType.CTREPCM, RobotMap.INTAKE_CLAMP_FORWARD_CHANNEL);
+      new Solenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_CLAMP_FORWARD_CHANNEL);
 
   private CANSparkMax intakeLeft =
       new CANSparkMax(RobotMap.INTAKE_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
