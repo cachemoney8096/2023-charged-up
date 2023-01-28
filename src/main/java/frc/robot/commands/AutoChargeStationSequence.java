@@ -10,11 +10,13 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Calibrations;
+import frc.robot.Constants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 
+/** Drives onto the charge station and balances */
 public class AutoChargeStationSequence extends SequentialCommandGroup {
 
-  private PathPlannerTrajectory traj = PathPlanner.loadPath("Trajectory", new PathConstraints(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
+  private PathPlannerTrajectory traj = PathPlanner.loadPath(Constants.PLACEHOLDER_STRING, new PathConstraints(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
 
   public AutoChargeStationSequence(boolean isFirstPath, DriveSubsystem drive) {
     addCommands(

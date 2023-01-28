@@ -128,6 +128,13 @@ public class Lift extends SubsystemBase {
   */
   public void scoreGamePiece() {}
 
+  /** Says whether or not the robot is done scoring a game piece
+   * Currently empty because we don't know exactly what it will look like
+  */
+  public boolean doneScoring() {
+    return true; // Placeholder until logic is made
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
