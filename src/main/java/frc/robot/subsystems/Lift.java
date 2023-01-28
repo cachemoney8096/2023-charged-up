@@ -28,6 +28,8 @@ public class Lift extends SubsystemBase {
       new CANSparkMax(RobotMap.ELEVATOR_MOTOR_CAN_ID, MotorType.kBrushless);
 
   private final RelativeEncoder elevatorEncoder = elevator.getEncoder();
+
+  /* Returns [0,1] in revolutions */
   private final DutyCycleEncoder elevatorDutyCycleEncoderOne =
       new DutyCycleEncoder(RobotMap.ELEVATOR_ENCODER_ONE_DIO);
   private final DutyCycleEncoder elevatorDutyCycleEncoderTwo =
@@ -50,7 +52,6 @@ public class Lift extends SubsystemBase {
 
   // Sensors
   private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
-  ;
 
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
@@ -150,10 +151,14 @@ public class Lift extends SubsystemBase {
         armAbsoluteEncoder.getPosition() + Calibrations.ARM_ABSOLUTE_ENCODER_OFFSET_DEG);
 
     double elevatorDutyCycleEncodersDifference =
-        elevatorDutyCycleEncoderOne.getAbsolutePosition()
-            - elevatorDutyCycleEncoderTwo.getAbsolutePosition();
+        elevatorDutyCycleEncoderOne.getAbsolutePosition() * Constants.REVOLUTIONS_TO_DEGREES
+            - elevatorDutyCycleEncoderTwo.getAbsolutePosition() * Constants.REVOLUTIONS_TO_DEGREES;
+    if (elevatorDutyCycleEncodersDifference < 0) {
+      elevatorDutyCycleEncodersDifference += 360;
+    }
     elevatorEncoder.setPosition(
-        elevatorDutyCycleEncodersDifference * Constants.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR);
+        elevatorDutyCycleEncodersDifference
+            * Constants.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE);
   }
 
   @Override
