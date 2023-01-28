@@ -160,6 +160,23 @@ public class Lift extends SubsystemBase {
     return Math.cos(armEncoder.getPosition() - Constants.ARM_POSITION_WHEN_HORIZONTAL_DEGREES);
   }
 
+  public void initialize() {
+    armEncoder.setPosition(
+        armAbsoluteEncoder.getPosition() + Calibrations.ARM_ABSOLUTE_ENCODER_OFFSET_DEG);
+
+    double elevatorDutyCycleEncodersDifferenceDegrees =
+        ((elevatorDutyCycleEncoderOne.getAbsolutePosition()
+                    - elevatorDutyCycleEncoderTwo.getAbsolutePosition())
+                * Constants.REVOLUTIONS_TO_DEGREES)
+            % 360;
+    if (elevatorDutyCycleEncodersDifferenceDegrees < 0.0) {
+      elevatorDutyCycleEncodersDifferenceDegrees += Constants.REVOLUTIONS_TO_DEGREES;
+    }
+    elevatorEncoder.setPosition(
+        elevatorDutyCycleEncodersDifferenceDegrees
+            * Constants.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE);
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run

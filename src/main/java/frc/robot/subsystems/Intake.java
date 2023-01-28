@@ -125,6 +125,11 @@ public class Intake extends SubsystemBase {
         deployMotorEncoder.getPosition() - Constants.INTAKE_POSITION_WHEN_HORIZONTAL_DEGREES);
   }
 
+  public void initialize() {
+    deployMotorEncoder.setPosition(
+        deployMotorAbsoluteEncoder.getPosition() + Calibrations.INTAKE_ABSOLUTE_ENCODER_OFFSET_DEG);
+  }
+
   @Override
   public void periodic() {
     if (clampTimer.hasElapsed(Calibrations.AUTO_CLAMP_WAIT_TIME_SECONDS)) {
