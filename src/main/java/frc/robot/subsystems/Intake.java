@@ -4,12 +4,11 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -36,9 +35,6 @@ public class Intake extends SubsystemBase {
   private SparkMaxPIDController deployMotorPID = deployMotor.getPIDController();
 
   private final RelativeEncoder deployMotorEncoder = deployMotor.getEncoder();
-  private final AbsoluteEncoder deployMotorAbsoluteEncoder =
-      deployMotor.getAbsoluteEncoder(Type.kDutyCycle);
-
   private Solenoid clamp =
       new Solenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_CLAMP_FORWARD_CHANNEL);
 
@@ -49,16 +45,26 @@ public class Intake extends SubsystemBase {
 
   private Timer clampTimer = new Timer();
 
+  private final int SMART_MOTION_SLOT = 0;
+
   /** Creates a new Intake. */
   public Intake() {
     deployMotor.restoreFactoryDefaults();
     deployMotorEncoder.setPositionConversionFactor(Constants.DEPLOY_MOTOR_ENCODER_SCALAR);
     deployMotorEncoder.setVelocityConversionFactor(Constants.DEPLOY_MOTOR_ENCODER_VELOCITY_SCALAR);
-    deployMotorAbsoluteEncoder.setPositionConversionFactor(Constants.REVOLUTIONS_TO_DEGREES);
 
     deployMotorPID.setP(Calibrations.INTAKE_DEPLOY_MOTOR_P);
     deployMotorPID.setI(Calibrations.INTAKE_DEPLOY_MOTOR_I);
     deployMotorPID.setD(Calibrations.INTAKE_DEPLOY_MOTOR_D);
+
+    deployMotorPID.setSmartMotionMaxAccel(
+        Calibrations.INTAKE_DEPLOY_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED, SMART_MOTION_SLOT);
+    deployMotorPID.setSmartMotionMaxVelocity(
+        Calibrations.INTAKE_DEPLOY_MAX_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT);
+    deployMotorPID.setSmartMotionMinOutputVelocity(
+        Calibrations.INTAKE_DEPLOY_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT);
+    deployMotorPID.setSmartMotionAllowedClosedLoopError(
+        Calibrations.INTAKE_DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG, SMART_MOTION_SLOT);
 
     intakeLeft.restoreFactoryDefaults();
 
@@ -69,7 +75,11 @@ public class Intake extends SubsystemBase {
   /** Deploys the intake out */
   public void deploy() {
     deployMotorPID.setReference(
-        Calibrations.INTAKE_DEPLOYED_POSITION_DEGREES, CANSparkMax.ControlType.kPosition);
+        Calibrations.INTAKE_DEPLOYED_POSITION_DEGREES,
+        CANSparkMax.ControlType.kSmartMotion,
+        SMART_MOTION_SLOT,
+        Calibrations.ARBITRARY_INTAKE_FEED_FORWARD_VOLTS * getCosineIntakeAngle(),
+        ArbFFUnits.kVoltage);
     clampTimer.reset();
     clampTimer.start();
   }
@@ -78,7 +88,11 @@ public class Intake extends SubsystemBase {
   public void retract() {
     unclampIntake();
     deployMotorPID.setReference(
-        Calibrations.INTAKE_STARTING_POSITION_DEGREES, CANSparkMax.ControlType.kPosition);
+        Calibrations.INTAKE_STARTING_POSITION_DEGREES,
+        CANSparkMax.ControlType.kSmartMotion,
+        SMART_MOTION_SLOT,
+        Calibrations.ARBITRARY_INTAKE_FEED_FORWARD_VOLTS * getCosineIntakeAngle(),
+        ArbFFUnits.kVoltage);
   }
 
   /** Runs the intake wheels inward */
@@ -105,9 +119,10 @@ public class Intake extends SubsystemBase {
     return !gamePieceSensor.get();
   }
 
-  public void initialize() {
-    deployMotorEncoder.setPosition(
-        deployMotorAbsoluteEncoder.getPosition() + Calibrations.INTAKE_ABSOLUTE_ENCODER_OFFSET_DEG);
+  /** Returns the cosine of the intake angle in degrees off of the horizontal. */
+  public double getCosineIntakeAngle() {
+    return Math.cos(
+        deployMotorEncoder.getPosition() - Constants.INTAKE_POSITION_WHEN_HORIZONTAL_DEGREES);
   }
 
   @Override

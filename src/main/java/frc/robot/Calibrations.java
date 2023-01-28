@@ -83,8 +83,20 @@ public final class Calibrations {
   /** High profile constraints = pure P controller */
   public static final PIDController PATH_THETA_CONTROLLER = new PIDController(9.0, 0.0, 0.80);
 
-  /** Difference in what the intake absolute encoder says is 0 and what is actually 0 */
-  public static final double INTAKE_ABSOLUTE_ENCODER_OFFSET_DEG = PLACEHOLDER_DOUBLE;
-  /** Difference in what the arm absolute encoder says is 0 and what is actually 0 */
-  public static final double ARM_ABSOLUTE_ENCODER_OFFSET_DEG = PLACEHOLDER_DOUBLE;
+  /** Voltage required to hold the mechanism in horizontal position */
+  public static final double ARBITRARY_ARM_FEED_FORWARD_VOLTS = PLACEHOLDER_DOUBLE,
+      ARBITRARY_INTAKE_FEED_FORWARD_VOLTS = PLACEHOLDER_DOUBLE;
+
+  /** Parameters for intake SmartMotion */
+  public static final double
+      INTAKE_DEPLOY_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = PLACEHOLDER_DOUBLE,
+      INTAKE_DEPLOY_MAX_VELOCITY_DEG_PER_SECOND = PLACEHOLDER_DOUBLE,
+      INTAKE_DEPLOY_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND = PLACEHOLDER_DOUBLE,
+      INTAKE_DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG = PLACEHOLDER_DOUBLE;
+
+  /** Parameters for arm SmartMotion */
+  public static final double ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = PLACEHOLDER_DOUBLE,
+      ARM_MAX_VELOCITY_DEG_PER_SECOND = PLACEHOLDER_DOUBLE,
+      ARM_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND = PLACEHOLDER_DOUBLE,
+      ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG = PLACEHOLDER_DOUBLE;
 }

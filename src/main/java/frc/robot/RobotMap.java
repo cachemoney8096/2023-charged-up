@@ -35,7 +35,4 @@ public final class RobotMap {
   public static final int LIFT_GAME_PIECE_DIO = 0, INTAKE_GAME_PIECE_DIO = 1;
 
   public static final int PIGEON_CAN_ID = 1;
-
-  /** Elevator DutyCycleEncoder channels */
-  public static final int ELEVATOR_ENCODER_ONE_DIO = 2, ELEVATOR_ENCODER_TWO_DIO = 3;
 }
