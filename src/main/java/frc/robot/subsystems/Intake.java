@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Calibrations;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
+import java.util.Optional;
 
 /**
  * The game piece intake.
@@ -27,28 +28,32 @@ import frc.robot.RobotMap;
  * preps them to be grabbed by the lift.
  */
 public class Intake extends SubsystemBase {
-
-  // Sensors
-  private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.INTAKE_GAME_PIECE_DIO);
-  ;
-
+  // Actuators
   private CANSparkMax deployMotor =
       new CANSparkMax(RobotMap.INTAKE_DEPLOY_MOTOR_CAN_ID, MotorType.kBrushless);
   private SparkMaxPIDController deployMotorPID = deployMotor.getPIDController();
-
-  private final RelativeEncoder deployMotorEncoder = deployMotor.getEncoder();
-  private final AbsoluteEncoder deployMotorAbsoluteEncoder =
-      deployMotor.getAbsoluteEncoder(Type.kDutyCycle);
-
   private Solenoid clamp =
       new Solenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_CLAMP_FORWARD_CHANNEL);
-
   private CANSparkMax intakeLeft =
       new CANSparkMax(RobotMap.INTAKE_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
   private CANSparkMax intakeRight =
       new CANSparkMax(RobotMap.INTAKE_RIGHT_MOTOR_CAN_ID, MotorType.kBrushless);
 
-  private Timer clampTimer = new Timer();
+  // Sensors
+  private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.INTAKE_GAME_PIECE_DIO);
+  private final RelativeEncoder deployMotorEncoder = deployMotor.getEncoder();
+  private final AbsoluteEncoder deployMotorAbsoluteEncoder =
+      deployMotor.getAbsoluteEncoder(Type.kDutyCycle);
+
+  // Members
+  /**
+   * Timer for clamping. Not present means retracted or retracting (clamp!). Exists means deploying
+   * or already deployed (check timer for whether to clamp). Elapsed means we should clamp or stay
+   * clamped.
+   */
+  private Optional<Timer> clampTimer = Optional.empty();
+
+  private double intakeDesiredPositionDegrees = Calibrations.INTAKE_STARTING_POSITION_DEGREES;
 
   private final int SMART_MOTION_SLOT = 0;
 
@@ -78,27 +83,38 @@ public class Intake extends SubsystemBase {
     intakeRight.follow(intakeLeft, true);
   }
 
-  /** Deploys the intake out */
+  /** Deploys the intake out. */
   public void deploy() {
+    // Set the desired intake position
     deployMotorPID.setReference(
         Calibrations.INTAKE_DEPLOYED_POSITION_DEGREES,
         CANSparkMax.ControlType.kSmartMotion,
         SMART_MOTION_SLOT,
         Calibrations.ARBITRARY_INTAKE_FEED_FORWARD_VOLTS * getCosineIntakeAngle(),
         ArbFFUnits.kVoltage);
-    clampTimer.reset();
-    clampTimer.start();
+    intakeDesiredPositionDegrees = Calibrations.INTAKE_DEPLOYED_POSITION_DEGREES;
+
+    // Set a timer only if we're newly deploying
+    // If we have already set a timer, we shouldn't restart the timer
+    if (!clampTimer.isPresent()) {
+      clampTimer = Optional.of(new Timer());
+      clampTimer.get().start();
+    }
   }
 
   /** Brings the intake back in */
   public void retract() {
-    unclampIntake();
+    // Kill the timer to indicate retraction for clamping
+    clampTimer = Optional.empty();
+
+    // Set the desired intake position
     deployMotorPID.setReference(
         Calibrations.INTAKE_STARTING_POSITION_DEGREES,
         CANSparkMax.ControlType.kSmartMotion,
         SMART_MOTION_SLOT,
         Calibrations.ARBITRARY_INTAKE_FEED_FORWARD_VOLTS * getCosineIntakeAngle(),
         ArbFFUnits.kVoltage);
+    intakeDesiredPositionDegrees = Calibrations.INTAKE_STARTING_POSITION_DEGREES;
   }
 
   /** Runs the intake wheels inward */
@@ -111,11 +127,15 @@ public class Intake extends SubsystemBase {
     intakeLeft.set(Calibrations.INTAKE_EJECTION_POWER);
   }
 
-  public void clampIntake() {
+  public void stopIntakingGamePiece() {
+    intakeLeft.set(0.0);
+  }
+
+  private void clampIntake() {
     clamp.set(false);
   }
 
-  public void unclampIntake() {
+  private void unclampIntake() {
     clamp.set(true);
   }
 
@@ -138,10 +158,24 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (clampTimer.hasElapsed(Calibrations.AUTO_CLAMP_WAIT_TIME_SECONDS)) {
-      clampIntake();
-      clampTimer.stop();
-      clampTimer.reset();
+    if (clampTimer.isPresent()) {
+      // If present, that means we're deployed or in the process of deploying
+      if (clampTimer.get().hasElapsed(Calibrations.AUTO_CLAMP_WAIT_TIME_SECONDS)) {
+        // If the time has elapsed, that means we've deployed enough to clamp
+        clampIntake();
+      } else {
+        // If time has not elapsed, we are still in the process of deploying and shouldn't clamp yet
+        unclampIntake();
+      }
+    } else {
+      // When there's no timer, we're retracting or retracted so we should unclamp
+      unclampIntake();
+    }
+
+    // If the intake has achieved its desired position, then cut power
+    if (Math.abs(intakeDesiredPositionDegrees - deployMotorEncoder.getPosition())
+        < Calibrations.INTAKE_POSITION_THRESHOLD_DEGREES) {
+      deployMotorPID.setReference(0.0, CANSparkMax.ControlType.kVoltage);
     }
   }
 

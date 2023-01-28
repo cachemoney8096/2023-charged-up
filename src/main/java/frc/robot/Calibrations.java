@@ -113,4 +113,7 @@ public final class Calibrations {
       ELEVATOR_MAX_VELOCITY_IN_PER_SECOND = PLACEHOLDER_DOUBLE,
       ELEVATOR_MIN_OUTPUT_VELOCITY_IN_PER_SECOND = PLACEHOLDER_DOUBLE,
       ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN = PLACEHOLDER_DOUBLE;
+
+  /** Threshold for having achieved the desired intake position (in degrees) */
+  public static final double INTAKE_POSITION_THRESHOLD_DEGREES = 3.0;
 }
