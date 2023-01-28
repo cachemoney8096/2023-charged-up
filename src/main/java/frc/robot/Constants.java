@@ -115,4 +115,7 @@ public final class Constants {
 
   /*Revolutions to Degrees */
   public static final double REVOLUTIONS_TO_DEGREES = 360.0;
+
+  /** Scalar for the difference in the elevator's absolute encoders in inches per degree */
+  public static final double ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR = PLACEHOLDER_DOUBLE;
 }

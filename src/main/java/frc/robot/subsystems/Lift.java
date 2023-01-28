@@ -13,6 +13,7 @@ import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Calibrations;
@@ -22,11 +23,15 @@ import java.util.TreeMap;
 
 /** Contains code for elevator, arm, and game piece grabber */
 public class Lift extends SubsystemBase {
+
   private CANSparkMax elevator =
       new CANSparkMax(RobotMap.ELEVATOR_MOTOR_CAN_ID, MotorType.kBrushless);
 
   private final RelativeEncoder elevatorEncoder = elevator.getEncoder();
-  ;
+  private final DutyCycleEncoder elevatorDutyCycleEncoderOne =
+      new DutyCycleEncoder(RobotMap.ELEVATOR_ENCODER_ONE_DIO);
+  private final DutyCycleEncoder elevatorDutyCycleEncoderTwo =
+      new DutyCycleEncoder(RobotMap.ELEVATOR_ENCODER_TWO_DIO);
 
   private SparkMaxPIDController elevatorPID = elevator.getPIDController();
 
@@ -143,6 +148,12 @@ public class Lift extends SubsystemBase {
   public void initialize() {
     armEncoder.setPosition(
         armAbsoluteEncoder.getPosition() + Calibrations.ARM_ABSOLUTE_ENCODER_OFFSET_DEG);
+
+    double elevatorDutyCycleEncodersDifference =
+        elevatorDutyCycleEncoderOne.getAbsolutePosition()
+            - elevatorDutyCycleEncoderTwo.getAbsolutePosition();
+    elevatorEncoder.setPosition(
+        elevatorDutyCycleEncodersDifference * Constants.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR);
   }
 
   @Override
