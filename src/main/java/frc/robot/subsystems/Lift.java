@@ -170,6 +170,7 @@ public class Lift extends SubsystemBase {
   /** Returns the cosine of the arm angle in degrees off of the horizontal. */
   public double getCosineArmAngle() {
     return Math.cos(armEncoder.getPosition() - Constants.ARM_POSITION_WHEN_HORIZONTAL_DEGREES);
+  }
 
   public void initialize() {
     armEncoder.setPosition(

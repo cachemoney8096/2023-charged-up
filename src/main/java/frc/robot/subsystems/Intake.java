@@ -129,6 +129,7 @@ public class Intake extends SubsystemBase {
   public double getCosineIntakeAngle() {
     return Math.cos(
         deployMotorEncoder.getPosition() - Constants.INTAKE_POSITION_WHEN_HORIZONTAL_DEGREES);
+  }
 
   public void initialize() {
     deployMotorEncoder.setPosition(
