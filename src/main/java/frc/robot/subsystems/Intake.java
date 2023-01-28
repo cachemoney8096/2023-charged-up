@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -66,7 +67,8 @@ public class Intake extends SubsystemBase {
         Calibrations.INTAKE_DEPLOYED_POSITION_DEGREES,
         CANSparkMax.ControlType.kPosition,
         Calibrations.SMART_MOTION_SLOT,
-        Calibrations.ARBITRARY_INTAKE_FEED_FORWARD * getCosineIntakeAngle());
+        Calibrations.ARBITRARY_INTAKE_FEED_FORWARD_VOLTS * getCosineIntakeAngle(),
+        ArbFFUnits.kVoltage);
     clampTimer.reset();
     clampTimer.start();
   }
@@ -78,7 +80,8 @@ public class Intake extends SubsystemBase {
         Calibrations.INTAKE_STARTING_POSITION_DEGREES,
         CANSparkMax.ControlType.kPosition,
         Calibrations.SMART_MOTION_SLOT,
-        Calibrations.ARBITRARY_INTAKE_FEED_FORWARD * getCosineIntakeAngle());
+        Calibrations.ARBITRARY_INTAKE_FEED_FORWARD_VOLTS * getCosineIntakeAngle(),
+        ArbFFUnits.kVoltage);
   }
 
   /** Runs the intake wheels inward */

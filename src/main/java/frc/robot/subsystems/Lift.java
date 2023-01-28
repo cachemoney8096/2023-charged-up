@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -41,7 +42,6 @@ public class Lift extends SubsystemBase {
 
   // Sensors
   private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
-  ;
 
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
@@ -106,12 +106,14 @@ public class Lift extends SubsystemBase {
         liftPositionMap.get(pos).getFirst(),
         CANSparkMax.ControlType.kPosition,
         Calibrations.SMART_MOTION_SLOT,
-        Calibrations.ARBITRARY_ARM_FEED_FORWARD * getCosineArmAngle());
+        Calibrations.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle(),
+        ArbFFUnits.kVoltage);
     armPID.setReference(
         liftPositionMap.get(pos).getSecond(),
         CANSparkMax.ControlType.kPosition,
         Calibrations.SMART_MOTION_SLOT,
-        Calibrations.ARBITRARY_ARM_FEED_FORWARD * getCosineArmAngle());
+        Calibrations.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle(),
+        ArbFFUnits.kVoltage);
   }
 
   public void grab() {
