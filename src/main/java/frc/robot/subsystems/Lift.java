@@ -20,34 +20,31 @@ import java.util.TreeMap;
 
 /** Contains code for elevator, arm, and game piece grabber */
 public class Lift extends SubsystemBase {
-  private CANSparkMax elevator =
-      new CANSparkMax(RobotMap.ELEVATOR_MOTOR_CAN_ID, MotorType.kBrushless);
+  private CANSparkMax elevator = new CANSparkMax(RobotMap.ELEVATOR_MOTOR_CAN_ID, MotorType.kBrushless);
 
   private final RelativeEncoder elevatorEncoder = elevator.getEncoder();
-  ;
 
   private SparkMaxPIDController elevatorPID = elevator.getPIDController();
 
   private CANSparkMax arm = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
 
   private final RelativeEncoder armEncoder = arm.getEncoder();
-  ;
 
   private SparkMaxPIDController armPID = arm.getPIDController();
 
-  private DoubleSolenoid grabber =
-      new DoubleSolenoid(
-          PneumaticsModuleType.REVPH,
-          RobotMap.LIFT_GRABBING_FORWARD_CHANNEL,
-          RobotMap.LIFT_GRABBING_REVERSE_CHANNEL);
+  private DoubleSolenoid grabber = new DoubleSolenoid(
+      PneumaticsModuleType.REVPH,
+      RobotMap.LIFT_GRABBING_FORWARD_CHANNEL,
+      RobotMap.LIFT_GRABBING_REVERSE_CHANNEL);
 
   // Sensors
-  private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
-  ;
+  private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);;
 
   /**
-   * Indicates the elevator and arm positions at each position of the lift. The first value
-   * indicates the elevator position in inches and the second value indicates the arm position in
+   * Indicates the elevator and arm positions at each position of the lift. The
+   * first value
+   * indicates the elevator position in inches and the second value indicates the
+   * arm position in
    * degrees
    */
   TreeMap<LiftPosition, Pair<Double, Double>> liftPositionMap;
@@ -57,11 +54,11 @@ public class Lift extends SubsystemBase {
     elevator.restoreFactoryDefaults();
     arm.restoreFactoryDefaults();
 
-    /* Get positions and degrees of elevator through encoder in inches*/
+    /* Get positions and degrees of elevator through encoder in inches */
     elevatorEncoder.setPositionConversionFactor(Constants.ELEVATOR_MOTOR_ENCODER_SCALAR);
     elevatorEncoder.setVelocityConversionFactor(Constants.ELEVATOR_MOTOR_ENCODER_VELOCITY_SCALAR);
 
-    /* Get positions and degrees of arm through encoder in degrees*/
+    /* Get positions and degrees of arm through encoder in degrees */
     armEncoder.setPositionConversionFactor(Constants.ARM_MOTOR_ENCODER_SCALAR);
     armEncoder.setVelocityConversionFactor(Constants.ARM_MOTOR_ENCODER_VELOCITY_SCALAR);
 
@@ -105,8 +102,10 @@ public class Lift extends SubsystemBase {
 
   public void goToPosition(LiftPosition pos) {
     elevatorPID.setReference(
-        liftPositionMap.get(pos).getFirst(), CANSparkMax.ControlType.kPosition);
-    armPID.setReference(liftPositionMap.get(pos).getSecond(), CANSparkMax.ControlType.kPosition);
+        liftPositionMap.get(pos).getFirst(), CANSparkMax.ControlType.kPosition, Calibrations.SMART_MOTION_SLOT,
+        Calibrations.ARBITRARY_ARM_FEED_FORWARD * getCosineArmAngle());
+    armPID.setReference(liftPositionMap.get(pos).getSecond(), CANSparkMax.ControlType.kPosition,
+        Calibrations.SMART_MOTION_SLOT, Calibrations.ARBITRARY_ARM_FEED_FORWARD * getCosineArmAngle());
   }
 
   public void grab() {
@@ -124,17 +123,27 @@ public class Lift extends SubsystemBase {
   }
 
   /**
-   * Scores the currently loaded game piece Currently empty because we don't know exactly what it
+   * Scores the currently loaded game piece Currently empty because we don't know
+   * exactly what it
    * will do
    */
-  public void scoreGamePiece() {}
+  public void scoreGamePiece() {
+  }
 
   /**
-   * Says whether or not the robot is done scoring a game piece Currently empty because we don't
+   * Says whether or not the robot is done scoring a game piece Currently empty
+   * because we don't
    * know exactly what it will look like
    */
   public boolean doneScoring() {
     return true; // Placeholder until logic is made
+  }
+
+  /**
+   * Returns the cosine of the arm angle in degrees off of the horizontal.
+   */
+  public double getCosineArmAngle() {
+    return Math.cos(armEncoder.getPosition() - 90);
   }
 
   @Override

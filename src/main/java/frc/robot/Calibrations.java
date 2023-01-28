@@ -82,4 +82,10 @@ public final class Calibrations {
 
   /** High profile constraints = pure P controller */
   public static final PIDController PATH_THETA_CONTROLLER = new PIDController(9.0, 0.0, 0.80);
+
+  public static final double ARBITRARY_ARM_FEED_FORWARD = PLACEHOLDER_DOUBLE;
+  public static final double ARBITRARY_INTAKE_FEED_FORWARD = PLACEHOLDER_DOUBLE;
+
+  public static final int SMART_MOTION_SLOT = 0;
+
 }
