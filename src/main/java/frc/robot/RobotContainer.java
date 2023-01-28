@@ -47,6 +47,10 @@ public class RobotContainer {
 
     // Put the chooser on the dashboard
     SmartDashboard.putData(autonChooser);
+
+    // Encoder offset stuff
+    intake.initialize();
+    lift.initialize();
   }
 
   /**

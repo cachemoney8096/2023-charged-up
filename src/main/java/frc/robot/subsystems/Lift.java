@@ -4,9 +4,11 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -31,7 +33,7 @@ public class Lift extends SubsystemBase {
   private CANSparkMax arm = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
 
   private final RelativeEncoder armEncoder = arm.getEncoder();
-  ;
+  private final AbsoluteEncoder armAbsoluteEncoder = arm.getAbsoluteEncoder(Type.kDutyCycle);
 
   private SparkMaxPIDController armPID = arm.getPIDController();
 
@@ -135,6 +137,10 @@ public class Lift extends SubsystemBase {
    */
   public boolean doneScoring() {
     return true; // Placeholder until logic is made
+  }
+
+  public void initialize() {
+    armEncoder.setPosition(armAbsoluteEncoder.getPosition() + Calibrations.ABSOLUTE_ENCODER_OFFSET);
   }
 
   @Override
