@@ -15,8 +15,9 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import frc.robot.Calibrations;
+import frc.robot.Cal;
 import frc.robot.Constants;
+import frc.robot.utils.SparkMaxUtils;
 
 public class SwerveModule implements Sendable {
   private final CANSparkMax drivingSparkMax;
@@ -36,82 +37,108 @@ public class SwerveModule implements Sendable {
    * controller. This configuration is specific to the REV MAXSwerve Module built with NEOs, SPARKS
    * MAX, and a Through Bore Encoder.
    */
-  // TODO: Check error codes from various setters
-  public SwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
-    drivingSparkMax = new CANSparkMax(drivingCANId, MotorType.kBrushless);
-    turningSparkMax = new CANSparkMax(turningCANId, MotorType.kBrushless);
+  public SwerveModule(int drivingCanId, int turningCanId, double chassisAngularOffset) {
+    drivingSparkMax = new CANSparkMax(drivingCanId, MotorType.kBrushless);
+    turningSparkMax = new CANSparkMax(turningCanId, MotorType.kBrushless);
 
-    // Factory reset, so we get the SPARKS MAX to a known state before configuring
-    // them. This is useful in case a SPARK MAX is swapped out.
-    drivingSparkMax.restoreFactoryDefaults();
-    turningSparkMax.restoreFactoryDefaults();
+    SparkMaxUtils.initWithRetry(this::initDriveSpark, Cal.SPARK_INIT_RETRY_ATTEMPTS);
+    SparkMaxUtils.initWithRetry(this::initTurnSpark, Cal.SPARK_INIT_RETRY_ATTEMPTS);
 
-    // Setup encoders and PID controllers for the driving and turning SPARKS MAX.
     drivingEncoder = drivingSparkMax.getEncoder();
-    turningEncoder = turningSparkMax.getAbsoluteEncoder(Type.kDutyCycle);
     drivingPIDController = drivingSparkMax.getPIDController();
+    turningEncoder = turningSparkMax.getAbsoluteEncoder(Type.kDutyCycle);
     turningPIDController = turningSparkMax.getPIDController();
-    drivingPIDController.setFeedbackDevice(drivingEncoder);
-    turningPIDController.setFeedbackDevice(turningEncoder);
-
-    // Apply position and velocity conversion factors for the driving encoder. The
-    // native units for position and velocity are rotations and RPM, respectively,
-    // but we want meters and meters per second to use with WPILib's swerve APIs.
-    drivingEncoder.setPositionConversionFactor(
-        Constants.SwerveModule.DRIVING_ENCODER_POSITION_FACTOR_METERS);
-    drivingEncoder.setVelocityConversionFactor(
-        Constants.SwerveModule.DRIVING_ENCODER_VELOCITY_FACTOR_METERS_PER_SECOND);
-
-    // Apply position and velocity conversion factors for the turning encoder. We
-    // want these in radians and radians per second to use with WPILib's swerve
-    // APIs.
-    turningEncoder.setPositionConversionFactor(
-        Constants.SwerveModule.TURNING_ENCODER_POSITION_FACTOR_RADIANS);
-    turningEncoder.setVelocityConversionFactor(
-        Constants.SwerveModule.TURNING_ENCODER_VELOCITY_FACTOR_RAD_PER_SEC);
-
-    // Invert the turning encoder, since the output shaft rotates in the opposite direction of
-    // the steering motor in the Swerve Module.
-    turningEncoder.setInverted(Constants.SwerveModule.TURNING_ENCODER_INVERTED);
-
-    // Enable PID wrap around for the turning motor. This will allow the PID
-    // controller to go through 0 to get to the setpoint i.e. going from 350 degrees
-    // to 10 degrees will go through 0 rather than the other direction which is a
-    // longer route.
-    turningPIDController.setPositionPIDWrappingEnabled(true);
-    turningPIDController.setPositionPIDWrappingMinInput(
-        Constants.SwerveModule.TURNING_ENCODER_POSITION_PID_MIN_INPUT_RADIANS);
-    turningPIDController.setPositionPIDWrappingMaxInput(
-        Constants.SwerveModule.TURNING_ENCODER_POSITION_PID_MAX_INPUT_RADIANS);
-
-    // Set the PID gains for the driving motor.
-    drivingPIDController.setP(Calibrations.SwerveModule.DRIVING_P);
-    drivingPIDController.setI(Calibrations.SwerveModule.DRIVING_I);
-    drivingPIDController.setD(Calibrations.SwerveModule.DRIVING_D);
-    drivingPIDController.setFF(Calibrations.SwerveModule.DRIVING_FF);
-    drivingPIDController.setOutputRange(
-        Calibrations.SwerveModule.DRIVING_MIN_OUTPUT, Calibrations.SwerveModule.DRIVING_MAX_OUTPUT);
-
-    // Set the PID gains for the turning motor.
-    turningPIDController.setP(Calibrations.SwerveModule.TURNING_P);
-    turningPIDController.setI(Calibrations.SwerveModule.TURNING_I);
-    turningPIDController.setD(Calibrations.SwerveModule.TURNING_D);
-    turningPIDController.setFF(Calibrations.SwerveModule.TURNING_FF);
-    turningPIDController.setOutputRange(
-        Calibrations.SwerveModule.TURNING_MIN_OUTPUT, Calibrations.SwerveModule.TURNING_MAX_OUTPUT);
-
-    drivingSparkMax.setIdleMode(Constants.SwerveModule.DRIVING_MOTOR_IDLE_MODE);
-    turningSparkMax.setIdleMode(Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
-    drivingSparkMax.setSmartCurrentLimit(Constants.SwerveModule.DRIVING_MOTOR_CURRENT_LIMIT_AMPS);
-    turningSparkMax.setSmartCurrentLimit(Constants.SwerveModule.TURNING_MOTOR_CURRENT_LIMIT_AMPS);
-
-    // Save the SPARK MAX configurations. If a SPARK MAX browns out during
-    // operation, it will maintain the above configurations.
-    drivingSparkMax.burnFlash();
-    turningSparkMax.burnFlash();
 
     desiredState.angle = new Rotation2d(turningEncoder.getPosition());
     drivingEncoder.setPosition(0);
+  }
+
+  /** Does all the initialization for the spark, return true on success */
+  boolean initTurnSpark() {
+    int errors = 0;
+
+    errors += SparkMaxUtils.check(turningSparkMax.restoreFactoryDefaults());
+
+    AbsoluteEncoder turningEncoderTmp = turningSparkMax.getAbsoluteEncoder(Type.kDutyCycle);
+    SparkMaxPIDController turningPidTmp = turningSparkMax.getPIDController();
+    errors += SparkMaxUtils.check(turningPidTmp.setFeedbackDevice(turningEncoder));
+
+    // Gear ratio 1.0 because the encoder is 1:1 with the module (doesn't involve the actual turning
+    // gear ratio)
+    errors +=
+        SparkMaxUtils.check(
+            SparkMaxUtils.UnitConversions.setRadsFromGearRatio(turningEncoderTmp, 1.0));
+
+    errors +=
+        SparkMaxUtils.check(
+            turningEncoderTmp.setInverted(Constants.SwerveModule.TURNING_ENCODER_INVERTED));
+
+    errors += SparkMaxUtils.check(turningPidTmp.setPositionPIDWrappingEnabled(true));
+    errors +=
+        SparkMaxUtils.check(
+            turningPidTmp.setPositionPIDWrappingMinInput(
+                Constants.SwerveModule.TURNING_ENCODER_POSITION_PID_MIN_INPUT_RADIANS));
+    errors +=
+        SparkMaxUtils.check(
+            turningPidTmp.setPositionPIDWrappingMaxInput(
+                Constants.SwerveModule.TURNING_ENCODER_POSITION_PID_MAX_INPUT_RADIANS));
+
+    errors += SparkMaxUtils.check(turningPidTmp.setP(Cal.SwerveModule.TURNING_P));
+    errors += SparkMaxUtils.check(turningPidTmp.setI(Cal.SwerveModule.TURNING_I));
+    errors += SparkMaxUtils.check(turningPidTmp.setD(Cal.SwerveModule.TURNING_D));
+    errors += SparkMaxUtils.check(turningPidTmp.setFF(Cal.SwerveModule.TURNING_FF));
+    errors +=
+        SparkMaxUtils.check(
+            turningPidTmp.setOutputRange(
+                Cal.SwerveModule.TURNING_MIN_OUTPUT, Cal.SwerveModule.TURNING_MAX_OUTPUT));
+
+    errors +=
+        SparkMaxUtils.check(
+            turningSparkMax.setIdleMode(Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE));
+    errors +=
+        SparkMaxUtils.check(
+            turningSparkMax.setSmartCurrentLimit(
+                Constants.SwerveModule.TURNING_MOTOR_CURRENT_LIMIT_AMPS));
+
+    return errors == 0;
+  }
+
+  /** Does all the initialization for the spark, return true on success */
+  boolean initDriveSpark() {
+    int errors = 0;
+    errors += SparkMaxUtils.check(drivingSparkMax.restoreFactoryDefaults());
+
+    RelativeEncoder drivingEncoderTmp = drivingSparkMax.getEncoder();
+    SparkMaxPIDController drivingPidTmp = drivingSparkMax.getPIDController();
+    errors += SparkMaxUtils.check(drivingPidTmp.setFeedbackDevice(drivingEncoder));
+
+    errors += SparkMaxUtils.check(drivingPidTmp.setP(Cal.SwerveModule.DRIVING_P));
+    errors += SparkMaxUtils.check(drivingPidTmp.setI(Cal.SwerveModule.DRIVING_I));
+    errors += SparkMaxUtils.check(drivingPidTmp.setD(Cal.SwerveModule.DRIVING_D));
+    errors += SparkMaxUtils.check(drivingPidTmp.setFF(Cal.SwerveModule.DRIVING_FF));
+    errors +=
+        SparkMaxUtils.check(
+            drivingPidTmp.setOutputRange(
+                Cal.SwerveModule.DRIVING_MIN_OUTPUT, Cal.SwerveModule.DRIVING_MAX_OUTPUT));
+
+    errors +=
+        SparkMaxUtils.check(
+            drivingEncoderTmp.setPositionConversionFactor(
+                Constants.SwerveModule.DRIVING_ENCODER_POSITION_FACTOR_METERS));
+    errors +=
+        SparkMaxUtils.check(
+            drivingEncoderTmp.setVelocityConversionFactor(
+                Constants.SwerveModule.DRIVING_ENCODER_VELOCITY_FACTOR_METERS_PER_SECOND));
+
+    errors +=
+        SparkMaxUtils.check(
+            drivingSparkMax.setIdleMode(Constants.SwerveModule.DRIVING_MOTOR_IDLE_MODE));
+    errors +=
+        SparkMaxUtils.check(
+            drivingSparkMax.setSmartCurrentLimit(
+                Constants.SwerveModule.DRIVING_MOTOR_CURRENT_LIMIT_AMPS));
+
+    return errors == 0;
   }
 
   /**

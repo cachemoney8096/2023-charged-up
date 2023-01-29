@@ -2,8 +2,8 @@ package frc.robot;
 
 import edu.wpi.first.math.controller.PIDController;
 
-/** This class provides a place for arbitrary but tuned values, like PID values. */
-public final class Calibrations {
+/** This class provides a place for Calibrations: arbitrary but tuned values, like PID values. */
+public final class Cal {
   public static final double PLACEHOLDER_DOUBLE = 0.0;
   public static final int PLACEHOLDER_INT = 0;
 
@@ -52,26 +52,26 @@ public final class Calibrations {
     public static final double AUTO_CLAMP_WAIT_TIME_SECONDS = 0.5;
 
     /** Input degrees, output [0,1] */
-    public static final double DEPLOY_MOTOR_P = Calibrations.PLACEHOLDER_DOUBLE,
-        DEPLOY_MOTOR_I = Calibrations.PLACEHOLDER_DOUBLE,
-        DEPLOY_MOTOR_D = Calibrations.PLACEHOLDER_DOUBLE;
+    public static final double DEPLOY_MOTOR_P = Cal.PLACEHOLDER_DOUBLE,
+        DEPLOY_MOTOR_I = Cal.PLACEHOLDER_DOUBLE,
+        DEPLOY_MOTOR_D = Cal.PLACEHOLDER_DOUBLE;
 
     /** Intake positions in degrees */
-    public static final double STARTING_POSITION_DEGREES = Calibrations.PLACEHOLDER_DOUBLE,
-        DEPLOYED_POSITION_DEGREES = Calibrations.PLACEHOLDER_DOUBLE;
+    public static final double STARTING_POSITION_DEGREES = Cal.PLACEHOLDER_DOUBLE,
+        DEPLOYED_POSITION_DEGREES = Cal.PLACEHOLDER_DOUBLE;
 
     /** Difference in what the intake absolute encoder says is 0 and what is actually 0 */
-    public static final double ABSOLUTE_ENCODER_OFFSET_DEG = Calibrations.PLACEHOLDER_DOUBLE;
+    public static final double ABSOLUTE_ENCODER_OFFSET_DEG = Cal.PLACEHOLDER_DOUBLE;
 
     /** Voltage required to hold the intake in the horizontal position */
-    public static final double ARBITRARY_FEED_FORWARD_VOLTS = Calibrations.PLACEHOLDER_DOUBLE;
+    public static final double ARBITRARY_FEED_FORWARD_VOLTS = Cal.PLACEHOLDER_DOUBLE;
 
     /** Parameters for intake SmartMotion */
     public static final double
-        DEPLOY_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = Calibrations.PLACEHOLDER_DOUBLE,
-        DEPLOY_MAX_VELOCITY_DEG_PER_SECOND = Calibrations.PLACEHOLDER_DOUBLE,
-        DEPLOY_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND = Calibrations.PLACEHOLDER_DOUBLE,
-        DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG = Calibrations.PLACEHOLDER_DOUBLE;
+        DEPLOY_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = Cal.PLACEHOLDER_DOUBLE,
+        DEPLOY_MAX_VELOCITY_DEG_PER_SECOND = Cal.PLACEHOLDER_DOUBLE,
+        DEPLOY_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND = Cal.PLACEHOLDER_DOUBLE,
+        DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG = Cal.PLACEHOLDER_DOUBLE;
 
     /** Threshold for having achieved the desired intake position (in degrees) */
     public static final double POSITION_THRESHOLD_DEGREES = 3.0;
@@ -79,38 +79,36 @@ public final class Calibrations {
 
   public static final class Lift {
     /** Input inches, output [0,1] */
-    public static final double ELEVATOR_P = Calibrations.PLACEHOLDER_DOUBLE,
-        ELEVATOR_I = Calibrations.PLACEHOLDER_DOUBLE,
-        ELEVATOR_D = Calibrations.PLACEHOLDER_DOUBLE;
+    public static final double ELEVATOR_P = Cal.PLACEHOLDER_DOUBLE,
+        ELEVATOR_I = Cal.PLACEHOLDER_DOUBLE,
+        ELEVATOR_D = Cal.PLACEHOLDER_DOUBLE;
 
     /** Input degrees, output [0,1] */
-    public static final double ARM_P = Calibrations.PLACEHOLDER_DOUBLE,
-        ARM_I = Calibrations.PLACEHOLDER_DOUBLE,
-        ARM_D = Calibrations.PLACEHOLDER_DOUBLE;
+    public static final double ARM_P = Cal.PLACEHOLDER_DOUBLE,
+        ARM_I = Cal.PLACEHOLDER_DOUBLE,
+        ARM_D = Cal.PLACEHOLDER_DOUBLE;
 
     /** Difference in what the arm absolute encoder says is 0 and what is actually 0 */
-    public static final double ARM_ABSOLUTE_ENCODER_OFFSET_DEG = Calibrations.PLACEHOLDER_DOUBLE;
+    public static final double ARM_ABSOLUTE_ENCODER_OFFSET_DEG = Cal.PLACEHOLDER_DOUBLE;
 
     /** Voltage required to hold the arm in the horizontal position */
-    public static final double ARBITRARY_ARM_FEED_FORWARD_VOLTS = Calibrations.PLACEHOLDER_DOUBLE;
+    public static final double ARBITRARY_ARM_FEED_FORWARD_VOLTS = Cal.PLACEHOLDER_DOUBLE;
 
     /** Voltage required to hold the elevator */
-    public static final double ARBITRARY_ELEVATOR_FEED_FORWARD_VOLTS =
-        Calibrations.PLACEHOLDER_DOUBLE;
+    public static final double ARBITRARY_ELEVATOR_FEED_FORWARD_VOLTS = Cal.PLACEHOLDER_DOUBLE;
 
     /** Parameters for arm SmartMotion */
-    public static final double
-        ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = Calibrations.PLACEHOLDER_DOUBLE,
-        ARM_MAX_VELOCITY_DEG_PER_SECOND = Calibrations.PLACEHOLDER_DOUBLE,
-        ARM_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND = Calibrations.PLACEHOLDER_DOUBLE,
-        ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG = Calibrations.PLACEHOLDER_DOUBLE;
+    public static final double ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = Cal.PLACEHOLDER_DOUBLE,
+        ARM_MAX_VELOCITY_DEG_PER_SECOND = Cal.PLACEHOLDER_DOUBLE,
+        ARM_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND = Cal.PLACEHOLDER_DOUBLE,
+        ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG = Cal.PLACEHOLDER_DOUBLE;
 
     /** Parameters for elevator SmartMotion */
     public static final double
-        ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED = Calibrations.PLACEHOLDER_DOUBLE,
-        ELEVATOR_MAX_VELOCITY_IN_PER_SECOND = Calibrations.PLACEHOLDER_DOUBLE,
-        ELEVATOR_MIN_OUTPUT_VELOCITY_IN_PER_SECOND = Calibrations.PLACEHOLDER_DOUBLE,
-        ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN = Calibrations.PLACEHOLDER_DOUBLE;
+        ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED = Cal.PLACEHOLDER_DOUBLE,
+        ELEVATOR_MAX_VELOCITY_IN_PER_SECOND = Cal.PLACEHOLDER_DOUBLE,
+        ELEVATOR_MIN_OUTPUT_VELOCITY_IN_PER_SECOND = Cal.PLACEHOLDER_DOUBLE,
+        ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN = Cal.PLACEHOLDER_DOUBLE;
   }
 
   public static final class AutoBalance {

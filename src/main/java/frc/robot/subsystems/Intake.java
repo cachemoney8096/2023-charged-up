@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Calibrations;
+import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
 import frc.robot.utils.SparkMaxUtils;
@@ -55,17 +55,17 @@ public class Intake extends SubsystemBase {
    */
   private Optional<Timer> clampTimer = Optional.empty();
 
-  private double intakeDesiredPositionDegrees = Calibrations.Intake.STARTING_POSITION_DEGREES;
+  private double intakeDesiredPositionDegrees = Cal.Intake.STARTING_POSITION_DEGREES;
 
   private final int SMART_MOTION_SLOT = 0;
 
   /** Creates a new Intake. */
   public Intake() {
-    SparkMaxUtils.initWithRetry(this::setUpDeploySpark, Calibrations.SPARK_INIT_RETRY_ATTEMPTS);
-    SparkMaxUtils.initWithRetry(
-        this::setUpIntakeWheelSparks, Calibrations.SPARK_INIT_RETRY_ATTEMPTS);
+    SparkMaxUtils.initWithRetry(this::setUpDeploySpark, Cal.SPARK_INIT_RETRY_ATTEMPTS);
+    SparkMaxUtils.initWithRetry(this::setUpIntakeWheelSparks, Cal.SPARK_INIT_RETRY_ATTEMPTS);
   }
 
+  /** Does all the initialization for the sparks, return true on success */
   boolean setUpIntakeWheelSparks() {
     int errors = 0;
     errors += SparkMaxUtils.check(intakeLeft.restoreFactoryDefaults());
@@ -75,6 +75,7 @@ public class Intake extends SubsystemBase {
     return errors == 0;
   }
 
+  /** Does all the initialization for the spark, return true on success */
   boolean setUpDeploySpark() {
     int errors = 0;
 
@@ -87,27 +88,26 @@ public class Intake extends SubsystemBase {
         SparkMaxUtils.check(
             deployMotorAbsoluteEncoder.setPositionConversionFactor(
                 Constants.REVOLUTIONS_TO_DEGREES));
-    errors += SparkMaxUtils.check(deployMotorPID.setP(Calibrations.Intake.DEPLOY_MOTOR_P));
-    errors += SparkMaxUtils.check(deployMotorPID.setI(Calibrations.Intake.DEPLOY_MOTOR_I));
-    errors += SparkMaxUtils.check(deployMotorPID.setD(Calibrations.Intake.DEPLOY_MOTOR_D));
+    errors += SparkMaxUtils.check(deployMotorPID.setP(Cal.Intake.DEPLOY_MOTOR_P));
+    errors += SparkMaxUtils.check(deployMotorPID.setI(Cal.Intake.DEPLOY_MOTOR_I));
+    errors += SparkMaxUtils.check(deployMotorPID.setD(Cal.Intake.DEPLOY_MOTOR_D));
 
     errors +=
         SparkMaxUtils.check(
             deployMotorPID.setSmartMotionMaxAccel(
-                Calibrations.Intake.DEPLOY_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED,
-                SMART_MOTION_SLOT));
+                Cal.Intake.DEPLOY_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED, SMART_MOTION_SLOT));
     errors +=
         SparkMaxUtils.check(
             deployMotorPID.setSmartMotionMaxVelocity(
-                Calibrations.Intake.DEPLOY_MAX_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT));
+                Cal.Intake.DEPLOY_MAX_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT));
     errors +=
         SparkMaxUtils.check(
             deployMotorPID.setSmartMotionMinOutputVelocity(
-                Calibrations.Intake.DEPLOY_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT));
+                Cal.Intake.DEPLOY_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT));
     errors +=
         SparkMaxUtils.check(
             deployMotorPID.setSmartMotionAllowedClosedLoopError(
-                Calibrations.Intake.DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG, SMART_MOTION_SLOT));
+                Cal.Intake.DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG, SMART_MOTION_SLOT));
 
     return errors == 0;
   }
@@ -116,12 +116,12 @@ public class Intake extends SubsystemBase {
   public void deploy() {
     // Set the desired intake position
     deployMotorPID.setReference(
-        Calibrations.Intake.DEPLOYED_POSITION_DEGREES,
+        Cal.Intake.DEPLOYED_POSITION_DEGREES,
         CANSparkMax.ControlType.kSmartMotion,
         SMART_MOTION_SLOT,
-        Calibrations.Intake.ARBITRARY_FEED_FORWARD_VOLTS * getCosineIntakeAngle(),
+        Cal.Intake.ARBITRARY_FEED_FORWARD_VOLTS * getCosineIntakeAngle(),
         ArbFFUnits.kVoltage);
-    intakeDesiredPositionDegrees = Calibrations.Intake.DEPLOYED_POSITION_DEGREES;
+    intakeDesiredPositionDegrees = Cal.Intake.DEPLOYED_POSITION_DEGREES;
 
     // Set a timer only if we're newly deploying
     // If we have already set a timer, we shouldn't restart the timer
@@ -138,22 +138,22 @@ public class Intake extends SubsystemBase {
 
     // Set the desired intake position
     deployMotorPID.setReference(
-        Calibrations.Intake.STARTING_POSITION_DEGREES,
+        Cal.Intake.STARTING_POSITION_DEGREES,
         CANSparkMax.ControlType.kSmartMotion,
         SMART_MOTION_SLOT,
-        Calibrations.Intake.ARBITRARY_FEED_FORWARD_VOLTS * getCosineIntakeAngle(),
+        Cal.Intake.ARBITRARY_FEED_FORWARD_VOLTS * getCosineIntakeAngle(),
         ArbFFUnits.kVoltage);
-    intakeDesiredPositionDegrees = Calibrations.Intake.STARTING_POSITION_DEGREES;
+    intakeDesiredPositionDegrees = Cal.Intake.STARTING_POSITION_DEGREES;
   }
 
   /** Runs the intake wheels inward */
   public void intakeGamePiece() {
-    intakeLeft.set(Calibrations.Intake.INTAKING_POWER);
+    intakeLeft.set(Cal.Intake.INTAKING_POWER);
   }
 
   /** Runs the intake wheels outward */
   public void ejectGamePiece() {
-    intakeLeft.set(Calibrations.Intake.EJECTION_POWER);
+    intakeLeft.set(Cal.Intake.EJECTION_POWER);
   }
 
   public void stopIntakingGamePiece() {
@@ -176,7 +176,7 @@ public class Intake extends SubsystemBase {
 
   public void initialize() {
     deployMotorEncoder.setPosition(
-        deployMotorAbsoluteEncoder.getPosition() + Calibrations.Intake.ABSOLUTE_ENCODER_OFFSET_DEG);
+        deployMotorAbsoluteEncoder.getPosition() + Cal.Intake.ABSOLUTE_ENCODER_OFFSET_DEG);
   }
 
   /** Returns the cosine of the intake angle in degrees off of the horizontal. */
@@ -189,7 +189,7 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     if (clampTimer.isPresent()) {
       // If present, that means we're deployed or in the process of deploying
-      if (clampTimer.get().hasElapsed(Calibrations.Intake.AUTO_CLAMP_WAIT_TIME_SECONDS)) {
+      if (clampTimer.get().hasElapsed(Cal.Intake.AUTO_CLAMP_WAIT_TIME_SECONDS)) {
         // If the time has elapsed, that means we've deployed enough to clamp
         clampIntake();
       } else {
@@ -203,7 +203,7 @@ public class Intake extends SubsystemBase {
 
     // If the intake has achieved its desired position, then cut power
     if (Math.abs(intakeDesiredPositionDegrees - deployMotorEncoder.getPosition())
-        < Calibrations.Intake.POSITION_THRESHOLD_DEGREES) {
+        < Cal.Intake.POSITION_THRESHOLD_DEGREES) {
       deployMotorPID.setReference(0.0, CANSparkMax.ControlType.kVoltage);
     }
   }
