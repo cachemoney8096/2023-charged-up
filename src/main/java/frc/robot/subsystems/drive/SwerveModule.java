@@ -13,11 +13,12 @@ import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import frc.robot.Calibrations;
 import frc.robot.Constants;
 
-public class SwerveModule {
+public class SwerveModule implements Sendable {
   private final CANSparkMax drivingSparkMax;
   private final CANSparkMax turningSparkMax;
 

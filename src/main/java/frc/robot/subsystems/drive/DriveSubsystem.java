@@ -281,5 +281,9 @@ public class DriveSubsystem extends SubsystemBase {
     addChild("Theta Controller", Calibrations.SwerveSubsystem.PATH_THETA_CONTROLLER);
     addChild(
         "Rotate to target controller", Calibrations.SwerveSubsystem.ROTATE_TO_TARGET_PID_CONTROLLER);
+    addChild("Front Right", frontRight);
+    addChild("Front Left", frontLeft);
+    addChild("Back Right", rearLeft);
+    addChild("Rear Left", rearLeft);
   }
 }
