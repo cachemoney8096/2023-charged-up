@@ -18,12 +18,16 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final double PLACEHOLDER_DOUBLE = 1.0;
-  public static final int PLACEHOLDER_INT = 1;
+  public static final double PLACEHOLDER_DOUBLE = 0.0;
+  public static final int PLACEHOLDER_INT = 0;
   public static final String PLACEHOLDER_STRING = "";
 
-  public static final class SwerveModule {
+  /** This is the maximum pitch of the charge station in degrees. */
+  public static final double MAX_PITCH_DEGREES = 15;
 
+  public static final double REVOLUTIONS_TO_DEGREES = 360.0;
+
+  public static final class SwerveModule {
     /**
      * Invert the turning encoder, since the output shaft rotates in the opposite direction of the
      * steering motor in the MAXSwerve Module.
@@ -76,8 +80,10 @@ public final class Constants {
 
     /** Chassis configuration */
     public static final double TRACK_WIDTH_METERS = PLACEHOLDER_DOUBLE;
+
     /** Distance between centers of right and left wheels on robot */
     public static final double WHEEL_BASE_METERS = PLACEHOLDER_DOUBLE;
+
     /** Distance between front and back wheels on robot */
     public static final SwerveDriveKinematics DRIVE_KINEMATICS =
         new SwerveDriveKinematics(
@@ -95,31 +101,34 @@ public final class Constants {
     public static final boolean GYRO_REVERSED = false;
   }
 
-  /** This is the maximum pitch of the charge station in degrees. */
-  public static final double MAX_PITCH_DEGREES = 15;
+  public static final class Lift {
+    /* Scalar for elevator motor encoder from RPM to real inches per seconds */
+    public static final double ELEVATOR_MOTOR_ENCODER_VELOCITY_SCALAR =
+        Constants.PLACEHOLDER_DOUBLE;
 
-  /* Scalar for elevator motor encoder from RPM to real inches per seconds */
-  public static final double ELEVATOR_MOTOR_ENCODER_VELOCITY_SCALAR = PLACEHOLDER_DOUBLE;
-  /* Scalar for elevator motor encoder from rotations to real inches */
-  public static final double ELEVATOR_MOTOR_ENCODER_SCALAR = PLACEHOLDER_DOUBLE;
+    /* Scalar for elevator motor encoder from rotations to real inches */
+    public static final double ELEVATOR_MOTOR_ENCODER_SCALAR = Constants.PLACEHOLDER_DOUBLE;
 
-  /* Scalar for arm motor encoder from RPM to real degrees per seconds */
-  public static final double ARM_MOTOR_ENCODER_VELOCITY_SCALAR = PLACEHOLDER_DOUBLE;
-  /* Scalar for arm motor encoder from rotations to real degrees */
-  public static final double ARM_MOTOR_ENCODER_SCALAR = PLACEHOLDER_DOUBLE;
+    /* Scalar for arm motor encoder from RPM to real degrees per seconds */
+    public static final double ARM_MOTOR_ENCODER_VELOCITY_SCALAR = Constants.PLACEHOLDER_DOUBLE;
 
-  /* Scalar for deploy motor encoder from RPM to real degrees per seconds */
-  public static final double DEPLOY_MOTOR_ENCODER_VELOCITY_SCALAR = PLACEHOLDER_DOUBLE;
-  /* Scalar for arm motor encoder from rotations to real degrees */
-  public static final double DEPLOY_MOTOR_ENCODER_SCALAR = PLACEHOLDER_DOUBLE;
+    /* Scalar for arm motor encoder from rotations to real degrees */
+    public static final double ARM_MOTOR_ENCODER_SCALAR = Constants.PLACEHOLDER_DOUBLE;
 
-  public static final double ARM_POSITION_WHEN_HORIZONTAL_DEGREES = 90,
-      INTAKE_POSITION_WHEN_HORIZONTAL_DEGREES = 180;
+    public static final double ARM_POSITION_WHEN_HORIZONTAL_DEGREES = 90;
 
-  /*Revolutions to Degrees */
-  public static final double REVOLUTIONS_TO_DEGREES = 360.0;
+    /** Scalar for the difference in the elevator's absolute encoders in inches per degree */
+    public static final double ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE =
+        Constants.PLACEHOLDER_DOUBLE;
+  }
 
-  /** Scalar for the difference in the elevator's absolute encoders in inches per degree */
-  public static final double ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE =
-      PLACEHOLDER_DOUBLE;
+  public static final class Intake {
+    /* Scalar for deploy motor encoder from RPM to real degrees per seconds */
+    public static final double DEPLOY_MOTOR_ENCODER_VELOCITY_SCALAR = Constants.PLACEHOLDER_DOUBLE;
+
+    /* Scalar for arm motor encoder from rotations to real degrees */
+    public static final double DEPLOY_MOTOR_ENCODER_SCALAR = Constants.PLACEHOLDER_DOUBLE;
+
+    public static final double POSITION_WHEN_HORIZONTAL_DEGREES = 180;
+  }
 }

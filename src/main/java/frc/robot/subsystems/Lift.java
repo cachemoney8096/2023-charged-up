@@ -69,41 +69,42 @@ public class Lift extends SubsystemBase {
     arm.restoreFactoryDefaults();
 
     /* Get positions and degrees of elevator through encoder in inches */
-    elevatorEncoder.setPositionConversionFactor(Constants.ELEVATOR_MOTOR_ENCODER_SCALAR);
-    elevatorEncoder.setVelocityConversionFactor(Constants.ELEVATOR_MOTOR_ENCODER_VELOCITY_SCALAR);
+    elevatorEncoder.setPositionConversionFactor(Constants.Lift.ELEVATOR_MOTOR_ENCODER_SCALAR);
+    elevatorEncoder.setVelocityConversionFactor(
+        Constants.Lift.ELEVATOR_MOTOR_ENCODER_VELOCITY_SCALAR);
 
     /* Get positions and degrees of arm through encoder in degrees */
-    armEncoder.setPositionConversionFactor(Constants.ARM_MOTOR_ENCODER_SCALAR);
-    armEncoder.setVelocityConversionFactor(Constants.ARM_MOTOR_ENCODER_VELOCITY_SCALAR);
+    armEncoder.setPositionConversionFactor(Constants.Lift.ARM_MOTOR_ENCODER_SCALAR);
+    armEncoder.setVelocityConversionFactor(Constants.Lift.ARM_MOTOR_ENCODER_VELOCITY_SCALAR);
     armAbsoluteEncoder.setPositionConversionFactor(Constants.REVOLUTIONS_TO_DEGREES);
 
     /* Set PID of Elevator */
-    elevatorPID.setP(Calibrations.ELEVATOR_P);
-    elevatorPID.setI(Calibrations.ELEVATOR_I);
-    elevatorPID.setD(Calibrations.ELEVATOR_D);
+    elevatorPID.setP(Calibrations.Lift.ELEVATOR_P);
+    elevatorPID.setI(Calibrations.Lift.ELEVATOR_I);
+    elevatorPID.setD(Calibrations.Lift.ELEVATOR_D);
 
     elevatorPID.setSmartMotionMaxAccel(
-        Calibrations.ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED, SMART_MOTION_SLOT);
+        Calibrations.Lift.ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED, SMART_MOTION_SLOT);
     elevatorPID.setSmartMotionMaxVelocity(
-        Calibrations.ELEVATOR_MAX_VELOCITY_IN_PER_SECOND, SMART_MOTION_SLOT);
+        Calibrations.Lift.ELEVATOR_MAX_VELOCITY_IN_PER_SECOND, SMART_MOTION_SLOT);
     elevatorPID.setSmartMotionMinOutputVelocity(
-        Calibrations.ELEVATOR_MIN_OUTPUT_VELOCITY_IN_PER_SECOND, SMART_MOTION_SLOT);
+        Calibrations.Lift.ELEVATOR_MIN_OUTPUT_VELOCITY_IN_PER_SECOND, SMART_MOTION_SLOT);
     elevatorPID.setSmartMotionAllowedClosedLoopError(
-        Calibrations.ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN, SMART_MOTION_SLOT);
+        Calibrations.Lift.ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN, SMART_MOTION_SLOT);
 
     /* Set PID of Arm */
-    armPID.setP(Calibrations.ARM_P);
-    armPID.setI(Calibrations.ARM_I);
-    armPID.setD(Calibrations.ARM_D);
+    armPID.setP(Calibrations.Lift.ARM_P);
+    armPID.setI(Calibrations.Lift.ARM_I);
+    armPID.setD(Calibrations.Lift.ARM_D);
 
     armPID.setSmartMotionMaxAccel(
-        Calibrations.ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED, SMART_MOTION_SLOT);
+        Calibrations.Lift.ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED, SMART_MOTION_SLOT);
     armPID.setSmartMotionMaxVelocity(
-        Calibrations.ARM_MAX_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT);
+        Calibrations.Lift.ARM_MAX_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT);
     armPID.setSmartMotionMinOutputVelocity(
-        Calibrations.ARM_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT);
+        Calibrations.Lift.ARM_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT);
     armPID.setSmartMotionAllowedClosedLoopError(
-        Calibrations.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG, SMART_MOTION_SLOT);
+        Calibrations.Lift.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG, SMART_MOTION_SLOT);
 
     /* Map of all LiftPosition with according values */
     liftPositionMap = new TreeMap<LiftPosition, Pair<Double, Double>>();
@@ -137,13 +138,13 @@ public class Lift extends SubsystemBase {
         liftPositionMap.get(pos).getFirst(),
         CANSparkMax.ControlType.kSmartMotion,
         SMART_MOTION_SLOT,
-        Calibrations.ARBITRARY_ELEVATOR_FEED_FORWARD_VOLTS,
+        Calibrations.Lift.ARBITRARY_ELEVATOR_FEED_FORWARD_VOLTS,
         ArbFFUnits.kVoltage);
     armPID.setReference(
         liftPositionMap.get(pos).getSecond(),
         CANSparkMax.ControlType.kSmartMotion,
         SMART_MOTION_SLOT,
-        Calibrations.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle(),
+        Calibrations.Lift.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle(),
         ArbFFUnits.kVoltage);
   }
 
@@ -177,12 +178,12 @@ public class Lift extends SubsystemBase {
 
   /** Returns the cosine of the arm angle in degrees off of the horizontal. */
   public double getCosineArmAngle() {
-    return Math.cos(armEncoder.getPosition() - Constants.ARM_POSITION_WHEN_HORIZONTAL_DEGREES);
+    return Math.cos(armEncoder.getPosition() - Constants.Lift.ARM_POSITION_WHEN_HORIZONTAL_DEGREES);
   }
 
   public void initialize() {
     armEncoder.setPosition(
-        armAbsoluteEncoder.getPosition() + Calibrations.ARM_ABSOLUTE_ENCODER_OFFSET_DEG);
+        armAbsoluteEncoder.getPosition() + Calibrations.Lift.ARM_ABSOLUTE_ENCODER_OFFSET_DEG);
 
     double elevatorDutyCycleEncodersDifferenceDegrees =
         ((elevatorDutyCycleEncoderOne.getAbsolutePosition()
@@ -194,7 +195,7 @@ public class Lift extends SubsystemBase {
     }
     elevatorEncoder.setPosition(
         elevatorDutyCycleEncodersDifferenceDegrees
-            * Constants.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE);
+            * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE);
   }
 
   @Override

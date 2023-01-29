@@ -13,7 +13,7 @@ import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.Calibrations.SwerveModuleCalibrations;
+import frc.robot.Calibrations;
 import frc.robot.Constants;
 
 public class SwerveModule {
@@ -83,20 +83,20 @@ public class SwerveModule {
         Constants.SwerveModule.TURNING_ENCODER_POSITION_PID_MAX_INPUT_RADIANS);
 
     // Set the PID gains for the driving motor.
-    drivingPIDController.setP(SwerveModuleCalibrations.DRIVING_P);
-    drivingPIDController.setI(SwerveModuleCalibrations.DRIVING_I);
-    drivingPIDController.setD(SwerveModuleCalibrations.DRIVING_D);
-    drivingPIDController.setFF(SwerveModuleCalibrations.DRIVING_FF);
+    drivingPIDController.setP(Calibrations.SwerveModule.DRIVING_P);
+    drivingPIDController.setI(Calibrations.SwerveModule.DRIVING_I);
+    drivingPIDController.setD(Calibrations.SwerveModule.DRIVING_D);
+    drivingPIDController.setFF(Calibrations.SwerveModule.DRIVING_FF);
     drivingPIDController.setOutputRange(
-        SwerveModuleCalibrations.DRIVING_MIN_OUTPUT, SwerveModuleCalibrations.DRIVING_MAX_OUTPUT);
+        Calibrations.SwerveModule.DRIVING_MIN_OUTPUT, Calibrations.SwerveModule.DRIVING_MAX_OUTPUT);
 
     // Set the PID gains for the turning motor.
-    turningPIDController.setP(SwerveModuleCalibrations.TURNING_P);
-    turningPIDController.setI(SwerveModuleCalibrations.TURNING_I);
-    turningPIDController.setD(SwerveModuleCalibrations.TURNING_D);
-    turningPIDController.setFF(SwerveModuleCalibrations.TURNING_FF);
+    turningPIDController.setP(Calibrations.SwerveModule.TURNING_P);
+    turningPIDController.setI(Calibrations.SwerveModule.TURNING_I);
+    turningPIDController.setD(Calibrations.SwerveModule.TURNING_D);
+    turningPIDController.setFF(Calibrations.SwerveModule.TURNING_FF);
     turningPIDController.setOutputRange(
-        SwerveModuleCalibrations.TURNING_MIN_OUTPUT, SwerveModuleCalibrations.TURNING_MAX_OUTPUT);
+        Calibrations.SwerveModule.TURNING_MIN_OUTPUT, Calibrations.SwerveModule.TURNING_MAX_OUTPUT);
 
     drivingSparkMax.setIdleMode(Constants.SwerveModule.DRIVING_MOTOR_IDLE_MODE);
     turningSparkMax.setIdleMode(Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
