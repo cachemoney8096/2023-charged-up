@@ -13,10 +13,12 @@ import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import frc.robot.Calibrations;
 import frc.robot.Constants;
 
-public class SwerveModule {
+public class SwerveModule implements Sendable {
   private final CANSparkMax drivingSparkMax;
   private final CANSparkMax turningSparkMax;
 
@@ -165,5 +167,18 @@ public class SwerveModule {
   /** Zeroes all the SwerveModule encoders. */
   public void resetEncoders() {
     drivingEncoder.setPosition(0);
+  }
+
+  public void initSendable(SendableBuilder builder) {
+    builder.addDoubleProperty("Driving kP", drivingPIDController::getP, drivingPIDController::setP);
+    builder.addDoubleProperty("Driving kI", drivingPIDController::getI, drivingPIDController::setI);
+    builder.addDoubleProperty("Driving kD", drivingPIDController::getD, drivingPIDController::setD);
+    builder.addDoubleProperty(
+        "Driving kFF", drivingPIDController::getFF, drivingPIDController::setFF);
+    builder.addDoubleProperty("Turning kP", turningPIDController::getP, turningPIDController::setP);
+    builder.addDoubleProperty("Turning kI", turningPIDController::getI, turningPIDController::setI);
+    builder.addDoubleProperty("Turning kD", turningPIDController::getD, turningPIDController::setD);
+    builder.addDoubleProperty(
+        "Turning kFF", turningPIDController::getFF, turningPIDController::setFF);
   }
 }
