@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Calibrations;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
+import frc.robot.utils.SparkMaxUtils;
 import java.util.Optional;
 
 /**
@@ -60,29 +61,55 @@ public class Intake extends SubsystemBase {
 
   /** Creates a new Intake. */
   public Intake() {
-    deployMotor.restoreFactoryDefaults();
-    deployMotorEncoder.setPositionConversionFactor(Constants.Intake.DEPLOY_MOTOR_ENCODER_SCALAR);
-    deployMotorEncoder.setVelocityConversionFactor(
-        Constants.Intake.DEPLOY_MOTOR_ENCODER_VELOCITY_SCALAR);
-    deployMotorAbsoluteEncoder.setPositionConversionFactor(Constants.REVOLUTIONS_TO_DEGREES);
+    SparkMaxUtils.initWithRetry(this::setUpDeploySpark, Calibrations.SPARK_INIT_RETRY_ATTEMPTS);
+    SparkMaxUtils.initWithRetry(
+        this::setUpIntakeWheelSparks, Calibrations.SPARK_INIT_RETRY_ATTEMPTS);
+  }
 
-    deployMotorPID.setP(Calibrations.Intake.DEPLOY_MOTOR_P);
-    deployMotorPID.setI(Calibrations.Intake.DEPLOY_MOTOR_I);
-    deployMotorPID.setD(Calibrations.Intake.DEPLOY_MOTOR_D);
+  boolean setUpIntakeWheelSparks() {
+    int errors = 0;
+    errors += SparkMaxUtils.check(intakeLeft.restoreFactoryDefaults());
 
-    deployMotorPID.setSmartMotionMaxAccel(
-        Calibrations.Intake.DEPLOY_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED, SMART_MOTION_SLOT);
-    deployMotorPID.setSmartMotionMaxVelocity(
-        Calibrations.Intake.DEPLOY_MAX_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT);
-    deployMotorPID.setSmartMotionMinOutputVelocity(
-        Calibrations.Intake.DEPLOY_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT);
-    deployMotorPID.setSmartMotionAllowedClosedLoopError(
-        Calibrations.Intake.DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG, SMART_MOTION_SLOT);
+    errors += SparkMaxUtils.check(intakeRight.restoreFactoryDefaults());
+    errors += SparkMaxUtils.check(intakeRight.follow(intakeLeft, true));
+    return errors == 0;
+  }
 
-    intakeLeft.restoreFactoryDefaults();
+  boolean setUpDeploySpark() {
+    int errors = 0;
 
-    intakeRight.restoreFactoryDefaults();
-    intakeRight.follow(intakeLeft, true);
+    errors += SparkMaxUtils.check(deployMotor.restoreFactoryDefaults());
+    errors +=
+        SparkMaxUtils.check(
+            SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(
+                deployMotorEncoder, Constants.Intake.DEPLOY_MOTOR_GEAR_RATIO));
+    errors +=
+        SparkMaxUtils.check(
+            deployMotorAbsoluteEncoder.setPositionConversionFactor(
+                Constants.REVOLUTIONS_TO_DEGREES));
+    errors += SparkMaxUtils.check(deployMotorPID.setP(Calibrations.Intake.DEPLOY_MOTOR_P));
+    errors += SparkMaxUtils.check(deployMotorPID.setI(Calibrations.Intake.DEPLOY_MOTOR_I));
+    errors += SparkMaxUtils.check(deployMotorPID.setD(Calibrations.Intake.DEPLOY_MOTOR_D));
+
+    errors +=
+        SparkMaxUtils.check(
+            deployMotorPID.setSmartMotionMaxAccel(
+                Calibrations.Intake.DEPLOY_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED,
+                SMART_MOTION_SLOT));
+    errors +=
+        SparkMaxUtils.check(
+            deployMotorPID.setSmartMotionMaxVelocity(
+                Calibrations.Intake.DEPLOY_MAX_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT));
+    errors +=
+        SparkMaxUtils.check(
+            deployMotorPID.setSmartMotionMinOutputVelocity(
+                Calibrations.Intake.DEPLOY_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT));
+    errors +=
+        SparkMaxUtils.check(
+            deployMotorPID.setSmartMotionAllowedClosedLoopError(
+                Calibrations.Intake.DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG, SMART_MOTION_SLOT));
+
+    return errors == 0;
   }
 
   /** Deploys the intake out. */

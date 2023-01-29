@@ -134,4 +134,6 @@ public final class Calibrations {
      */
     public static final double CHARGE_STATION_DEADBAND_NORM_VELOCITY = 0.05;
   }
+
+  public static final int SPARK_INIT_RETRY_ATTEMPTS = 5;
 }
