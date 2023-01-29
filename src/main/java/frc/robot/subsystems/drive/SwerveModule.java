@@ -173,10 +173,12 @@ public class SwerveModule implements Sendable {
     builder.addDoubleProperty("Driving kP", drivingPIDController::getP, drivingPIDController::setP);
     builder.addDoubleProperty("Driving kI", drivingPIDController::getI, drivingPIDController::setI);
     builder.addDoubleProperty("Driving kD", drivingPIDController::getD, drivingPIDController::setD);
-    builder.addDoubleProperty("Driving kFF", drivingPIDController::getFF, drivingPIDController::setFF);
+    builder.addDoubleProperty(
+        "Driving kFF", drivingPIDController::getFF, drivingPIDController::setFF);
     builder.addDoubleProperty("Turning kP", turningPIDController::getP, turningPIDController::setP);
     builder.addDoubleProperty("Turning kI", turningPIDController::getI, turningPIDController::setI);
     builder.addDoubleProperty("Turning kD", turningPIDController::getD, turningPIDController::setD);
-    builder.addDoubleProperty("Turning kFF", turningPIDController::getFF, turningPIDController::setFF);
+    builder.addDoubleProperty(
+        "Turning kFF", turningPIDController::getFF, turningPIDController::setFF);
   }
 }

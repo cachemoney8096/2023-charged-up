@@ -208,12 +208,13 @@ public class Lift extends SubsystemBase {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder){
+  public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     builder.addDoubleProperty("Elevator kP", elevatorPID::getP, elevatorPID::setP);
     builder.addDoubleProperty("Elevator kI", elevatorPID::getI, elevatorPID::setI);
     builder.addDoubleProperty("Elevator kD", elevatorPID::getD, elevatorPID::setD);
-    builder.addDoubleProperty("Elevator Position", elevatorEncoder::getPosition, elevatorEncoder::setPosition);
+    builder.addDoubleProperty(
+        "Elevator Position", elevatorEncoder::getPosition, elevatorEncoder::setPosition);
     builder.addDoubleProperty("Arm kP", armPID::getP, armPID::setP);
     builder.addDoubleProperty("Arm kI", armPID::getI, armPID::setI);
     builder.addDoubleProperty("Arm kD", armPID::getD, armPID::setD);

@@ -11,7 +11,6 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
-
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -188,13 +187,17 @@ public class Intake extends SubsystemBase {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder){
+  public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     builder.addDoubleProperty("Intake Deploy kP", deployMotorPID::getP, deployMotorPID::setP);
     builder.addDoubleProperty("Intake Deploy kI", deployMotorPID::getI, deployMotorPID::setI);
     builder.addDoubleProperty("Intake Deploy kD", deployMotorPID::getD, deployMotorPID::setD);
-    builder.addDoubleProperty("Intake Desired Position (Degrees)", () -> intakeDesiredPositionDegrees, null);
-    builder.addDoubleProperty("Intake Current Position (Degrees)", deployMotorEncoder::getPosition, deployMotorEncoder::setPosition);
+    builder.addDoubleProperty(
+        "Intake Desired Position (Degrees)", () -> intakeDesiredPositionDegrees, null);
+    builder.addDoubleProperty(
+        "Intake Current Position (Degrees)",
+        deployMotorEncoder::getPosition,
+        deployMotorEncoder::setPosition);
     builder.addBooleanProperty("See Game Piece", this::seeGamePiece, null);
   }
 }
