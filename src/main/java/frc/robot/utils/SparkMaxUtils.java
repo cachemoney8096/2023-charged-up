@@ -1,5 +1,6 @@
 package frc.robot.utils;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
@@ -17,6 +18,32 @@ public class SparkMaxUtils {
   }
 
   public static class UnitConversions {
+
+    public static REVLibError setDegreesFromGearRatio(
+        AbsoluteEncoder sparkMaxEncoder, double ratio) {
+      double degreesPerRotation = 360.0 / ratio;
+      double degreesPerRotationPerSecond = degreesPerRotation / 60.0;
+      REVLibError error = sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation);
+
+      if (error != REVLibError.kOk) {
+        return error;
+      }
+
+      return sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond);
+    }
+
+    public static REVLibError setRadsFromGearRatio(AbsoluteEncoder sparkMaxEncoder, double ratio) {
+      double radsPerRotation = (2.0 * Math.PI) / ratio;
+      double radsPerRotationPerSecond = radsPerRotation / 60.0;
+      REVLibError error = sparkMaxEncoder.setPositionConversionFactor(radsPerRotation);
+
+      if (error != REVLibError.kOk) {
+        return error;
+      }
+
+      return sparkMaxEncoder.setVelocityConversionFactor(radsPerRotationPerSecond);
+    }
+
     public static REVLibError setDegreesFromGearRatio(
         RelativeEncoder sparkMaxEncoder, double ratio) {
       double degreesPerRotation = 360.0 / ratio;

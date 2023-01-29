@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Calibrations;
+import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
 
@@ -205,9 +205,8 @@ public class DriveSubsystem extends SubsystemBase {
     double offsetHeadingDegrees = MathUtil.inputModulus(headingDifferenceDegrees, -180, 180);
 
     double desiredRotation =
-        Calibrations.SwerveSubsystem.ROTATE_TO_TARGET_PID_CONTROLLER.calculate(
-                offsetHeadingDegrees, 0.0)
-            + Math.signum(offsetHeadingDegrees) * Calibrations.SwerveSubsystem.ROTATE_TO_TARGET_FF;
+        Cal.SwerveSubsystem.ROTATE_TO_TARGET_PID_CONTROLLER.calculate(offsetHeadingDegrees, 0.0)
+            + Math.signum(offsetHeadingDegrees) * Cal.SwerveSubsystem.ROTATE_TO_TARGET_FF;
 
     drive(x, y, desiredRotation, fieldRelative);
   }
@@ -258,12 +257,12 @@ public class DriveSubsystem extends SubsystemBase {
             traj,
             this::getPose, // Pose supplier
             Constants.SwerveDrive.DRIVE_KINEMATICS, // SwerveDriveKinematics
-            Calibrations.SwerveSubsystem
+            Cal.SwerveSubsystem
                 .PATH_X_CONTROLLER, // X controller. Tune these values for your robot. Leaving them
             // 0 will only use feedforwards.
-            Calibrations.SwerveSubsystem
+            Cal.SwerveSubsystem
                 .PATH_Y_CONTROLLER, // Y controller (usually the same values as X controller)
-            Calibrations.SwerveSubsystem
+            Cal.SwerveSubsystem
                 .PATH_THETA_CONTROLLER, // Rotation controller. Tune these values for your robot.
             // Leaving them 0 will only use feedforwards.
             this::setModuleStates, // Module states consumer
@@ -276,12 +275,10 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
-    addChild("X Controller", Calibrations.SwerveSubsystem.PATH_X_CONTROLLER);
-    addChild("Y Controller", Calibrations.SwerveSubsystem.PATH_Y_CONTROLLER);
-    addChild("Theta Controller", Calibrations.SwerveSubsystem.PATH_THETA_CONTROLLER);
-    addChild(
-        "Rotate to target controller",
-        Calibrations.SwerveSubsystem.ROTATE_TO_TARGET_PID_CONTROLLER);
+    addChild("X Controller", Cal.SwerveSubsystem.PATH_X_CONTROLLER);
+    addChild("Y Controller", Cal.SwerveSubsystem.PATH_Y_CONTROLLER);
+    addChild("Theta Controller", Cal.SwerveSubsystem.PATH_THETA_CONTROLLER);
+    addChild("Rotate to target controller", Cal.SwerveSubsystem.ROTATE_TO_TARGET_PID_CONTROLLER);
     addChild("Front Right", frontRight);
     addChild("Front Left", frontLeft);
     addChild("Back Right", rearLeft);

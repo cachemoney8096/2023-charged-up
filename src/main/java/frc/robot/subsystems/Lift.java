@@ -18,9 +18,10 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Calibrations;
+import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
+import frc.robot.utils.SparkMaxUtils;
 import java.util.TreeMap;
 
 /** Contains code for elevator, arm, and game piece grabber */
@@ -71,63 +72,99 @@ public class Lift extends SubsystemBase {
 
   /** Creates a new Lift */
   public Lift() {
-    elevator.restoreFactoryDefaults();
-
-    // Get positions and degrees of elevator through encoder in inches
-    elevatorEncoder.setPositionConversionFactor(Constants.Lift.ELEVATOR_MOTOR_ENCODER_SCALAR);
-    elevatorEncoder.setVelocityConversionFactor(
-        Constants.Lift.ELEVATOR_MOTOR_ENCODER_VELOCITY_SCALAR);
-
-    // Set PID of Elevator
-    elevatorPID.setP(Calibrations.Lift.ELEVATOR_P);
-    elevatorPID.setI(Calibrations.Lift.ELEVATOR_I);
-    elevatorPID.setD(Calibrations.Lift.ELEVATOR_D);
-    elevatorPID.setSmartMotionMaxAccel(
-        Calibrations.Lift.ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED, SMART_MOTION_SLOT);
-    elevatorPID.setSmartMotionMaxVelocity(
-        Calibrations.Lift.ELEVATOR_MAX_VELOCITY_IN_PER_SECOND, SMART_MOTION_SLOT);
-    elevatorPID.setSmartMotionMinOutputVelocity(
-        Calibrations.Lift.ELEVATOR_MIN_OUTPUT_VELOCITY_IN_PER_SECOND, SMART_MOTION_SLOT);
-    elevatorPID.setSmartMotionAllowedClosedLoopError(
-        Calibrations.Lift.ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN, SMART_MOTION_SLOT);
-
-    arm.restoreFactoryDefaults();
-
-    // Set PID of Arm
-    armPID.setP(Calibrations.Lift.ARM_P);
-    armPID.setI(Calibrations.Lift.ARM_I);
-    armPID.setD(Calibrations.Lift.ARM_D);
-    armPID.setSmartMotionMaxAccel(
-        Calibrations.Lift.ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED, SMART_MOTION_SLOT);
-    armPID.setSmartMotionMaxVelocity(
-        Calibrations.Lift.ARM_MAX_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT);
-    armPID.setSmartMotionMinOutputVelocity(
-        Calibrations.Lift.ARM_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT);
-    armPID.setSmartMotionAllowedClosedLoopError(
-        Calibrations.Lift.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG, SMART_MOTION_SLOT);
-
-    // Get positions and degrees of arm through encoder in degrees /
-    armEncoder.setPositionConversionFactor(Constants.Lift.ARM_MOTOR_ENCODER_SCALAR);
-    armEncoder.setVelocityConversionFactor(Constants.Lift.ARM_MOTOR_ENCODER_VELOCITY_SCALAR);
-    armAbsoluteEncoder.setPositionConversionFactor(Constants.REVOLUTIONS_TO_DEGREES);
+    SparkMaxUtils.initWithRetry(this::initSparks, Cal.SPARK_INIT_RETRY_ATTEMPTS);
 
     // Map of all LiftPosition with according values
     liftPositionMap = new TreeMap<LiftPosition, Pair<Double, Double>>();
     liftPositionMap.put(
         LiftPosition.GRAB_FROM_INTAKE,
-        new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
+        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
     liftPositionMap.put(
         LiftPosition.SHELF,
-        new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
+        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
     liftPositionMap.put(
         LiftPosition.SCORE_MID,
-        new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
+        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
     liftPositionMap.put(
         LiftPosition.SCORE_HIGH,
-        new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
+        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
     liftPositionMap.put(
         LiftPosition.STARTING,
-        new Pair<Double, Double>(Calibrations.PLACEHOLDER_DOUBLE, Calibrations.PLACEHOLDER_DOUBLE));
+        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+  }
+
+  /** Does all the initialization for the sparks, return true on success */
+  boolean initSparks() {
+    int errors = 0;
+
+    errors += SparkMaxUtils.check(elevator.restoreFactoryDefaults());
+    errors += SparkMaxUtils.check(arm.restoreFactoryDefaults());
+
+    // Get positions and degrees of elevator through encoder in inches
+    errors +=
+        SparkMaxUtils.check(
+            elevatorEncoder.setPositionConversionFactor(
+                Constants.Lift.ELEVATOR_MOTOR_ENCODER_SCALAR));
+    errors +=
+        SparkMaxUtils.check(
+            elevatorEncoder.setVelocityConversionFactor(
+                Constants.Lift.ELEVATOR_MOTOR_ENCODER_VELOCITY_SCALAR));
+
+    // Set PID of Elevator
+    errors += SparkMaxUtils.check(elevatorPID.setP(Cal.Lift.ELEVATOR_P));
+    errors += SparkMaxUtils.check(elevatorPID.setI(Cal.Lift.ELEVATOR_I));
+    errors += SparkMaxUtils.check(elevatorPID.setD(Cal.Lift.ELEVATOR_D));
+    errors +=
+        SparkMaxUtils.check(
+            elevatorPID.setSmartMotionMaxAccel(
+                Cal.Lift.ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED, SMART_MOTION_SLOT));
+    errors +=
+        SparkMaxUtils.check(
+            elevatorPID.setSmartMotionMaxVelocity(
+                Cal.Lift.ELEVATOR_MAX_VELOCITY_IN_PER_SECOND, SMART_MOTION_SLOT));
+    errors +=
+        SparkMaxUtils.check(
+            elevatorPID.setSmartMotionMinOutputVelocity(
+                Cal.Lift.ELEVATOR_MIN_OUTPUT_VELOCITY_IN_PER_SECOND, SMART_MOTION_SLOT));
+    errors +=
+        SparkMaxUtils.check(
+            elevatorPID.setSmartMotionAllowedClosedLoopError(
+                Cal.Lift.ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN, SMART_MOTION_SLOT));
+
+    // Set PID of Arm
+    errors += SparkMaxUtils.check(armPID.setP(Cal.Lift.ARM_P));
+    errors += SparkMaxUtils.check(armPID.setI(Cal.Lift.ARM_I));
+    errors += SparkMaxUtils.check(armPID.setD(Cal.Lift.ARM_D));
+    errors +=
+        SparkMaxUtils.check(
+            armPID.setSmartMotionMaxAccel(
+                Cal.Lift.ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED, SMART_MOTION_SLOT));
+    errors +=
+        SparkMaxUtils.check(
+            armPID.setSmartMotionMaxVelocity(
+                Cal.Lift.ARM_MAX_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT));
+    errors +=
+        SparkMaxUtils.check(
+            armPID.setSmartMotionMinOutputVelocity(
+                Cal.Lift.ARM_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT));
+    errors +=
+        SparkMaxUtils.check(
+            armPID.setSmartMotionAllowedClosedLoopError(
+                Cal.Lift.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG, SMART_MOTION_SLOT));
+
+    // Get positions and degrees of arm through encoder in degrees
+    errors +=
+        SparkMaxUtils.check(
+            armEncoder.setPositionConversionFactor(Constants.Lift.ARM_MOTOR_ENCODER_SCALAR));
+    errors +=
+        SparkMaxUtils.check(
+            armEncoder.setVelocityConversionFactor(
+                Constants.Lift.ARM_MOTOR_ENCODER_VELOCITY_SCALAR));
+    errors +=
+        SparkMaxUtils.check(
+            armAbsoluteEncoder.setPositionConversionFactor(Constants.REVOLUTIONS_TO_DEGREES));
+
+    return errors == 0;
   }
 
   public void goToPosition(LiftPosition pos) {
@@ -135,13 +172,13 @@ public class Lift extends SubsystemBase {
         liftPositionMap.get(pos).getFirst(),
         CANSparkMax.ControlType.kSmartMotion,
         SMART_MOTION_SLOT,
-        Calibrations.Lift.ARBITRARY_ELEVATOR_FEED_FORWARD_VOLTS,
+        Cal.Lift.ARBITRARY_ELEVATOR_FEED_FORWARD_VOLTS,
         ArbFFUnits.kVoltage);
     armPID.setReference(
         liftPositionMap.get(pos).getSecond(),
         CANSparkMax.ControlType.kSmartMotion,
         SMART_MOTION_SLOT,
-        Calibrations.Lift.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle(),
+        Cal.Lift.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle(),
         ArbFFUnits.kVoltage);
   }
 
@@ -181,7 +218,7 @@ public class Lift extends SubsystemBase {
   public void initialize() {
     // Set arm encoder position from absolute
     armEncoder.setPosition(
-        armAbsoluteEncoder.getPosition() + Calibrations.Lift.ARM_ABSOLUTE_ENCODER_OFFSET_DEG);
+        armAbsoluteEncoder.getPosition() + Cal.Lift.ARM_ABSOLUTE_ENCODER_OFFSET_DEG);
 
     // Set elevator encoder position from absolute encoders
     double elevatorDutyCycleEncodersDifferenceDegrees =

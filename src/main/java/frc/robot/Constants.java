@@ -51,13 +51,9 @@ public final class Constants {
     public static final double DRIVING_ENCODER_VELOCITY_FACTOR_METERS_PER_SECOND =
         ((WHEEL_DIAMETER_METERS * Math.PI) / DRIVING_MOTOR_REDUCTION) / 60.0; // meters per second
 
-    public static final double TURNING_ENCODER_POSITION_FACTOR_RADIANS = (2 * Math.PI); // radians
-    public static final double TURNING_ENCODER_VELOCITY_FACTOR_RAD_PER_SEC =
-        (2 * Math.PI) / 60.0; // radians per second
-
     public static final double TURNING_ENCODER_POSITION_PID_MIN_INPUT_RADIANS = 0; // radians
     public static final double TURNING_ENCODER_POSITION_PID_MAX_INPUT_RADIANS =
-        TURNING_ENCODER_POSITION_FACTOR_RADIANS; // radians
+        2 * Math.PI; // radians
 
     public static final IdleMode DRIVING_MOTOR_IDLE_MODE = IdleMode.kBrake;
     public static final IdleMode TURNING_MOTOR_IDLE_MODE = IdleMode.kBrake;
