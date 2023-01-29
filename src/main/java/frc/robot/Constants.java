@@ -123,11 +123,7 @@ public final class Constants {
   }
 
   public static final class Intake {
-    /* Scalar for deploy motor encoder from RPM to real degrees per seconds */
-    public static final double DEPLOY_MOTOR_ENCODER_VELOCITY_SCALAR = Constants.PLACEHOLDER_DOUBLE;
-
-    /* Scalar for arm motor encoder from rotations to real degrees */
-    public static final double DEPLOY_MOTOR_ENCODER_SCALAR = Constants.PLACEHOLDER_DOUBLE;
+    public static final double DEPLOY_MOTOR_GEAR_RATIO = Constants.PLACEHOLDER_DOUBLE;
 
     public static final double POSITION_WHEN_HORIZONTAL_DEGREES = 180;
   }
