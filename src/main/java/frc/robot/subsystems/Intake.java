@@ -53,29 +53,30 @@ public class Intake extends SubsystemBase {
    */
   private Optional<Timer> clampTimer = Optional.empty();
 
-  private double intakeDesiredPositionDegrees = Calibrations.INTAKE_STARTING_POSITION_DEGREES;
+  private double intakeDesiredPositionDegrees = Calibrations.Intake.STARTING_POSITION_DEGREES;
 
   private final int SMART_MOTION_SLOT = 0;
 
   /** Creates a new Intake. */
   public Intake() {
     deployMotor.restoreFactoryDefaults();
-    deployMotorEncoder.setPositionConversionFactor(Constants.DEPLOY_MOTOR_ENCODER_SCALAR);
-    deployMotorEncoder.setVelocityConversionFactor(Constants.DEPLOY_MOTOR_ENCODER_VELOCITY_SCALAR);
+    deployMotorEncoder.setPositionConversionFactor(Constants.Intake.DEPLOY_MOTOR_ENCODER_SCALAR);
+    deployMotorEncoder.setVelocityConversionFactor(
+        Constants.Intake.DEPLOY_MOTOR_ENCODER_VELOCITY_SCALAR);
     deployMotorAbsoluteEncoder.setPositionConversionFactor(Constants.REVOLUTIONS_TO_DEGREES);
 
-    deployMotorPID.setP(Calibrations.INTAKE_DEPLOY_MOTOR_P);
-    deployMotorPID.setI(Calibrations.INTAKE_DEPLOY_MOTOR_I);
-    deployMotorPID.setD(Calibrations.INTAKE_DEPLOY_MOTOR_D);
+    deployMotorPID.setP(Calibrations.Intake.DEPLOY_MOTOR_P);
+    deployMotorPID.setI(Calibrations.Intake.DEPLOY_MOTOR_I);
+    deployMotorPID.setD(Calibrations.Intake.DEPLOY_MOTOR_D);
 
     deployMotorPID.setSmartMotionMaxAccel(
-        Calibrations.INTAKE_DEPLOY_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED, SMART_MOTION_SLOT);
+        Calibrations.Intake.DEPLOY_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED, SMART_MOTION_SLOT);
     deployMotorPID.setSmartMotionMaxVelocity(
-        Calibrations.INTAKE_DEPLOY_MAX_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT);
+        Calibrations.Intake.DEPLOY_MAX_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT);
     deployMotorPID.setSmartMotionMinOutputVelocity(
-        Calibrations.INTAKE_DEPLOY_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT);
+        Calibrations.Intake.DEPLOY_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT);
     deployMotorPID.setSmartMotionAllowedClosedLoopError(
-        Calibrations.INTAKE_DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG, SMART_MOTION_SLOT);
+        Calibrations.Intake.DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG, SMART_MOTION_SLOT);
 
     intakeLeft.restoreFactoryDefaults();
 
@@ -87,12 +88,12 @@ public class Intake extends SubsystemBase {
   public void deploy() {
     // Set the desired intake position
     deployMotorPID.setReference(
-        Calibrations.INTAKE_DEPLOYED_POSITION_DEGREES,
+        Calibrations.Intake.DEPLOYED_POSITION_DEGREES,
         CANSparkMax.ControlType.kSmartMotion,
         SMART_MOTION_SLOT,
-        Calibrations.ARBITRARY_INTAKE_FEED_FORWARD_VOLTS * getCosineIntakeAngle(),
+        Calibrations.Intake.ARBITRARY_FEED_FORWARD_VOLTS * getCosineIntakeAngle(),
         ArbFFUnits.kVoltage);
-    intakeDesiredPositionDegrees = Calibrations.INTAKE_DEPLOYED_POSITION_DEGREES;
+    intakeDesiredPositionDegrees = Calibrations.Intake.DEPLOYED_POSITION_DEGREES;
 
     // Set a timer only if we're newly deploying
     // If we have already set a timer, we shouldn't restart the timer
@@ -109,22 +110,22 @@ public class Intake extends SubsystemBase {
 
     // Set the desired intake position
     deployMotorPID.setReference(
-        Calibrations.INTAKE_STARTING_POSITION_DEGREES,
+        Calibrations.Intake.STARTING_POSITION_DEGREES,
         CANSparkMax.ControlType.kSmartMotion,
         SMART_MOTION_SLOT,
-        Calibrations.ARBITRARY_INTAKE_FEED_FORWARD_VOLTS * getCosineIntakeAngle(),
+        Calibrations.Intake.ARBITRARY_FEED_FORWARD_VOLTS * getCosineIntakeAngle(),
         ArbFFUnits.kVoltage);
-    intakeDesiredPositionDegrees = Calibrations.INTAKE_STARTING_POSITION_DEGREES;
+    intakeDesiredPositionDegrees = Calibrations.Intake.STARTING_POSITION_DEGREES;
   }
 
   /** Runs the intake wheels inward */
   public void intakeGamePiece() {
-    intakeLeft.set(Calibrations.INTAKE_INTAKING_POWER);
+    intakeLeft.set(Calibrations.Intake.INTAKING_POWER);
   }
 
   /** Runs the intake wheels outward */
   public void ejectGamePiece() {
-    intakeLeft.set(Calibrations.INTAKE_EJECTION_POWER);
+    intakeLeft.set(Calibrations.Intake.EJECTION_POWER);
   }
 
   public void stopIntakingGamePiece() {
@@ -147,20 +148,20 @@ public class Intake extends SubsystemBase {
 
   public void initialize() {
     deployMotorEncoder.setPosition(
-        deployMotorAbsoluteEncoder.getPosition() + Calibrations.INTAKE_ABSOLUTE_ENCODER_OFFSET_DEG);
+        deployMotorAbsoluteEncoder.getPosition() + Calibrations.Intake.ABSOLUTE_ENCODER_OFFSET_DEG);
   }
 
   /** Returns the cosine of the intake angle in degrees off of the horizontal. */
   public double getCosineIntakeAngle() {
     return Math.cos(
-        deployMotorEncoder.getPosition() - Constants.INTAKE_POSITION_WHEN_HORIZONTAL_DEGREES);
+        deployMotorEncoder.getPosition() - Constants.Intake.POSITION_WHEN_HORIZONTAL_DEGREES);
   }
 
   @Override
   public void periodic() {
     if (clampTimer.isPresent()) {
       // If present, that means we're deployed or in the process of deploying
-      if (clampTimer.get().hasElapsed(Calibrations.AUTO_CLAMP_WAIT_TIME_SECONDS)) {
+      if (clampTimer.get().hasElapsed(Calibrations.Intake.AUTO_CLAMP_WAIT_TIME_SECONDS)) {
         // If the time has elapsed, that means we've deployed enough to clamp
         clampIntake();
       } else {
@@ -174,7 +175,7 @@ public class Intake extends SubsystemBase {
 
     // If the intake has achieved its desired position, then cut power
     if (Math.abs(intakeDesiredPositionDegrees - deployMotorEncoder.getPosition())
-        < Calibrations.INTAKE_POSITION_THRESHOLD_DEGREES) {
+        < Calibrations.Intake.POSITION_THRESHOLD_DEGREES) {
       deployMotorPID.setReference(0.0, CANSparkMax.ControlType.kVoltage);
     }
   }

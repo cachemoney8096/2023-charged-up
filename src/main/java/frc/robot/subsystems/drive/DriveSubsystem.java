@@ -204,8 +204,9 @@ public class DriveSubsystem extends SubsystemBase {
     double offsetHeadingDegrees = MathUtil.inputModulus(headingDifferenceDegrees, -180, 180);
 
     double desiredRotation =
-        Calibrations.ROTATE_TO_TARGET_PID_CONTROLLER.calculate(offsetHeadingDegrees, 0.0)
-            + Math.signum(offsetHeadingDegrees) * Calibrations.ROTATE_TO_TARGET_FF;
+        Calibrations.SwerveSubsystem.ROTATE_TO_TARGET_PID_CONTROLLER.calculate(
+                offsetHeadingDegrees, 0.0)
+            + Math.signum(offsetHeadingDegrees) * Calibrations.SwerveSubsystem.ROTATE_TO_TARGET_FF;
 
     drive(x, y, desiredRotation, fieldRelative);
   }
@@ -256,12 +257,12 @@ public class DriveSubsystem extends SubsystemBase {
             traj,
             this::getPose, // Pose supplier
             Constants.SwerveDrive.DRIVE_KINEMATICS, // SwerveDriveKinematics
-            Calibrations
+            Calibrations.SwerveSubsystem
                 .PATH_X_CONTROLLER, // X controller. Tune these values for your robot. Leaving them
             // 0 will only use feedforwards.
-            Calibrations
+            Calibrations.SwerveSubsystem
                 .PATH_Y_CONTROLLER, // Y controller (usually the same values as X controller)
-            Calibrations
+            Calibrations.SwerveSubsystem
                 .PATH_THETA_CONTROLLER, // Rotation controller. Tune these values for your robot.
             // Leaving them 0 will only use feedforwards.
             this::setModuleStates, // Module states consumer
