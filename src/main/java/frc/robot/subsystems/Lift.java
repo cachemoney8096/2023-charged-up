@@ -12,6 +12,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -204,5 +205,20 @@ public class Lift extends SubsystemBase {
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder){
+    super.initSendable(builder);
+    builder.addDoubleProperty("Elevator kP", elevatorPID::getP, elevatorPID::setP);
+    builder.addDoubleProperty("Elevator kI", elevatorPID::getI, elevatorPID::setI);
+    builder.addDoubleProperty("Elevator kD", elevatorPID::getD, elevatorPID::setD);
+    builder.addDoubleProperty("Elevator Position", elevatorEncoder::getPosition, elevatorEncoder::setPosition);
+    builder.addDoubleProperty("Arm kP", armPID::getP, armPID::setP);
+    builder.addDoubleProperty("Arm kI", armPID::getI, armPID::setI);
+    builder.addDoubleProperty("Arm kD", armPID::getD, armPID::setD);
+    builder.addDoubleProperty("Arm Position", armEncoder::getPosition, armEncoder::setPosition);
+    builder.addBooleanProperty("Done Scoring", this::doneScoring, null);
+    builder.addBooleanProperty("See Game Piece", this::seeGamePiece, null);
   }
 }
