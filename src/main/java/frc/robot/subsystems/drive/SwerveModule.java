@@ -15,6 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.utils.SparkMaxUtils;
@@ -139,6 +140,17 @@ public class SwerveModule implements Sendable {
                 Constants.SwerveModule.DRIVING_MOTOR_CURRENT_LIMIT_AMPS));
 
     return errors == 0;
+  }
+
+  /**
+   * Burns the current settings to sparks so they keep current settings on reboot. Should be done
+   * after all settings are set.
+   */
+  public void burnFlashSparks() {
+    Timer.delay(0.005);
+    drivingSparkMax.burnFlash();
+    Timer.delay(0.005);
+    turningSparkMax.burnFlash();
   }
 
   /**
