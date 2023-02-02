@@ -37,6 +37,13 @@ public class Lift extends SubsystemBase {
     STARTING
   }
 
+  /** Position of the lift relative to to the start position */
+  public enum LiftPositionStartRelative {
+    BELOW_START,
+    AT_START,
+    ABOVE_START
+  }
+
   // Actuators
   private CANSparkMax elevator =
       new CANSparkMax(RobotMap.ELEVATOR_MOTOR_CAN_ID, MotorType.kBrushless);
@@ -63,6 +70,8 @@ public class Lift extends SubsystemBase {
 
   // Members
   private final int SMART_MOTION_SLOT = 0;
+  private LiftPosition latestPosition = LiftPosition.STARTING;
+  private LiftPosition desiredPosition = LiftPosition.STARTING;
 
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
@@ -179,7 +188,7 @@ public class Lift extends SubsystemBase {
     arm.burnFlash();
   }
 
-  public void goToPosition(LiftPosition pos) {
+  private void goToPosition(LiftPosition pos) {
     elevatorPID.setReference(
         liftPositionMap.get(pos).getFirst(),
         CANSparkMax.ControlType.kSmartMotion,
@@ -246,9 +255,78 @@ public class Lift extends SubsystemBase {
             * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE);
   }
 
+  /** Sets the desired position, which the lift may not go to directly. */
+  public void setDesiredPosition(LiftPosition pos) {
+    desiredPosition = pos;
+  }
+
+  /** True if the lift is at the queried position. */
+  private boolean atPosition(LiftPosition positionToCheck) {
+    double armThresholdDegrees =
+        positionToCheck == LiftPosition.STARTING
+            ? Cal.Lift.ARM_START_THRESHOLD_DEGREES
+            : Cal.Lift.ARM_THRESHOLD_DEGREES;
+    double elevatorThresholdInches =
+        positionToCheck == LiftPosition.STARTING
+            ? Cal.Lift.ELEVATOR_START_THRESHOLD_INCHES
+            : Cal.Lift.ELEVATOR_THRESHOLD_INCHES;
+    double elevatorPositionToCheckInches = liftPositionMap.get(positionToCheck).getFirst();
+    double armPositionToCheckDegrees = liftPositionMap.get(positionToCheck).getSecond();
+    double elevatorPositionInches = elevatorEncoder.getPosition();
+    double armPositionDegrees = armEncoder.getPosition();
+    if (Math.abs(armPositionDegrees - armPositionToCheckDegrees) > armThresholdDegrees) {
+      return false;
+    }
+
+    if (Math.abs(elevatorPositionInches - elevatorPositionToCheckInches)
+        > elevatorThresholdInches) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /** Converts a lift position to a relative lift position (above or below starting position). */
+  private static LiftPositionStartRelative getRelativeLiftPosition(LiftPosition pos) {
+    switch (pos) {
+      case STARTING:
+        return LiftPositionStartRelative.AT_START;
+      case SCORE_MID:
+      case SCORE_HIGH:
+      case SHELF:
+        return LiftPositionStartRelative.ABOVE_START;
+      case GRAB_FROM_INTAKE:
+        return LiftPositionStartRelative.BELOW_START;
+      default:
+        // should never be used?
+        return LiftPositionStartRelative.ABOVE_START;
+    }
+  }
+
+  /** Called every scheduler run */
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    // Check if position has updated.
+    if (atPosition(LiftPosition.STARTING)) {
+      latestPosition = LiftPosition.STARTING;
+    } else if (atPosition(desiredPosition)) {
+      latestPosition = desiredPosition;
+    }
+
+    // If the lift is going from below to above or above to below, we have to transit through
+    // starting position. Otherwise, we can go directly to the desired position.
+    LiftPositionStartRelative latestPositionStartRelative = getRelativeLiftPosition(latestPosition);
+    LiftPositionStartRelative desiredPositionStartRelative =
+        getRelativeLiftPosition(desiredPosition);
+    if (desiredPositionStartRelative == LiftPositionStartRelative.BELOW_START
+        && latestPositionStartRelative == LiftPositionStartRelative.ABOVE_START) {
+      goToPosition(LiftPosition.STARTING);
+    } else if (desiredPositionStartRelative == LiftPositionStartRelative.ABOVE_START
+        && latestPositionStartRelative == LiftPositionStartRelative.BELOW_START) {
+      goToPosition(LiftPosition.STARTING);
+    } else {
+      goToPosition(desiredPosition);
+    }
   }
 
   @Override
