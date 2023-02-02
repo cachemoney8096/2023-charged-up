@@ -31,14 +31,17 @@ public final class Constants {
    * Pitch angle from horizontal of the limelight in degrees (0 = straight ahead, 90 = straight up)
    */
   public static final double INTAKE_LIMELIGHT_PITCH_DEGREES = PLACEHOLDER_DOUBLE;
+
   public static final double TAG_LIMELIGHT_PITCH_DEGREES = PLACEHOLDER_DOUBLE;
 
   /** Height of the limelight on the robot from the carpet in meters */
   public static final double INTAKE_LIMELIGHT_HEIGHT_METERS = PLACEHOLDER_DOUBLE;
+
   public static final double TAG_LIMELIGHT_HEIGHT_METERS = PLACEHOLDER_DOUBLE;
 
   /** Height of the vision targets above the carpet */
   public static final double INTAKE_TARGET_HEIGHT_METERS = PLACEHOLDER_DOUBLE;
+
   public static final double TAG_TARGET_HEIGHT_METERS = PLACEHOLDER_DOUBLE;
 
   public static final class SwerveModule {

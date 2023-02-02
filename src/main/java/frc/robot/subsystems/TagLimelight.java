@@ -2,48 +2,47 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
-
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** Limelight to read april tags */
 public class TagLimelight extends SubsystemBase {
-    private final double kCameraAngleDegrees;
-    private final double kCameraHeight;
-    private final double kTargetHeight;
-    private final double kImageCaptureLatency = 11.0;
+  private final double kCameraAngleDegrees;
+  private final double kCameraHeight;
+  private final double kTargetHeight;
+  private final double kImageCaptureLatency = 11.0;
 
-    // Simulation functions
-    private SimDevice m_simDevice;
-    private SimDouble m_targetArea;
-    private SimDouble m_skew;
-    private SimDouble m_latency;
-    private SimDouble m_tx;
-    private SimDouble m_ty;
-    private SimBoolean m_valid;
+  // Simulation functions
+  private SimDevice m_simDevice;
+  private SimDouble m_targetArea;
+  private SimDouble m_skew;
+  private SimDouble m_latency;
+  private SimDouble m_tx;
+  private SimDouble m_ty;
+  private SimBoolean m_valid;
 
-    // NT published variables when using translation api
-    private double m_lastDistance = 0.0;
-    private double m_lastX = 0.0;
-    private double m_lastY = 0.0;
+  // NT published variables when using translation api
+  private double m_lastDistance = 0.0;
+  private double m_lastX = 0.0;
+  private double m_lastY = 0.0;
 
-    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-    NetworkTableEntry tx = table.getEntry("tx");
-    NetworkTableEntry ty = table.getEntry("ty");
-    NetworkTableEntry ta = table.getEntry("ta");
+  NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+  NetworkTableEntry tx = table.getEntry("tx");
+  NetworkTableEntry ty = table.getEntry("ty");
+  NetworkTableEntry ta = table.getEntry("ta");
 
-    /**
+  /**
    * Create an IntakeLimelight object
    *
    * @param angleDegrees angle from normal in degress. Looking straight out is 0, and increasing as
@@ -51,25 +50,24 @@ public class TagLimelight extends SubsystemBase {
    * @param heightMeters height of the camera measured from the lens to the ground in meters.
    * @param targetHeightMeters height to the center of the target in meters
    */
-    public TagLimelight(double angleDegrees, double heightMeters, double targetHeightMeters) {
-        kCameraAngleDegrees = angleDegrees;
-        kCameraHeight = heightMeters;
-        kTargetHeight = targetHeightMeters;
-        setLimelightValues(ledMode.ON, camMode.VISION_PROCESSING, pipeline.PIPELINE3);
+  public TagLimelight(double angleDegrees, double heightMeters, double targetHeightMeters) {
+    kCameraAngleDegrees = angleDegrees;
+    kCameraHeight = heightMeters;
+    kTargetHeight = targetHeightMeters;
+    setLimelightValues(ledMode.ON, camMode.VISION_PROCESSING, pipeline.PIPELINE3);
 
-
-        m_simDevice = SimDevice.create("Limelight");
-        if (m_simDevice != null) {
-            m_targetArea = m_simDevice.createDouble("Target Area", Direction.kBidir, 0.0);
-            m_skew = m_simDevice.createDouble("Skew", Direction.kBidir, 0.0);
-            m_latency = m_simDevice.createDouble("Latency", Direction.kBidir, 0.0);
-            m_tx = m_simDevice.createDouble("Tx", Direction.kBidir, 0.0);
-            m_ty = m_simDevice.createDouble("Ty", Direction.kBidir, 0.0);
-            m_valid = m_simDevice.createBoolean("Valid", Direction.kBidir, false);
-        }
+    m_simDevice = SimDevice.create("Limelight");
+    if (m_simDevice != null) {
+      m_targetArea = m_simDevice.createDouble("Target Area", Direction.kBidir, 0.0);
+      m_skew = m_simDevice.createDouble("Skew", Direction.kBidir, 0.0);
+      m_latency = m_simDevice.createDouble("Latency", Direction.kBidir, 0.0);
+      m_tx = m_simDevice.createDouble("Tx", Direction.kBidir, 0.0);
+      m_ty = m_simDevice.createDouble("Ty", Direction.kBidir, 0.0);
+      m_valid = m_simDevice.createBoolean("Valid", Direction.kBidir, false);
     }
+  }
 
-    /*
+  /*
    * 0 - whatever pipleine is on
    * 1 - off
    * 2 - blinking
