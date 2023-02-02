@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -54,6 +55,27 @@ public class RobotContainer {
     // Encoder offset stuff
     intake.initialize();
     lift.initialize();
+
+    burnFlashSparks();
+  }
+
+  /**
+   * Run burnFlash() for all controllers initialized. The ideal use case for this call is to call it
+   * once everything has been initialized. The burnFlash() call has the side effect of preventing
+   * all communication *to* the device for up to 200ms or more, potentially including some messages
+   * called before the burnFlash() call, and receiving messages *from* the device.
+   *
+   * <p>WARNING: This call will sleep the thread before and after burning flash. This is for your
+   * safety.
+   *
+   * <p>Borrowed from 3005.
+   */
+  public void burnFlashSparks() {
+    Timer.delay(0.25);
+    lift.burnFlashSparks();
+    intake.burnFlashSparks();
+    drive.burnFlashSparks();
+    Timer.delay(0.25);
   }
 
   /**

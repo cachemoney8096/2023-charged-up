@@ -84,6 +84,13 @@ public class DriveSubsystem extends SubsystemBase {
         });
   }
 
+  public void burnFlashSparks() {
+    frontLeft.burnFlashSparks();
+    frontRight.burnFlashSparks();
+    rearLeft.burnFlashSparks();
+    rearRight.burnFlashSparks();
+  }
+
   /**
    * Returns the currently-estimated pose of the robot.
    *

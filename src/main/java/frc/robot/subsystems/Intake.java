@@ -112,6 +112,19 @@ public class Intake extends SubsystemBase {
     return errors == 0;
   }
 
+  /**
+   * Burns the current settings to sparks so they keep current settings on reboot. Should be done
+   * after all settings are set.
+   */
+  public void burnFlashSparks() {
+    Timer.delay(0.005);
+    deployMotor.burnFlash();
+    Timer.delay(0.005);
+    intakeLeft.burnFlash();
+    Timer.delay(0.005);
+    intakeRight.burnFlash();
+  }
+
   /** Deploys the intake out. */
   public void deploy() {
     // Set the desired intake position

@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
@@ -165,6 +166,17 @@ public class Lift extends SubsystemBase {
             armAbsoluteEncoder.setPositionConversionFactor(Constants.REVOLUTIONS_TO_DEGREES));
 
     return errors == 0;
+  }
+
+  /**
+   * Burns the current settings to sparks so they keep current settings on reboot. Should be done
+   * after all settings are set.
+   */
+  public void burnFlashSparks() {
+    Timer.delay(0.005);
+    elevator.burnFlash();
+    Timer.delay(0.005);
+    arm.burnFlash();
   }
 
   public void goToPosition(LiftPosition pos) {
