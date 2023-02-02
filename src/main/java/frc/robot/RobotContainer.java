@@ -15,7 +15,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoChargeStationSequence;
 import frc.robot.commands.AutoScoreAndBalance;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.IntakeLimelight;
 import frc.robot.subsystems.Lift;
+import frc.robot.subsystems.TagLimelight;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.JoystickUtil;
 
@@ -29,6 +31,8 @@ public class RobotContainer {
   private final Intake intake = new Intake();
   private final DriveSubsystem drive = new DriveSubsystem();
   private final Lift lift = new Lift();
+  private final IntakeLimelight intakeLimelight;
+  private final TagLimelight tagLimelight;
 
   // A chooser for autonomous commands
   private SendableChooser<Command> autonChooser = new SendableChooser<>();
@@ -41,6 +45,19 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+
+    // set up the limelights
+    intakeLimelight =
+        new IntakeLimelight(
+            Constants.INTAKE_LIMELIGHT_PITCH_DEGREES,
+            Constants.INTAKE_LIMELIGHT_HEIGHT_METERS,
+            Constants.INTAKE_TARGET_HEIGHT_METERS);
+
+    tagLimelight =
+        new TagLimelight(
+            Constants.TAG_LIMELIGHT_PITCH_DEGREES,
+            Constants.TAG_LIMELIGHT_HEIGHT_METERS,
+            Constants.TAG_TARGET_HEIGHT_METERS);
   }
 
   public void initialize() {
