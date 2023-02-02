@@ -109,6 +109,17 @@ public final class Cal {
         ELEVATOR_MAX_VELOCITY_IN_PER_SECOND = Cal.PLACEHOLDER_DOUBLE,
         ELEVATOR_MIN_OUTPUT_VELOCITY_IN_PER_SECOND = Cal.PLACEHOLDER_DOUBLE,
         ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN = Cal.PLACEHOLDER_DOUBLE;
+
+    /**
+     * Thresholds for when we consider the lift has reached a position. This is logical (for
+     * considering where the lift can go) but not functional (does not stop arm control or something
+     * when reached). We apply broader thresholds for the Starting position as the lift transits
+     * through this position.
+     */
+    public static final double ELEVATOR_THRESHOLD_INCHES = 0.5,
+        ARM_THRESHOLD_DEGREES = 2.0,
+        ELEVATOR_START_THRESHOLD_INCHES = 1.0,
+        ARM_START_THRESHOLD_DEGREES = 4.0;
   }
 
   public static final class AutoBalance {
