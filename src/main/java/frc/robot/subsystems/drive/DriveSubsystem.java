@@ -23,7 +23,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
-
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 public class DriveSubsystem extends SubsystemBase {
   private double targetHeadingDegrees;
 
@@ -67,6 +69,10 @@ public class DriveSubsystem extends SubsystemBase {
             rearLeft.getPosition(),
             rearRight.getPosition()
           });
+
+  private boolean halfSpeed = false;
+
+  private DoubleSolenoid skid = new DoubleSolenoid(PneumaticsModuleType.REVPH, RobotMap.SKID_FORWARD_CHANNEL, RobotMap.SKID_REVERSE_CHANNEL);
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {}
@@ -230,7 +236,8 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void rotateOrKeepHeading(
       double x, double y, double rot, boolean fieldRelative, int povAngleDeg) {
-    // x, y, and rot are all being deadbanded from 0.1 to 0.0, so checking if they're equal to 0
+    // x, y, and rot are all being deadbanded from 0.1 to 0.0, so checking if
+    // they're equal to 0
     // does account for controller deadzones.
     if (x == 0 && y == 0 && rot == 0 && povAngleDeg == -1) {
       setX();
@@ -277,6 +284,15 @@ public class DriveSubsystem extends SubsystemBase {
             // Optional, defaults to true
             this // Requires this drive subsystem
             ));
+  }
+
+  public void deploySkids() {
+    skid.set(Value.kForward);
+  }
+
+  public void halfSpeedToggle() {
+    // Toggle halfSpeed. If it is true, set it to false, otherwise set it to true.
+    halfSpeed = halfSpeed ? false : true;
   }
 
   @Override

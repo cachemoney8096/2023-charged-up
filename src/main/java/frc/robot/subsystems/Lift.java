@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
@@ -35,6 +36,20 @@ public class Lift extends SubsystemBase {
     SCORE_MID,
     SCORE_HIGH,
     STARTING
+  }
+
+  /** Height to score at */
+  public enum ScoreHeight {
+    SHELF,
+    MID,
+    HIGH
+  }
+
+  /** Column to score in */
+  public enum ScoreCol {
+    LEFT,
+    CENTER,
+    RIGHT
   }
 
   /** Position of the lift relative to to the start position */
@@ -70,6 +85,8 @@ public class Lift extends SubsystemBase {
 
   // Members
   private final int SMART_MOTION_SLOT = 0;
+  private ScoreHeight scoreHeight = ScoreHeight.SHELF; // default value
+  private ScoreCol scoreCol = ScoreCol.LEFT; // default value
   private LiftPosition latestPosition = LiftPosition.STARTING;
   private LiftPosition desiredPosition = LiftPosition.STARTING;
 
@@ -253,6 +270,56 @@ public class Lift extends SubsystemBase {
     elevatorEncoder.setPosition(
         elevatorDutyCycleEncodersDifferenceDegrees
             * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE);
+  }
+
+  public void setScoreCol(int chooseCol) {
+    // 0 is left, 1 is center, 2 is right
+    if (chooseCol == 0) {
+      scoreCol = ScoreCol.LEFT;
+    } else if (chooseCol == 1) {
+      scoreCol = ScoreCol.CENTER;
+    } else {
+      scoreCol = ScoreCol.RIGHT;
+    }
+  }
+
+  public void setScoreHeight(int chooseHeight) {
+    // 0 is shelf, 1 is mid, 2 is high
+    if (chooseHeight == 0) {
+      scoreHeight = ScoreHeight.SHELF;
+    } else if (chooseHeight == 1) {
+      scoreHeight = ScoreHeight.MID;
+    } else {
+      scoreHeight = ScoreHeight.HIGH;
+    }
+  }
+
+  public void manualScore() {
+    // TODO do this
+  }
+
+  public void getRidOfObject() {
+    // TODO do this
+  }
+
+  public void cancelScore() {
+    // TODO do this
+  }
+
+  public void home() {
+    // TODO do this
+  }
+
+  public void prepScore() {
+    // TODO do this
+  }
+
+  public boolean holdingGamePiece() {
+    if (seeGamePiece() && grabber.get() == Value.kForward){
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /** Sets the desired position, which the lift may not go to directly. */

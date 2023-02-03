@@ -2,7 +2,7 @@ package frc.robot;
 
 /** This class is used to store IDs for physical connections to the robot, like CAN IDs. */
 public final class RobotMap {
-  public static final int DRIVER_CONTROLLER_PORT = 0;
+  public static final int DRIVER_CONTROLLER_PORT = 0, OPERATOR_CONTROLLER_PORT = 1;
 
   public static final int PIGEON_CAN_ID = 1;
 
@@ -31,6 +31,9 @@ public final class RobotMap {
 
   /** Lift grabbing pneumatic channels */
   public static final int LIFT_GRABBING_FORWARD_CHANNEL = 1, LIFT_GRABBING_REVERSE_CHANNEL = 2;
+
+  /** Skid pneumatic channels */
+  public static final int SKID_FORWARD_CHANNEL = 3, SKID_REVERSE_CHANNEL = 4;
 
   /** Sensor DIO */
   public static final int LIFT_GAME_PIECE_DIO = 0,

@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoChargeStationSequence;
 import frc.robot.commands.AutoScoreAndBalance;
+import frc.robot.commands.IntakeSequence;
+import frc.robot.commands.Score;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
 import frc.robot.subsystems.Lift;
@@ -41,6 +43,8 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverController =
       new CommandXboxController(RobotMap.DRIVER_CONTROLLER_PORT);
+  private final CommandXboxController operatorController =
+      new CommandXboxController(RobotMap.OPERATOR_CONTROLLER_PORT);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -105,7 +109,31 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    driverController.a().whileTrue(new InstantCommand(intake::deploy, intake));
+    driverController.a().onTrue(new InstantCommand(drive::deploySkids, drive));
+    driverController.b().onTrue(new InstantCommand(lift::getRidOfObject, lift));
+    driverController.x().onTrue(new InstantCommand(lift::cancelScore, lift));
+    driverController.y().whileTrue(new InstantCommand(lift::manualScore, lift));
+
+    driverController.back().onTrue(new InstantCommand(lift::home, lift));
+    driverController.start().onTrue(new InstantCommand(drive::halfSpeedToggle, drive));
+
+    // TODO Maybe: steal
+    driverController.rightBumper().whileTrue(new InstantCommand(lift::prepScore, lift));
+    driverController.leftTrigger().whileTrue(new IntakeSequence());
+    driverController.rightTrigger().whileTrue(new Score());
+
+    // 0 is shelf, 1 is mid, 2 is high
+    operatorController.povDown().onTrue(new InstantCommand(() -> lift.setScoreHeight(0), lift));
+    operatorController.povLeft().onTrue(new InstantCommand(() -> lift.setScoreHeight(1), lift));
+    operatorController.povRight().onTrue(new InstantCommand(() -> lift.setScoreHeight(1), lift));
+    operatorController.povUp().onTrue(new InstantCommand(() -> lift.setScoreHeight(2), lift));
+
+    // 0 is left, 1 is center, 2 is right
+    operatorController.x().onTrue(new InstantCommand(() -> lift.setScoreCol(0), lift));
+    operatorController.a().onTrue(new InstantCommand(() -> lift.setScoreCol(1), lift));
+    operatorController.y().onTrue(new InstantCommand(() -> lift.setScoreCol(1), lift));
+    operatorController.b().onTrue(new InstantCommand(() -> lift.setScoreCol(2), lift));
+
     // Drive controls
     drive.setDefaultCommand(
         new RunCommand(
@@ -119,6 +147,7 @@ public class RobotContainer {
                         driverController.getHID().getPOV()),
                 drive)
             .withName("Manual Drive"));
+    intake.setDefaultCommand(new RunCommand(intake::retract, intake));
   }
 
   public Command getAutonomousCommand() {
