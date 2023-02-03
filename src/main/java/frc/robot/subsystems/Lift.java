@@ -328,7 +328,7 @@ public class Lift extends SubsystemBase {
   }
 
   /** True if the lift is at the queried position. */
-  public boolean atPosition(LiftPosition positionToCheck) {
+  private boolean atPosition(LiftPosition positionToCheck) {
     double armThresholdDegrees =
         positionToCheck == LiftPosition.STARTING
             ? Cal.Lift.ARM_START_THRESHOLD_DEGREES
@@ -395,6 +395,15 @@ public class Lift extends SubsystemBase {
       goToPosition(LiftPosition.STARTING);
     } else {
       goToPosition(desiredPosition);
+    }
+  }
+
+  /** Returns true if the lift is clear of the zone where the intake moves, so that the intake can move as soon as the lift is clear of that zone */
+  public boolean clearOfIntakeZone(){
+    if ((elevatorEncoder.getPosition() > Cal.Lift.ELEVATOR_INTAKE_ZONE_THRESHOLD_INCHES) && (armEncoder.getPosition() > Cal.Lift.ARM_INTAKE_ZONE_THRESHOLD_DEGREES)){
+      return true;
+    } else {
+      return false;
     }
   }
 

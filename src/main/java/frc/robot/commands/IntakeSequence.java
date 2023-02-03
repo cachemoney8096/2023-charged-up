@@ -37,7 +37,7 @@ public class IntakeSequence extends CommandBase {
   public void end(boolean interrupted){
     if (!interrupted){
       lift.setDesiredPosition(Lift.LiftPosition.STARTING);
-      if (lift.atPosition(Lift.LiftPosition.STARTING)){
+      if (lift.clearOfIntakeZone()){
         intake.retract();
       }
     }

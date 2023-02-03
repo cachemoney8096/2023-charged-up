@@ -120,6 +120,10 @@ public final class Cal {
         ARM_THRESHOLD_DEGREES = 2.0,
         ELEVATOR_START_THRESHOLD_INCHES = 1.0,
         ARM_START_THRESHOLD_DEGREES = 4.0;
+
+    /** Threshold for when the lift is out of the zone where the intake moves. */
+    public static final double ELEVATOR_INTAKE_ZONE_THRESHOLD_INCHES = PLACEHOLDER_DOUBLE,
+        ARM_INTAKE_ZONE_THRESHOLD_DEGREES = PLACEHOLDER_DOUBLE;
   }
 
   public static final class AutoBalance {
