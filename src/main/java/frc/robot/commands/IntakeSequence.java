@@ -16,7 +16,7 @@ public class IntakeSequence extends CommandBase {
   @Override
   public void initialize() {
     intake.deploy();
-    lift.goToPosition(Lift.LiftPosition.GRAB_FROM_INTAKE);
+    lift.setDesiredPosition(Lift.LiftPosition.GRAB_FROM_INTAKE);
   }
 
   @Override
@@ -31,5 +31,15 @@ public class IntakeSequence extends CommandBase {
   @Override
   public boolean isFinished(){
     return lift.holdingGamePiece() ? true : false;
+  }
+
+  @Override
+  public void end(boolean interrupted){
+    if (!interrupted){
+      lift.setDesiredPosition(Lift.LiftPosition.STARTING);
+      if (lift.atPosition(Lift.LiftPosition.STARTING)){
+        intake.retract();
+      }
+    }
   }
 }

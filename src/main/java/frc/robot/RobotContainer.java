@@ -119,7 +119,7 @@ public class RobotContainer {
 
     // TODO Maybe: steal
     driverController.rightBumper().whileTrue(new InstantCommand(lift::prepScore, lift));
-    driverController.leftTrigger().whileTrue(new IntakeSequence());
+    driverController.leftTrigger().whileTrue(new IntakeSequence(intake, lift));
     driverController.rightTrigger().whileTrue(new Score());
 
     // 0 is shelf, 1 is mid, 2 is high

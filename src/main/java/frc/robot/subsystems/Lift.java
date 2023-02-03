@@ -328,7 +328,7 @@ public class Lift extends SubsystemBase {
   }
 
   /** True if the lift is at the queried position. */
-  private boolean atPosition(LiftPosition positionToCheck) {
+  public boolean atPosition(LiftPosition positionToCheck) {
     double armThresholdDegrees =
         positionToCheck == LiftPosition.STARTING
             ? Cal.Lift.ARM_START_THRESHOLD_DEGREES
