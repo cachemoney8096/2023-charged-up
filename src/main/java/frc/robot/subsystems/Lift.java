@@ -318,7 +318,9 @@ public class Lift extends SubsystemBase {
     LiftPositionStartRelative latestPositionStartRelative = getRelativeLiftPosition(latestPosition);
     LiftPositionStartRelative desiredPositionStartRelative =
         getRelativeLiftPosition(desiredPosition);
-    if (desiredPositionStartRelative == LiftPositionStartRelative.BELOW_START
+    if (!seeGamePiece()){
+      goToPosition(desiredPosition);
+    } else if (desiredPositionStartRelative == LiftPositionStartRelative.BELOW_START
         && latestPositionStartRelative == LiftPositionStartRelative.ABOVE_START) {
       goToPosition(LiftPosition.STARTING);
     } else if (desiredPositionStartRelative == LiftPositionStartRelative.ABOVE_START
