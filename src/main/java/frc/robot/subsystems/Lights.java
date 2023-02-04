@@ -10,10 +10,16 @@ public class Lights extends SubsystemBase {
   private LightCode currentLightStatus = LightCode.OFF;
   private AddressableLED led = new AddressableLED(RobotMap.LED_PWM_PORT);
   private AddressableLEDBuffer ledBuffer;
+
   /** for example, a spacing value of 1 would mean every LED is on */
   private int spacing = 1;
+
   /** timer for blinking led */
   private int blinkingTimer = 0;
+  /** When the blinkingTimer reaches 10 (equal to blinkingPeriod), the LED is toggled */
+  private int blinkingPeriod = 10;
+  /** True when light status should be blinking (ex. NO_TAG) */
+  private boolean currentlyBlinking = false;
 
   public Lights() {
     ledBuffer = new AddressableLEDBuffer(60);
@@ -63,36 +69,43 @@ public class Lights extends SubsystemBase {
         r = 255;
         g = 255;
         b = 0;
+        currentlyBlinking = false;
         break;
       case CUBE:
         r = 255;
         g = 0;
         b = 255;
+        currentlyBlinking = false;
         break;
       case GAME_OBJECT:
         r = 0;
         g = 255;
         b = 0;
+        currentlyBlinking = false;
         break;
       case NO_TAG:
         r = 0;
         g = 255;
         b = 0;
+        currentlyBlinking = true;
         break;
       case WORKING:
         r = 255;
         g = 0;
         b = 0;
+        currentlyBlinking = false;
         break;
       case READY_TO_SCORE:
         r = 0;
         g = 0;
         b = 255;
+        currentlyBlinking = false;
         break;
       case OFF:
         r = 0;
         g = 0;
         b = 0;
+        currentlyBlinking = false;
         break;
       default:
         // this should never trigger
@@ -108,12 +121,12 @@ public class Lights extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (currentLightStatus == LightCode.NO_TAG) {
-      if (blinkingTimer == 500) {
+    if (currentlyBlinking) {
+      if (blinkingTimer >= blinkingPeriod) {
         toggleCode(LightCode.NO_TAG);
         blinkingTimer = 0;
       }
+      blinkingTimer ++;
     }
-    blinkingTimer += 50;
   }
 }
