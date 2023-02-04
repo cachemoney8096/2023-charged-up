@@ -16,6 +16,7 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Timer;
@@ -276,6 +277,34 @@ public class Lift extends SubsystemBase {
             * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE);
   }
 
+  public void manualPrepScore() {
+    // TODO do this
+  }
+
+  public void getRidOfObject() {
+    // TODO do this
+  }
+
+  public void cancelScore() {
+    // TODO do this
+  }
+
+  public void home() {
+    // TODO do this
+  }
+
+  public void prepScore() {
+    // TODO do this
+  }
+
+  public boolean holdingGamePiece() {
+    if (seeGamePiece() && grabber.get() == Value.kForward) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   /** Sets the desired position, which the lift may not go to directly. */
   public void setDesiredPosition(LiftPosition pos) {
     desiredPosition = pos;
@@ -349,6 +378,19 @@ public class Lift extends SubsystemBase {
       goToPosition(LiftPosition.STARTING);
     } else {
       goToPosition(desiredPosition);
+    }
+  }
+
+  /**
+   * Returns true if the lift is clear of the zone where the intake moves, so that the intake can
+   * move as soon as the lift is clear of that zone
+   */
+  public boolean clearOfIntakeZone() {
+    if ((elevatorEncoder.getPosition() > Cal.Lift.ELEVATOR_INTAKE_ZONE_THRESHOLD_INCHES)
+        || (armEncoder.getPosition() > Cal.Lift.ARM_INTAKE_ZONE_THRESHOLD_DEGREES)) {
+      return true;
+    } else {
+      return false;
     }
   }
 

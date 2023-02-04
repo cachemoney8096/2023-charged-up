@@ -68,6 +68,8 @@ public class DriveSubsystem extends SubsystemBase {
             rearRight.getPosition()
           });
 
+  private boolean halfSpeed = false; // TODO use this
+
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {}
 
@@ -230,7 +232,8 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void rotateOrKeepHeading(
       double x, double y, double rot, boolean fieldRelative, int povAngleDeg) {
-    // x, y, and rot are all being deadbanded from 0.1 to 0.0, so checking if they're equal to 0
+    // x, y, and rot are all being deadbanded from 0.1 to 0.0, so checking if
+    // they're equal to 0
     // does account for controller deadzones.
     if (x == 0 && y == 0 && rot == 0 && povAngleDeg == -1) {
       setX();
@@ -277,6 +280,15 @@ public class DriveSubsystem extends SubsystemBase {
             // Optional, defaults to true
             this // Requires this drive subsystem
             ));
+  }
+
+  public void toggleSkids() {
+    // TODO do this once we can add skids
+  }
+
+  public void halfSpeedToggle() {
+    // Toggle halfSpeed. If it is true, set it to false, otherwise set it to true.
+    halfSpeed = !halfSpeed;
   }
 
   @Override

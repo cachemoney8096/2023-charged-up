@@ -127,6 +127,15 @@ public final class Cal {
      * reached). We apply broader margins for the Starting position as the lift transits through
      * this position.
      */
+    public static final double ELEVATOR_THRESHOLD_INCHES = 0.5,
+        ARM_THRESHOLD_DEGREES = 2.0,
+        ELEVATOR_START_THRESHOLD_INCHES = 1.0,
+        ARM_START_THRESHOLD_DEGREES = 4.0;
+
+    /** Threshold for when the lift is out of the zone where the intake moves. */
+    public static final double ELEVATOR_INTAKE_ZONE_THRESHOLD_INCHES = PLACEHOLDER_DOUBLE,
+        ARM_INTAKE_ZONE_THRESHOLD_DEGREES = PLACEHOLDER_DOUBLE;
+
     public static final double ELEVATOR_MARGIN_INCHES = 0.5,
         ARM_MARGIN_DEGREES = 2.0,
         ELEVATOR_START_MARGIN_INCHES = 1.0,
