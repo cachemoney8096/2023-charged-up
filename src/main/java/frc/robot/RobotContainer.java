@@ -144,6 +144,12 @@ public class RobotContainer {
 
     operatorController.leftBumper().onTrue(new InstantCommand(lights::toggleConeLight, lights));
     operatorController.rightBumper().onTrue(new InstantCommand(lights::toggleCubeLight, lights));
+    operatorController.leftTrigger().onTrue(new InstantCommand(lift::grab, lift));
+    operatorController.leftTrigger().onFalse(new InstantCommand(lift::drop, lift));
+    operatorController.rightTrigger().onTrue(new InstantCommand(scoreLoc::toggleMiddleGrid));
+    operatorController.rightTrigger().onFalse(new InstantCommand(scoreLoc::toggleMiddleGrid));
+
+    //TODO add manual arm and elevator control
 
     // Drive controls
     drive.setDefaultCommand(
