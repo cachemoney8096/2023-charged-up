@@ -13,7 +13,7 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 public class AutoScoreAndBalance extends SequentialCommandGroup {
   private PathPlannerTrajectory traj =
       PathPlanner.loadPath(
-          "ScoreAndBalanceTraj.path",
+          "ScoreAndBalanceTraj",
           new PathConstraints(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
 
   public AutoScoreAndBalance(boolean isFirstPath, Lift lift, DriveSubsystem drive) {

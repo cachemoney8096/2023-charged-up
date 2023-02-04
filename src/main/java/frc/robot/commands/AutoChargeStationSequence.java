@@ -15,7 +15,7 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 public class AutoChargeStationSequence extends SequentialCommandGroup {
   private PathPlannerTrajectory traj =
       PathPlanner.loadPath(
-          "EngageOnlyTraj.path",
+          "EngageOnlyTraj",
           new PathConstraints(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
 
   public AutoChargeStationSequence(boolean isFirstPath, DriveSubsystem drive) {
