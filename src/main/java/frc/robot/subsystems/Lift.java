@@ -177,20 +177,20 @@ public class Lift extends SubsystemBase {
 
     errors +=
         SparkMaxUtils.check(
-            elevator.setSoftLimit(SoftLimitDirection.kForward, Cal.Lift.ELEVATOR_POSITIVE_MARGIN));
+            elevator.setSoftLimit(SoftLimitDirection.kForward, Cal.Lift.ELEVATOR_POSITIVE_LIMIT_INCHES));
     errors += SparkMaxUtils.check(elevator.enableSoftLimit(SoftLimitDirection.kForward, true));
     errors +=
         SparkMaxUtils.check(
-            elevator.setSoftLimit(SoftLimitDirection.kReverse, Cal.Lift.ELEVATOR_NEGATIVE_MARGIN));
+            elevator.setSoftLimit(SoftLimitDirection.kReverse, Cal.Lift.ELEVATOR_NEGATIVE_LIMIT_INCHES));
     errors += SparkMaxUtils.check(elevator.enableSoftLimit(SoftLimitDirection.kReverse, true));
 
     errors +=
         SparkMaxUtils.check(
-            arm.setSoftLimit(SoftLimitDirection.kForward, Cal.Lift.ARM_POSITIVE_MARGIN));
+            arm.setSoftLimit(SoftLimitDirection.kForward, Cal.Lift.ARM_POSITIVE_LIMIT_DEGREES));
     errors += SparkMaxUtils.check(arm.enableSoftLimit(SoftLimitDirection.kForward, true));
     errors +=
         SparkMaxUtils.check(
-            arm.setSoftLimit(SoftLimitDirection.kReverse, Cal.Lift.ARM_NEGATIVE_MARGIN));
+            arm.setSoftLimit(SoftLimitDirection.kReverse, Cal.Lift.ARM_NEGATIVE_LIMIT_DEGREES));
     errors += SparkMaxUtils.check(arm.enableSoftLimit(SoftLimitDirection.kReverse, true));
 
     return errors == 0;

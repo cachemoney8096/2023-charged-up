@@ -6,11 +6,11 @@ package frc.robot.subsystems;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -73,18 +73,6 @@ public class Intake extends SubsystemBase {
 
     errors += SparkMaxUtils.check(intakeRight.restoreFactoryDefaults());
     errors += SparkMaxUtils.check(intakeRight.follow(intakeLeft, true));
-
-    errors += SparkMaxUtils.check(intakeLeft.setSoftLimit(SoftLimitDirection.kForward, Cal.Intake.INTAKE_LEFT_POSITIVE_MARGIN));
-    errors += SparkMaxUtils.check(intakeLeft.enableSoftLimit(SoftLimitDirection.kForward, true));
-    errors += SparkMaxUtils.check(intakeLeft.setSoftLimit(SoftLimitDirection.kReverse, Cal.Intake.INTAKE_LEFT_NEGATIVE_MARGIN));
-    errors += SparkMaxUtils.check(intakeLeft.enableSoftLimit(SoftLimitDirection.kReverse, true));
-
-    errors += SparkMaxUtils.check(intakeRight.setSoftLimit(SoftLimitDirection.kForward, Cal.Intake.INTAKE_RIGHT_POSITIVE_MARGIN));
-    errors += SparkMaxUtils.check(intakeRight.enableSoftLimit(SoftLimitDirection.kForward, true));
-    errors += SparkMaxUtils.check(intakeRight.setSoftLimit(SoftLimitDirection.kReverse, Cal.Intake.INTAKE_RIGHT_NEGATIVE_MARGIN));
-    errors += SparkMaxUtils.check(intakeRight.enableSoftLimit(SoftLimitDirection.kReverse, true));
-
-
     return errors == 0;
   }
 
@@ -121,6 +109,22 @@ public class Intake extends SubsystemBase {
         SparkMaxUtils.check(
             deployMotorPID.setSmartMotionAllowedClosedLoopError(
                 Cal.Intake.DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG, SMART_MOTION_SLOT));
+
+    errors +=
+        SparkMaxUtils.check(
+            deployMotor.setSoftLimit(
+                SoftLimitDirection.kForward, Cal.Intake.INTAKE_DEPLOY_MOTOR_POSITIVE_LIMIT_DEGREES));
+    errors +=
+        SparkMaxUtils.check(
+            deployMotor.enableSoftLimit(SoftLimitDirection.kForward, true));
+
+    errors +=
+        SparkMaxUtils.check(
+            deployMotor.setSoftLimit(
+                SoftLimitDirection.kReverse, Cal.Intake.INTAKE_DEPLOY_MOTOR_NEGATIVE_LIMIT_DEGREES));
+    errors +=
+        SparkMaxUtils.check(
+            deployMotor.enableSoftLimit(SoftLimitDirection.kReverse, true));
 
     return errors == 0;
   }

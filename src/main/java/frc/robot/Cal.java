@@ -77,11 +77,9 @@ public final class Cal {
     /** Margin for having achieved the desired intake position (in degrees) */
     public static final double POSITION_MARGIN_DEGREES = 3.0;
 
-    /** Positive and negative margins for softLimits for SparksMax */
-    public static final float INTAKE_LEFT_POSITIVE_MARGIN = PLACEHOLDER_FLOAT,
-        INTAKE_LEFT_NEGATIVE_MARGIN = PLACEHOLDER_FLOAT,
-        INTAKE_RIGHT_POSITIVE_MARGIN = PLACEHOLDER_FLOAT,
-        INTAKE_RIGHT_NEGATIVE_MARGIN = PLACEHOLDER_FLOAT;
+    /** Sets the min and max positions that the intake deploy motor will be allowed to reach */
+    public static final float INTAKE_DEPLOY_MOTOR_POSITIVE_LIMIT_DEGREES = PLACEHOLDER_FLOAT,
+    INTAKE_DEPLOY_MOTOR_NEGATIVE_LIMIT_DEGREES = PLACEHOLDER_FLOAT;
   }
 
   public static final class Lift {
@@ -117,11 +115,11 @@ public final class Cal {
         ELEVATOR_MIN_OUTPUT_VELOCITY_IN_PER_SECOND = Cal.PLACEHOLDER_DOUBLE,
         ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN = Cal.PLACEHOLDER_DOUBLE;
 
-    /** Positive and negative margins for softLimits for SparksMax */
-    public static final float ELEVATOR_POSITIVE_MARGIN = PLACEHOLDER_FLOAT,
-        ELEVATOR_NEGATIVE_MARGIN = PLACEHOLDER_FLOAT,
-        ARM_POSITIVE_MARGIN = PLACEHOLDER_FLOAT,
-        ARM_NEGATIVE_MARGIN = PLACEHOLDER_FLOAT;
+    /** Sets the min and max positions that the elevator and arm motors will be allowed to reach */
+    public static final float ELEVATOR_POSITIVE_LIMIT_INCHES = PLACEHOLDER_FLOAT,
+        ELEVATOR_NEGATIVE_LIMIT_INCHES = PLACEHOLDER_FLOAT,
+        ARM_POSITIVE_LIMIT_DEGREES = PLACEHOLDER_FLOAT,
+        ARM_NEGATIVE_LIMIT_DEGREES = PLACEHOLDER_FLOAT;
 
     /**
      * Margin for when we consider the lift has reached a position. This is logical (for considering
