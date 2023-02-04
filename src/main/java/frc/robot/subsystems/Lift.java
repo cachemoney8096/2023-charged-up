@@ -419,7 +419,7 @@ public class Lift extends SubsystemBase {
     builder.addDoubleProperty("Elevator kI", elevatorPID::getI, elevatorPID::setI);
     builder.addDoubleProperty("Elevator kD", elevatorPID::getD, elevatorPID::setD);
     builder.addDoubleProperty(
-        "Elevator Position", elevatorEncoder::getPosition, elevatorEncoder::setPosition);
+        "Elevator Positionffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", elevatorEncoder::getPosition, elevatorEncoder::setPosition);
     builder.addDoubleProperty("Arm kP", armPID::getP, armPID::setP);
     builder.addDoubleProperty("Arm kI", armPID::getI, armPID::setI);
     builder.addDoubleProperty("Arm kD", armPID::getD, armPID::setD);

@@ -134,6 +134,9 @@ public class RobotContainer {
     operatorController.y().onTrue(new InstantCommand(() -> lift.setScoreCol(1), lift));
     operatorController.b().onTrue(new InstantCommand(() -> lift.setScoreCol(2), lift));
 
+    operatorController.back().onTrue(new InstantCommand(intake::retract, intake));
+    operatorController.start().onTrue(new InstantCommand(intake::deploy, intake));
+
     // Drive controls
     drive.setDefaultCommand(
         new RunCommand(
@@ -147,6 +150,7 @@ public class RobotContainer {
                         driverController.getHID().getPOV()),
                 drive)
             .withName("Manual Drive"));
+
     intake.setDefaultCommand(new RunCommand(intake::retract, intake));
   }
 
