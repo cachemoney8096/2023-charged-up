@@ -5,18 +5,22 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 
+/** Controls the LEDs that indicate robot status */
 public class Lights extends SubsystemBase {
-  private LightCodes currentLightStatus = LightCodes.OFF;
-  private AddressableLED m_led = new AddressableLED(RobotMap.LED_PWM_PORT);
-  private AddressableLEDBuffer m_ledBuffer;
+  private LightCode currentLightStatus = LightCode.OFF;
+  private AddressableLED led = new AddressableLED(RobotMap.LED_PWM_PORT);
+  private AddressableLEDBuffer ledBuffer;
+  /** for example, a spacing value of 1 would mean every LED is on */
   private int spacing = 1;
+  /** timer for blinking led */
+  private int blinkingTimer = 0;
 
   public Lights() {
-    m_ledBuffer = new AddressableLEDBuffer(60);
-    m_led.setLength(m_ledBuffer.getLength());
+    ledBuffer = new AddressableLEDBuffer(60);
+    led.setLength(ledBuffer.getLength());
   }
 
-  public enum LightCodes {
+  public enum LightCode {
     CONE, // Solid Yellow
     CUBE, // Solid Purple
     GAME_OBJECT, // Solid Green
@@ -26,84 +30,22 @@ public class Lights extends SubsystemBase {
     OFF
   }
 
-  public void toggleConeLight() {
-    if (currentLightStatus == LightCodes.CONE) {
-      currentLightStatus = LightCodes.OFF;
+  public void toggleCode(LightCode light) {
+    if (currentLightStatus == light) {
+      currentLightStatus = LightCode.OFF;
     } else {
-      currentLightStatus = LightCodes.CONE;
+      currentLightStatus = light;
     }
     setColor(currentLightStatus);
-    m_led.setData(m_ledBuffer);
-    m_led.start();
+    led.setData(ledBuffer);
+    led.start();
   }
 
-  public void toggleCubeLight() {
-    if (currentLightStatus == LightCodes.CUBE) {
-      currentLightStatus = LightCodes.OFF;
-    } else {
-      currentLightStatus = LightCodes.CUBE;
-    }
-    setColor(currentLightStatus);
-    m_led.setData(m_ledBuffer);
-    m_led.start();
-  }
-
-  public void toggleGameObjectLight() {
-    if (currentLightStatus == LightCodes.GAME_OBJECT) {
-      currentLightStatus = LightCodes.OFF;
-    } else {
-      currentLightStatus = LightCodes.GAME_OBJECT;
-    }
-    setColor(currentLightStatus);
-    m_led.setData(m_ledBuffer);
-    m_led.start();
-  }
-
-  public void toggelNoTagLight() {
-    if (currentLightStatus == LightCodes.NO_TAG) {
-      currentLightStatus = LightCodes.OFF;
-    } else {
-      currentLightStatus = LightCodes.NO_TAG;
-    }
-    setColor(currentLightStatus);
-    m_led.setData(m_ledBuffer);
-    m_led.start();
-  }
-
-  public void toggleWorkingLight() {
-    if (currentLightStatus == LightCodes.WORKING) {
-      currentLightStatus = LightCodes.OFF;
-    } else {
-      currentLightStatus = LightCodes.WORKING;
-    }
-    setColor(currentLightStatus);
-    m_led.setData(m_ledBuffer);
-    m_led.start();
-  }
-
-  public void toggleReadyToScoreLight() {
-    if (currentLightStatus == LightCodes.READY_TO_SCORE) {
-      currentLightStatus = LightCodes.OFF;
-    } else {
-      currentLightStatus = LightCodes.READY_TO_SCORE;
-    }
-    setColor(currentLightStatus);
-    m_led.setData(m_ledBuffer);
-    m_led.start();
-  }
-
-  public void toggleOff() {
-    currentLightStatus = LightCodes.OFF;
-    setColor(currentLightStatus);
-    m_led.setData(m_ledBuffer);
-    m_led.start();
-  }
-
-  public void setLight(LightCodes light) {
+  public void setLight(LightCode light) {
     currentLightStatus = light;
     setColor(currentLightStatus);
-    m_led.setData(m_ledBuffer);
-    m_led.start();
+    led.setData(ledBuffer);
+    led.start();
   }
 
   /** Sets the spacing between each LED so not all are lit up when applicable */
@@ -112,31 +54,66 @@ public class Lights extends SubsystemBase {
   }
 
   /** sets the color of the LEDs in RGB */
-  public void setColor(LightCodes light) {
+  public void setColor(LightCode light) {
     int r = 0;
     int g = 0;
     int b = 0;
+    switch (light) {
+      case CONE:
+        r = 255;
+        g = 255;
+        b = 0;
+        break;
+      case CUBE:
+        r = 255;
+        g = 0;
+        b = 255;
+        break;
+      case GAME_OBJECT:
+        r = 0;
+        g = 255;
+        b = 0;
+        break;
+      case NO_TAG:
+        r = 0;
+        g = 255;
+        b = 0;
+        break;
+      case WORKING:
+        r = 255;
+        g = 0;
+        b = 0;
+        break;
+      case READY_TO_SCORE:
+        r = 0;
+        g = 0;
+        b = 255;
+        break;
+      case OFF:
+        r = 0;
+        g = 0;
+        b = 0;
+        break;
+      default:
+        // this should never trigger
+        r = 0;
+        g = 0;
+        b = 0;
+    }
 
-    if (light == LightCodes.CONE || light == LightCodes.CUBE || light == LightCodes.WORKING) {
-      r = 255;
-    }
-    if (light == LightCodes.CONE || light == LightCodes.GAME_OBJECT || light == LightCodes.NO_TAG) {
-      g = 255;
-    }
-    if (light == LightCodes.CUBE || light == LightCodes.READY_TO_SCORE) {
-      b = 255;
-    }
-    if (light == LightCodes.OFF) {
-      r = 0;
-      g = 0;
-      b = 0;
-    }
-
-    for (int i = 0; i < m_ledBuffer.getLength(); i = i + spacing) {
-      m_ledBuffer.setRGB(i, r, g, b);
+    for (int i = 0; i < ledBuffer.getLength(); i = i + spacing) {
+      ledBuffer.setRGB(i, r, g, b);
     }
   }
 
   @Override
-  public void periodic() {}
+  public void periodic() {
+    if (currentLightStatus == LightCode.NO_TAG) {
+      if (blinkingTimer == 500) {
+        toggleCode(LightCode.NO_TAG);
+        blinkingTimer = 0;
+      }
+    }
+    blinkingTimer += 50;
+  }
 }
