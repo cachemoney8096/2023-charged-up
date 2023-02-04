@@ -79,7 +79,7 @@ public final class Cal {
 
     /** Sets the min and max positions that the intake deploy motor will be allowed to reach */
     public static final float INTAKE_DEPLOY_MOTOR_POSITIVE_LIMIT_DEGREES = PLACEHOLDER_FLOAT,
-    INTAKE_DEPLOY_MOTOR_NEGATIVE_LIMIT_DEGREES = PLACEHOLDER_FLOAT;
+        INTAKE_DEPLOY_MOTOR_NEGATIVE_LIMIT_DEGREES = PLACEHOLDER_FLOAT;
   }
 
   public static final class Lift {

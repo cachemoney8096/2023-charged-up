@@ -113,18 +113,16 @@ public class Intake extends SubsystemBase {
     errors +=
         SparkMaxUtils.check(
             deployMotor.setSoftLimit(
-                SoftLimitDirection.kForward, Cal.Intake.INTAKE_DEPLOY_MOTOR_POSITIVE_LIMIT_DEGREES));
-    errors +=
-        SparkMaxUtils.check(
-            deployMotor.enableSoftLimit(SoftLimitDirection.kForward, true));
+                SoftLimitDirection.kForward,
+                Cal.Intake.INTAKE_DEPLOY_MOTOR_POSITIVE_LIMIT_DEGREES));
+    errors += SparkMaxUtils.check(deployMotor.enableSoftLimit(SoftLimitDirection.kForward, true));
 
     errors +=
         SparkMaxUtils.check(
             deployMotor.setSoftLimit(
-                SoftLimitDirection.kReverse, Cal.Intake.INTAKE_DEPLOY_MOTOR_NEGATIVE_LIMIT_DEGREES));
-    errors +=
-        SparkMaxUtils.check(
-            deployMotor.enableSoftLimit(SoftLimitDirection.kReverse, true));
+                SoftLimitDirection.kReverse,
+                Cal.Intake.INTAKE_DEPLOY_MOTOR_NEGATIVE_LIMIT_DEGREES));
+    errors += SparkMaxUtils.check(deployMotor.enableSoftLimit(SoftLimitDirection.kReverse, true));
 
     return errors == 0;
   }
