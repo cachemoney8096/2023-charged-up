@@ -256,7 +256,7 @@ public class Lift extends SubsystemBase {
             * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE);
   }
 
-  public void manualScore() {
+  public void manualPrepScore() {
     // TODO do this
   }
 
@@ -362,7 +362,7 @@ public class Lift extends SubsystemBase {
 
   /** Returns true if the lift is clear of the zone where the intake moves, so that the intake can move as soon as the lift is clear of that zone */
   public boolean clearOfIntakeZone(){
-    if ((elevatorEncoder.getPosition() > Cal.Lift.ELEVATOR_INTAKE_ZONE_THRESHOLD_INCHES) && (armEncoder.getPosition() > Cal.Lift.ARM_INTAKE_ZONE_THRESHOLD_DEGREES)){
+    if ((elevatorEncoder.getPosition() > Cal.Lift.ELEVATOR_INTAKE_ZONE_THRESHOLD_INCHES) || (armEncoder.getPosition() > Cal.Lift.ARM_INTAKE_ZONE_THRESHOLD_DEGREES)){
       return true;
     } else {
       return false;
@@ -381,7 +381,7 @@ public class Lift extends SubsystemBase {
     builder.addDoubleProperty("Elevator kI", elevatorPID::getI, elevatorPID::setI);
     builder.addDoubleProperty("Elevator kD", elevatorPID::getD, elevatorPID::setD);
     builder.addDoubleProperty(
-        "Elevator Positionffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", elevatorEncoder::getPosition, elevatorEncoder::setPosition);
+        "Elevator Position", elevatorEncoder::getPosition, elevatorEncoder::setPosition);
     builder.addDoubleProperty("Arm kP", armPID::getP, armPID::setP);
     builder.addDoubleProperty("Arm kI", armPID::getI, armPID::setI);
     builder.addDoubleProperty("Arm kD", armPID::getD, armPID::setD);

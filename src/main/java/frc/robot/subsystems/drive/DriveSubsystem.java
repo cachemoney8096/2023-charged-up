@@ -70,9 +70,7 @@ public class DriveSubsystem extends SubsystemBase {
             rearRight.getPosition()
           });
 
-  private boolean halfSpeed = false;
-
-  private DoubleSolenoid skid = new DoubleSolenoid(PneumaticsModuleType.REVPH, RobotMap.SKID_FORWARD_CHANNEL, RobotMap.SKID_REVERSE_CHANNEL);
+  private boolean halfSpeed = false; //TODO use this
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {}
@@ -286,8 +284,8 @@ public class DriveSubsystem extends SubsystemBase {
             ));
   }
 
-  public void deploySkids() {
-    skid.set(Value.kForward);
+  public void toggleSkids() {
+    //TODO do this once we can add skids
   }
 
   public void halfSpeedToggle() {

@@ -26,6 +26,7 @@ public class IntakeSequence extends CommandBase {
     } else {
         lift.grab();
     }
+    //TODO fix this
   }
 
   @Override
@@ -37,7 +38,7 @@ public class IntakeSequence extends CommandBase {
   public void end(boolean interrupted){
     if (!interrupted){
       lift.setDesiredPosition(Lift.LiftPosition.STARTING);
-      if (lift.clearOfIntakeZone()){
+      if (lift.clearOfIntakeZone()){ //TODO put this directly into intake
         intake.retract();
       }
     }

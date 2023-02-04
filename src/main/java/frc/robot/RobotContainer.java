@@ -16,12 +16,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoChargeStationSequence;
 import frc.robot.commands.AutoScoreAndBalance;
 import frc.robot.commands.IntakeSequence;
-import frc.robot.commands.Score;
+import frc.robot.commands.finishScore;
+import frc.robot.commands.startScore;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
 import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.TagLimelight;
+import frc.robot.subsystems.Lift.LiftPosition;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.JoystickUtil;
 import frc.robot.utils.ScoringLocationUtil;
@@ -114,26 +116,25 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    driverController.a().onTrue(new InstantCommand(drive::deploySkids, drive));
+    driverController.a().onTrue(new InstantCommand(drive::toggleSkids, drive));
     driverController.b().onTrue(new InstantCommand(lift::getRidOfObject, lift));
     driverController.x().onTrue(new InstantCommand(lift::cancelScore, lift));
-    driverController.y().whileTrue(new InstantCommand(lift::manualScore, lift));
+    driverController.y().whileTrue(new InstantCommand(lift::manualPrepScore, lift));
 
-    driverController.back().onTrue(new InstantCommand(lift::home, lift));
+    driverController.back().onTrue(new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.STARTING), lift));
     driverController.start().onTrue(new InstantCommand(drive::halfSpeedToggle, drive));
 
     // TODO Maybe: steal
-    driverController.rightBumper().whileTrue(new InstantCommand(lift::prepScore, lift));
-    driverController.leftTrigger().whileTrue(new IntakeSequence(intake, lift));
-    driverController.rightTrigger().whileTrue(new Score());
+    driverController.rightBumper().onTrue(new InstantCommand(lift::prepScore, lift));
+    driverController.leftTrigger().onTrue(new IntakeSequence(intake, lift));
+    driverController.rightTrigger().onTrue(new startScore());
+    driverController.rightTrigger().onFalse(new finishScore());
 
-    // 0 is shelf, 1 is mid, 2 is high
     operatorController.povDown().onTrue(new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.SHELF)));
     operatorController.povLeft().onTrue(new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
     operatorController.povRight().onTrue(new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
     operatorController.povUp().onTrue(new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH)));
 
-    // 0 is left, 1 is center, 2 is right
     operatorController.x().onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.LEFT)));
     operatorController.a().onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER)));
     operatorController.y().onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER)));
