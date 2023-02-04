@@ -74,6 +74,7 @@ public class Lift extends SubsystemBase {
   private final int SMART_MOTION_SLOT = 0;
   private LiftPosition latestPosition = LiftPosition.STARTING;
   private LiftPosition desiredPosition = LiftPosition.STARTING;
+  private boolean grabberOpen = false;
 
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
@@ -226,11 +227,11 @@ public class Lift extends SubsystemBase {
   }
 
   public void grab() {
-    grabber.set(DoubleSolenoid.Value.kForward);
+    grabberOpen = true;
   }
 
   public void drop() {
-    grabber.set(DoubleSolenoid.Value.kReverse);
+    grabberOpen = false;
   }
 
   /** Returns true if the game piece sensor sees a game piece */
@@ -378,6 +379,15 @@ public class Lift extends SubsystemBase {
       goToPosition(LiftPosition.STARTING);
     } else {
       goToPosition(desiredPosition);
+    }
+
+    // If the grabber is set to open and it is safe to open, open the grabber. Otherwise, close it.
+    if ((armEncoder.getPosition() > Cal.Lift.GRABBER_CLOSED_ZONE_TOP_DEGREES
+            || armEncoder.getPosition() < Cal.Lift.GRABBER_CLOSED_ZONE_BOTTOM_DEGREES)
+        && grabberOpen) {
+      grabber.set(Value.kForward);
+    } else {
+      grabber.set(Value.kReverse);
     }
   }
 
