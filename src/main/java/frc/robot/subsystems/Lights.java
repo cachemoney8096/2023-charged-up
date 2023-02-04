@@ -12,13 +12,6 @@ public class Lights extends SubsystemBase {
   private LightCode currentLightStatus = LightCode.OFF;
   private TreeMap<LightCode, AddressableLEDBuffer> lightOptionsMap;
   private AddressableLED led = new AddressableLED(RobotMap.LED_PWM_PORT);
-  private AddressableLEDBuffer ledBufferCone;
-  private AddressableLEDBuffer ledBufferCube;
-  private AddressableLEDBuffer ledBufferGameObject;
-  private AddressableLEDBuffer ledBufferNoTag;
-  private AddressableLEDBuffer ledBufferWorking;
-  private AddressableLEDBuffer ledBufferReadyToScore;
-  private AddressableLEDBuffer ledBufferOff;
 
   /** for example, a spacing value of 1 would mean every LED is on */
   private int spacing = 1;
@@ -30,49 +23,6 @@ public class Lights extends SubsystemBase {
   /** If we are currently blinking, then True would mean the color is currently showing */
   private boolean blinkingColorOn = false;
 
-  public Lights() {
-    ledBufferOff = new AddressableLEDBuffer(Constants.LED_LENGTH);
-    led.setLength(ledBufferOff.getLength());
-
-    // sets the rgb values for each of the AddressableLEDBuffers
-    for (int i = 0; i < ledBufferCone.getLength(); i = i + spacing) {
-      ledBufferCone.setRGB(i, 255, 255, 0);
-    }
-
-    for (int i = 0; i < ledBufferCube.getLength(); i = i + spacing) {
-      ledBufferCube.setRGB(i, 255, 0, 255);
-    }
-
-    for (int i = 0; i < ledBufferGameObject.getLength(); i = i + spacing) {
-      ledBufferCube.setRGB(i, 0, 255, 0);
-    }
-
-    for (int i = 0; i < ledBufferNoTag.getLength(); i = i + spacing) {
-      ledBufferNoTag.setRGB(i, 0, 255, 0);
-    }
-
-    for (int i = 0; i < ledBufferWorking.getLength(); i = i + spacing) {
-      ledBufferWorking.setRGB(i, 255, 0, 0);
-    }
-
-    for (int i = 0; i < ledBufferReadyToScore.getLength(); i = i + spacing) {
-      ledBufferReadyToScore.setRGB(i, 0, 0, 255);
-    }
-
-    for (int i = 0; i < ledBufferOff.getLength(); i = i + spacing) {
-      ledBufferOff.setRGB(i, 0, 0, 0);
-    }
-
-    lightOptionsMap = new TreeMap<LightCode, AddressableLEDBuffer>();
-    lightOptionsMap.put(LightCode.CONE, ledBufferCone);
-    lightOptionsMap.put(LightCode.CUBE, ledBufferCube);
-    lightOptionsMap.put(LightCode.GAME_OBJECT, ledBufferGameObject);
-    lightOptionsMap.put(LightCode.NO_TAG, ledBufferNoTag);
-    lightOptionsMap.put(LightCode.WORKING, ledBufferWorking);
-    lightOptionsMap.put(LightCode.READY_TO_SCORE, ledBufferReadyToScore);
-    lightOptionsMap.put(LightCode.OFF, ledBufferOff);
-  }
-
   public enum LightCode {
     CONE, // Solid Yellow
     CUBE, // Solid Purple
@@ -81,6 +31,33 @@ public class Lights extends SubsystemBase {
     WORKING, // Solid Red
     READY_TO_SCORE, // Blue
     OFF
+  }
+
+  public Lights() {
+    lightOptionsMap = new TreeMap<LightCode, AddressableLEDBuffer>();
+    lightOptionsMap.put(LightCode.CONE, new AddressableLEDBuffer(Constants.LED_LENGTH));
+    lightOptionsMap.put(LightCode.CUBE, new AddressableLEDBuffer(Constants.LED_LENGTH));
+    lightOptionsMap.put(LightCode.GAME_OBJECT, new AddressableLEDBuffer(Constants.LED_LENGTH));
+    lightOptionsMap.put(LightCode.NO_TAG, new AddressableLEDBuffer(Constants.LED_LENGTH));
+    lightOptionsMap.put(LightCode.WORKING, new AddressableLEDBuffer(Constants.LED_LENGTH));
+    lightOptionsMap.put(LightCode.READY_TO_SCORE, new AddressableLEDBuffer(Constants.LED_LENGTH));
+    lightOptionsMap.put(LightCode.OFF, new AddressableLEDBuffer(Constants.LED_LENGTH));
+
+    led.setLength(lightOptionsMap.get(LightCode.OFF).getLength());
+
+    setUpBuffer(lightOptionsMap.get(LightCode.CONE), 255, 255, 0);
+    setUpBuffer(lightOptionsMap.get(LightCode.CUBE), 255, 0, 255);
+    setUpBuffer(lightOptionsMap.get(LightCode.GAME_OBJECT), 0, 255, 0);
+    setUpBuffer(lightOptionsMap.get(LightCode.NO_TAG), 0, 255, 0);
+    setUpBuffer(lightOptionsMap.get(LightCode.WORKING), 255, 0, 0);
+    setUpBuffer(lightOptionsMap.get(LightCode.READY_TO_SCORE), 0, 0, 255);
+    setUpBuffer(lightOptionsMap.get(LightCode.OFF), 0, 0, 0);
+  }
+
+  private void setUpBuffer(AddressableLEDBuffer buffer, int r, int g, int b) {
+    for (var i = 0; i < buffer.getLength(); i += spacing) {
+      buffer.setRGB(i, 255, 0, 0);
+    }
   }
 
   public void toggleCode(LightCode light) {
@@ -110,9 +87,9 @@ public class Lights extends SubsystemBase {
     if (currentLightStatus == LightCode.NO_TAG) {
       if (blinkingTimer >= blinkingPeriod) {
         if (blinkingColorOn) {
-          led.setData(ledBufferOff);
+          led.setData(lightOptionsMap.get(LightCode.OFF));
         } else {
-          led.setData(ledBufferNoTag);
+          led.setData(lightOptionsMap.get(LightCode.NO_TAG));
         }
         blinkingColorOn = !blinkingColorOn;
       }
