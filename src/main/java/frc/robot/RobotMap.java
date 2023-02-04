@@ -37,4 +37,7 @@ public final class RobotMap {
       INTAKE_GAME_PIECE_DIO = 1,
       ELEVATOR_ENCODER_ONE_DIO = 2,
       ELEVATOR_ENCODER_TWO_DIO = 3;
+
+  /** PWM Port for LEDs */
+  public static final int LED_PWM_PORT = 0;
 }

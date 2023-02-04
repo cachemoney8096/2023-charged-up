@@ -143,8 +143,8 @@ public class RobotContainer {
     operatorController.back().onTrue(new InstantCommand(intake::retract, intake));
     operatorController.start().onTrue(new InstantCommand(intake::deploy, intake));
 
-    operatorController.leftBumper().onTrue(new InstantCommand(lights::toggleConeLight, lights));
-    operatorController.rightBumper().onTrue(new InstantCommand(lights::toggleCubeLight, lights));
+    operatorController.leftBumper().onTrue(new InstantCommand(() -> lights.toggleCode(Lights.LightCode.CONE), lights));
+    operatorController.rightBumper().onTrue(new InstantCommand(() -> lights.toggleCode(Lights.LightCode.CONE), lights));
     operatorController.leftTrigger().onTrue(new InstantCommand(lift::grab, lift));
     operatorController.leftTrigger().onFalse(new InstantCommand(lift::drop, lift));
     operatorController.rightTrigger().onTrue(new InstantCommand(scoreLoc::toggleMiddleGrid));
