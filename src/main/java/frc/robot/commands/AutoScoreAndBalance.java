@@ -6,7 +6,6 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Cal;
-import frc.robot.Constants;
 import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.drive.DriveSubsystem;
 
@@ -14,7 +13,7 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 public class AutoScoreAndBalance extends SequentialCommandGroup {
   private PathPlannerTrajectory traj =
       PathPlanner.loadPath(
-          Constants.PLACEHOLDER_STRING,
+          "ScoreAndBalanceTraj",
           new PathConstraints(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
 
   public AutoScoreAndBalance(boolean isFirstPath, Lift lift, DriveSubsystem drive) {
