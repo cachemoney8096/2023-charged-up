@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
@@ -66,7 +67,7 @@ public class Intake extends SubsystemBase {
   }
 
   /** Does all the initialization for the sparks, return true on success */
-  boolean setUpIntakeWheelSparks() {
+  private boolean setUpIntakeWheelSparks() {
     int errors = 0;
     errors += SparkMaxUtils.check(intakeLeft.restoreFactoryDefaults());
 
@@ -76,7 +77,7 @@ public class Intake extends SubsystemBase {
   }
 
   /** Does all the initialization for the spark, return true on success */
-  boolean setUpDeploySpark() {
+  private boolean setUpDeploySpark() {
     int errors = 0;
 
     errors += SparkMaxUtils.check(deployMotor.restoreFactoryDefaults());
@@ -108,6 +109,20 @@ public class Intake extends SubsystemBase {
         SparkMaxUtils.check(
             deployMotorPID.setSmartMotionAllowedClosedLoopError(
                 Cal.Intake.DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG, SMART_MOTION_SLOT));
+
+    errors +=
+        SparkMaxUtils.check(
+            deployMotor.setSoftLimit(
+                SoftLimitDirection.kForward,
+                Cal.Intake.INTAKE_DEPLOY_MOTOR_POSITIVE_LIMIT_DEGREES));
+    errors += SparkMaxUtils.check(deployMotor.enableSoftLimit(SoftLimitDirection.kForward, true));
+
+    errors +=
+        SparkMaxUtils.check(
+            deployMotor.setSoftLimit(
+                SoftLimitDirection.kReverse,
+                Cal.Intake.INTAKE_DEPLOY_MOTOR_NEGATIVE_LIMIT_DEGREES));
+    errors += SparkMaxUtils.check(deployMotor.enableSoftLimit(SoftLimitDirection.kReverse, true));
 
     return errors == 0;
   }
@@ -216,7 +231,7 @@ public class Intake extends SubsystemBase {
 
     // If the intake has achieved its desired position, then cut power
     if (Math.abs(intakeDesiredPositionDegrees - deployMotorEncoder.getPosition())
-        < Cal.Intake.POSITION_THRESHOLD_DEGREES) {
+        < Cal.Intake.POSITION_MARGIN_DEGREES) {
       deployMotorPID.setReference(0.0, CANSparkMax.ControlType.kVoltage);
     }
   }
