@@ -24,6 +24,8 @@ import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.TagLimelight;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.JoystickUtil;
+import frc.robot.utils.ScoringLocationUtil;
+import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -38,6 +40,7 @@ public class RobotContainer {
   private final IntakeLimelight intakeLimelight;
   private final TagLimelight tagLimelight;
   private final Lights lights = new Lights();
+  private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
 
   // A chooser for autonomous commands
   private SendableChooser<Command> autonChooser = new SendableChooser<>();
@@ -125,16 +128,16 @@ public class RobotContainer {
     driverController.rightTrigger().whileTrue(new Score());
 
     // 0 is shelf, 1 is mid, 2 is high
-    operatorController.povDown().onTrue(new InstantCommand(() -> lift.setScoreHeight(0), lift));
-    operatorController.povLeft().onTrue(new InstantCommand(() -> lift.setScoreHeight(1), lift));
-    operatorController.povRight().onTrue(new InstantCommand(() -> lift.setScoreHeight(1), lift));
-    operatorController.povUp().onTrue(new InstantCommand(() -> lift.setScoreHeight(2), lift));
+    operatorController.povDown().onTrue(new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.SHELF)));
+    operatorController.povLeft().onTrue(new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
+    operatorController.povRight().onTrue(new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
+    operatorController.povUp().onTrue(new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH)));
 
     // 0 is left, 1 is center, 2 is right
-    operatorController.x().onTrue(new InstantCommand(() -> lift.setScoreCol(0), lift));
-    operatorController.a().onTrue(new InstantCommand(() -> lift.setScoreCol(1), lift));
-    operatorController.y().onTrue(new InstantCommand(() -> lift.setScoreCol(1), lift));
-    operatorController.b().onTrue(new InstantCommand(() -> lift.setScoreCol(2), lift));
+    operatorController.x().onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.LEFT)));
+    operatorController.a().onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER)));
+    operatorController.y().onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER)));
+    operatorController.b().onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.RIGHT)));
 
     operatorController.back().onTrue(new InstantCommand(intake::retract, intake));
     operatorController.start().onTrue(new InstantCommand(intake::deploy, intake));

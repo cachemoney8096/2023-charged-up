@@ -38,20 +38,6 @@ public class Lift extends SubsystemBase {
     STARTING
   }
 
-  /** Height to score at */
-  public enum ScoreHeight {
-    SHELF,
-    MID,
-    HIGH
-  }
-
-  /** Column to score in */
-  public enum ScoreCol {
-    LEFT,
-    CENTER,
-    RIGHT
-  }
-
   /** Position of the lift relative to to the start position */
   public enum LiftPositionStartRelative {
     BELOW_START,
@@ -85,8 +71,6 @@ public class Lift extends SubsystemBase {
 
   // Members
   private final int SMART_MOTION_SLOT = 0;
-  private ScoreHeight scoreHeight = ScoreHeight.SHELF; // default value
-  private ScoreCol scoreCol = ScoreCol.LEFT; // default value
   private LiftPosition latestPosition = LiftPosition.STARTING;
   private LiftPosition desiredPosition = LiftPosition.STARTING;
 
@@ -270,28 +254,6 @@ public class Lift extends SubsystemBase {
     elevatorEncoder.setPosition(
         elevatorDutyCycleEncodersDifferenceDegrees
             * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE);
-  }
-
-  public void setScoreCol(int chooseCol) {
-    // 0 is left, 1 is center, 2 is right
-    if (chooseCol == 0) {
-      scoreCol = ScoreCol.LEFT;
-    } else if (chooseCol == 1) {
-      scoreCol = ScoreCol.CENTER;
-    } else {
-      scoreCol = ScoreCol.RIGHT;
-    }
-  }
-
-  public void setScoreHeight(int chooseHeight) {
-    // 0 is shelf, 1 is mid, 2 is high
-    if (chooseHeight == 0) {
-      scoreHeight = ScoreHeight.SHELF;
-    } else if (chooseHeight == 1) {
-      scoreHeight = ScoreHeight.MID;
-    } else {
-      scoreHeight = ScoreHeight.HIGH;
-    }
   }
 
   public void manualScore() {
