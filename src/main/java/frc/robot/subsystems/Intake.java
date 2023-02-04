@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -66,17 +67,29 @@ public class Intake extends SubsystemBase {
   }
 
   /** Does all the initialization for the sparks, return true on success */
-  boolean setUpIntakeWheelSparks() {
+  private boolean setUpIntakeWheelSparks() {
     int errors = 0;
     errors += SparkMaxUtils.check(intakeLeft.restoreFactoryDefaults());
 
     errors += SparkMaxUtils.check(intakeRight.restoreFactoryDefaults());
     errors += SparkMaxUtils.check(intakeRight.follow(intakeLeft, true));
+
+    errors += SparkMaxUtils.check(intakeLeft.setSoftLimit(SoftLimitDirection.kForward, Cal.Intake.INTAKE_LEFT_POSITIVE_MARGIN));
+    errors += SparkMaxUtils.check(intakeLeft.enableSoftLimit(SoftLimitDirection.kForward, true));
+    errors += SparkMaxUtils.check(intakeLeft.setSoftLimit(SoftLimitDirection.kReverse, Cal.Intake.INTAKE_LEFT_NEGATIVE_MARGIN));
+    errors += SparkMaxUtils.check(intakeLeft.enableSoftLimit(SoftLimitDirection.kReverse, true));
+
+    errors += SparkMaxUtils.check(intakeRight.setSoftLimit(SoftLimitDirection.kForward, Cal.Intake.INTAKE_RIGHT_POSITIVE_MARGIN));
+    errors += SparkMaxUtils.check(intakeRight.enableSoftLimit(SoftLimitDirection.kForward, true));
+    errors += SparkMaxUtils.check(intakeRight.setSoftLimit(SoftLimitDirection.kReverse, Cal.Intake.INTAKE_RIGHT_NEGATIVE_MARGIN));
+    errors += SparkMaxUtils.check(intakeRight.enableSoftLimit(SoftLimitDirection.kReverse, true));
+
+
     return errors == 0;
   }
 
   /** Does all the initialization for the spark, return true on success */
-  boolean setUpDeploySpark() {
+  private boolean setUpDeploySpark() {
     int errors = 0;
 
     errors += SparkMaxUtils.check(deployMotor.restoreFactoryDefaults());
@@ -216,7 +229,7 @@ public class Intake extends SubsystemBase {
 
     // If the intake has achieved its desired position, then cut power
     if (Math.abs(intakeDesiredPositionDegrees - deployMotorEncoder.getPosition())
-        < Cal.Intake.POSITION_THRESHOLD_DEGREES) {
+        < Cal.Intake.POSITION_MARGIN_DEGREES) {
       deployMotorPID.setReference(0.0, CANSparkMax.ControlType.kVoltage);
     }
   }
