@@ -20,6 +20,7 @@ import frc.robot.commands.Score;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
 import frc.robot.subsystems.Lift;
+import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.TagLimelight;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.JoystickUtil;
@@ -36,6 +37,7 @@ public class RobotContainer {
   private final Lift lift = new Lift();
   private final IntakeLimelight intakeLimelight;
   private final TagLimelight tagLimelight;
+  private final Lights lights = new Lights();
 
   // A chooser for autonomous commands
   private SendableChooser<Command> autonChooser = new SendableChooser<>();
@@ -136,6 +138,9 @@ public class RobotContainer {
 
     operatorController.back().onTrue(new InstantCommand(intake::retract, intake));
     operatorController.start().onTrue(new InstantCommand(intake::deploy, intake));
+
+    operatorController.leftBumper().onTrue(new InstantCommand(lights::toggleConeLight, lights));
+    operatorController.rightBumper().onTrue(new InstantCommand(lights::toggleCubeLight, lights));
 
     // Drive controls
     drive.setDefaultCommand(
