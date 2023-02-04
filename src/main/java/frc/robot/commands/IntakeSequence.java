@@ -22,23 +22,23 @@ public class IntakeSequence extends CommandBase {
   @Override
   public void execute() {
     if (!lift.seeGamePiece()) {
-        intake.intakeGamePiece();
+      intake.intakeGamePiece();
     } else {
-        lift.grab();
+      lift.grab();
     }
-    //TODO fix this
+    // TODO fix this
   }
 
   @Override
-  public boolean isFinished(){
+  public boolean isFinished() {
     return lift.holdingGamePiece() ? true : false;
   }
 
   @Override
-  public void end(boolean interrupted){
-    if (!interrupted){
+  public void end(boolean interrupted) {
+    if (!interrupted) {
       lift.setDesiredPosition(Lift.LiftPosition.STARTING);
-      if (lift.clearOfIntakeZone()){ //TODO put this directly into intake
+      if (lift.clearOfIntakeZone()) { // TODO put this directly into intake
         intake.retract();
       }
     }

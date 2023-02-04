@@ -15,9 +15,9 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
@@ -277,7 +277,7 @@ public class Lift extends SubsystemBase {
   }
 
   public boolean holdingGamePiece() {
-    if (seeGamePiece() && grabber.get() == Value.kForward){
+    if (seeGamePiece() && grabber.get() == Value.kForward) {
       return true;
     } else {
       return false;
@@ -360,9 +360,13 @@ public class Lift extends SubsystemBase {
     }
   }
 
-  /** Returns true if the lift is clear of the zone where the intake moves, so that the intake can move as soon as the lift is clear of that zone */
-  public boolean clearOfIntakeZone(){
-    if ((elevatorEncoder.getPosition() > Cal.Lift.ELEVATOR_INTAKE_ZONE_THRESHOLD_INCHES) || (armEncoder.getPosition() > Cal.Lift.ARM_INTAKE_ZONE_THRESHOLD_DEGREES)){
+  /**
+   * Returns true if the lift is clear of the zone where the intake moves, so that the intake can
+   * move as soon as the lift is clear of that zone
+   */
+  public boolean clearOfIntakeZone() {
+    if ((elevatorEncoder.getPosition() > Cal.Lift.ELEVATOR_INTAKE_ZONE_THRESHOLD_INCHES)
+        || (armEncoder.getPosition() > Cal.Lift.ARM_INTAKE_ZONE_THRESHOLD_DEGREES)) {
       return true;
     } else {
       return false;
