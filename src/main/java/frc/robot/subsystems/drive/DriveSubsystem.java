@@ -290,7 +290,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void halfSpeedToggle() {
     // Toggle halfSpeed. If it is true, set it to false, otherwise set it to true.
-    halfSpeed = halfSpeed ? false : true;
+    halfSpeed = !halfSpeed;
   }
 
   @Override

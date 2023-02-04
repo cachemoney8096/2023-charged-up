@@ -21,7 +21,7 @@ public class ScoringLocationUtil {
 
   /** Flip the value of middleGrid */
   public void toggleMiddleGrid() {
-    middleGrid = middleGrid ? false : true;
+    middleGrid = !middleGrid;
   }
 
   //TODO map scoreCol and scoreHeight to tag IDs.
