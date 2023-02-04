@@ -6,6 +6,7 @@ import edu.wpi.first.math.controller.PIDController;
 public final class Cal {
   public static final double PLACEHOLDER_DOUBLE = 0.0;
   public static final int PLACEHOLDER_INT = 0;
+  public static final float PLACEHOLDER_FLOAT = 0;
 
   public static final class SwerveModule {
     /** Input meters/second, output [-1,1] */
@@ -73,8 +74,12 @@ public final class Cal {
         DEPLOY_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND = Cal.PLACEHOLDER_DOUBLE,
         DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG = Cal.PLACEHOLDER_DOUBLE;
 
-    /** Threshold for having achieved the desired intake position (in degrees) */
-    public static final double POSITION_THRESHOLD_DEGREES = 3.0;
+    /** Margin for having achieved the desired intake position (in degrees) */
+    public static final double POSITION_MARGIN_DEGREES = 3.0;
+
+    /** Sets the min and max positions that the intake deploy motor will be allowed to reach */
+    public static final float INTAKE_DEPLOY_MOTOR_POSITIVE_LIMIT_DEGREES = PLACEHOLDER_FLOAT,
+        INTAKE_DEPLOY_MOTOR_NEGATIVE_LIMIT_DEGREES = PLACEHOLDER_FLOAT;
   }
 
   public static final class Lift {
@@ -110,11 +115,17 @@ public final class Cal {
         ELEVATOR_MIN_OUTPUT_VELOCITY_IN_PER_SECOND = Cal.PLACEHOLDER_DOUBLE,
         ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN = Cal.PLACEHOLDER_DOUBLE;
 
+    /** Sets the min and max positions that the elevator and arm motors will be allowed to reach */
+    public static final float ELEVATOR_POSITIVE_LIMIT_INCHES = PLACEHOLDER_FLOAT,
+        ELEVATOR_NEGATIVE_LIMIT_INCHES = PLACEHOLDER_FLOAT,
+        ARM_POSITIVE_LIMIT_DEGREES = PLACEHOLDER_FLOAT,
+        ARM_NEGATIVE_LIMIT_DEGREES = PLACEHOLDER_FLOAT;
+
     /**
-     * Thresholds for when we consider the lift has reached a position. This is logical (for
-     * considering where the lift can go) but not functional (does not stop arm control or something
-     * when reached). We apply broader thresholds for the Starting position as the lift transits
-     * through this position.
+     * Margin for when we consider the lift has reached a position. This is logical (for considering
+     * where the lift can go) but not functional (does not stop arm control or something when
+     * reached). We apply broader margins for the Starting position as the lift transits through
+     * this position.
      */
     public static final double ELEVATOR_THRESHOLD_INCHES = 0.5,
         ARM_THRESHOLD_DEGREES = 2.0,
@@ -124,6 +135,11 @@ public final class Cal {
     /** Threshold for when the lift is out of the zone where the intake moves. */
     public static final double ELEVATOR_INTAKE_ZONE_THRESHOLD_INCHES = PLACEHOLDER_DOUBLE,
         ARM_INTAKE_ZONE_THRESHOLD_DEGREES = PLACEHOLDER_DOUBLE;
+    
+    public static final double ELEVATOR_MARGIN_INCHES = 0.5,
+        ARM_MARGIN_DEGREES = 2.0,
+        ELEVATOR_START_MARGIN_INCHES = 1.0,
+        ARM_START_MARGIN_DEGREES = 4.0;
   }
 
   public static final class AutoBalance {

@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
@@ -105,7 +106,7 @@ public class Lift extends SubsystemBase {
   }
 
   /** Does all the initialization for the sparks, return true on success */
-  boolean initSparks() {
+  private boolean initSparks() {
     int errors = 0;
 
     errors += SparkMaxUtils.check(elevator.restoreFactoryDefaults());
@@ -174,6 +175,26 @@ public class Lift extends SubsystemBase {
     errors +=
         SparkMaxUtils.check(
             armAbsoluteEncoder.setPositionConversionFactor(Constants.REVOLUTIONS_TO_DEGREES));
+
+    errors +=
+        SparkMaxUtils.check(
+            elevator.setSoftLimit(
+                SoftLimitDirection.kForward, Cal.Lift.ELEVATOR_POSITIVE_LIMIT_INCHES));
+    errors += SparkMaxUtils.check(elevator.enableSoftLimit(SoftLimitDirection.kForward, true));
+    errors +=
+        SparkMaxUtils.check(
+            elevator.setSoftLimit(
+                SoftLimitDirection.kReverse, Cal.Lift.ELEVATOR_NEGATIVE_LIMIT_INCHES));
+    errors += SparkMaxUtils.check(elevator.enableSoftLimit(SoftLimitDirection.kReverse, true));
+
+    errors +=
+        SparkMaxUtils.check(
+            arm.setSoftLimit(SoftLimitDirection.kForward, Cal.Lift.ARM_POSITIVE_LIMIT_DEGREES));
+    errors += SparkMaxUtils.check(arm.enableSoftLimit(SoftLimitDirection.kForward, true));
+    errors +=
+        SparkMaxUtils.check(
+            arm.setSoftLimit(SoftLimitDirection.kReverse, Cal.Lift.ARM_NEGATIVE_LIMIT_DEGREES));
+    errors += SparkMaxUtils.check(arm.enableSoftLimit(SoftLimitDirection.kReverse, true));
 
     return errors == 0;
   }
@@ -293,12 +314,12 @@ public class Lift extends SubsystemBase {
   private boolean atPosition(LiftPosition positionToCheck) {
     double armThresholdDegrees =
         positionToCheck == LiftPosition.STARTING
-            ? Cal.Lift.ARM_START_THRESHOLD_DEGREES
-            : Cal.Lift.ARM_THRESHOLD_DEGREES;
+            ? Cal.Lift.ARM_START_MARGIN_DEGREES
+            : Cal.Lift.ARM_MARGIN_DEGREES;
     double elevatorThresholdInches =
         positionToCheck == LiftPosition.STARTING
-            ? Cal.Lift.ELEVATOR_START_THRESHOLD_INCHES
-            : Cal.Lift.ELEVATOR_THRESHOLD_INCHES;
+            ? Cal.Lift.ELEVATOR_START_MARGIN_INCHES
+            : Cal.Lift.ELEVATOR_MARGIN_INCHES;
     double elevatorPositionToCheckInches = liftPositionMap.get(positionToCheck).getFirst();
     double armPositionToCheckDegrees = liftPositionMap.get(positionToCheck).getSecond();
     double elevatorPositionInches = elevatorEncoder.getPosition();

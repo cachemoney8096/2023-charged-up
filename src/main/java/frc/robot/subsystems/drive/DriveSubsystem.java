@@ -60,7 +60,7 @@ public class DriveSubsystem extends SubsystemBase {
   SwerveDriveOdometry odometry =
       new SwerveDriveOdometry(
           Constants.SwerveDrive.DRIVE_KINEMATICS,
-          Rotation2d.fromDegrees(gyro.getAngle()),
+          Rotation2d.fromDegrees(gyro.getYaw()),
           new SwerveModulePosition[] {
             frontLeft.getPosition(),
             frontRight.getPosition(),
@@ -77,7 +77,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void periodic() {
     // Update the odometry in the periodic block
     odometry.update(
-        Rotation2d.fromDegrees(gyro.getAngle()),
+        Rotation2d.fromDegrees(gyro.getYaw()),
         new SwerveModulePosition[] {
           frontLeft.getPosition(),
           frontRight.getPosition(),
