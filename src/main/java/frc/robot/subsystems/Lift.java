@@ -74,7 +74,7 @@ public class Lift extends SubsystemBase {
   private final int SMART_MOTION_SLOT = 0;
   private LiftPosition latestPosition = LiftPosition.STARTING;
   private LiftPosition desiredPosition = LiftPosition.STARTING;
-  private boolean grabberOpen = false;
+  private boolean desiredGrabberClosed = false;
 
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
@@ -226,12 +226,12 @@ public class Lift extends SubsystemBase {
         ArbFFUnits.kVoltage);
   }
 
-  public void grab() {
-    grabberOpen = true;
+  public void closeGrabber() {
+    desiredGrabberClosed = true;
   }
 
-  public void drop() {
-    grabberOpen = false;
+  public void openGrabber() {
+    desiredGrabberClosed = false;
   }
 
   /** Returns true if the game piece sensor sees a game piece */
@@ -382,9 +382,9 @@ public class Lift extends SubsystemBase {
     }
 
     // If the grabber is set to open and it is safe to open, open the grabber. Otherwise, close it.
-    if ((armEncoder.getPosition() > Cal.Lift.GRABBER_CLOSED_ZONE_TOP_DEGREES
-            || armEncoder.getPosition() < Cal.Lift.GRABBER_CLOSED_ZONE_BOTTOM_DEGREES)
-        && grabberOpen) {
+    if (desiredGrabberClosed
+        && (armEncoder.getPosition() > Cal.Lift.GRABBER_CLOSED_ZONE_TOP_DEGREES
+            || armEncoder.getPosition() < Cal.Lift.GRABBER_CLOSED_ZONE_BOTTOM_DEGREES)) {
       grabber.set(Value.kForward);
     } else {
       grabber.set(Value.kReverse);
