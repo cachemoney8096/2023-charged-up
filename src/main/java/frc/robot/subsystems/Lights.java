@@ -3,27 +3,74 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.RobotMap;
+import java.util.TreeMap;
 
 /** Controls the LEDs that indicate robot status */
 public class Lights extends SubsystemBase {
   private LightCode currentLightStatus = LightCode.OFF;
+  private TreeMap<LightCode, AddressableLEDBuffer> lightOptionsMap;
   private AddressableLED led = new AddressableLED(RobotMap.LED_PWM_PORT);
-  private AddressableLEDBuffer ledBuffer;
+  private AddressableLEDBuffer ledBufferCone;
+  private AddressableLEDBuffer ledBufferCube;
+  private AddressableLEDBuffer ledBufferGameObject;
+  private AddressableLEDBuffer ledBufferNoTag;
+  private AddressableLEDBuffer ledBufferWorking;
+  private AddressableLEDBuffer ledBufferReadyToScore;
+  private AddressableLEDBuffer ledBufferOff;
 
   /** for example, a spacing value of 1 would mean every LED is on */
   private int spacing = 1;
 
-  /** timer for blinking led */
+  /** timer for blinking LED */
   private int blinkingTimer = 0;
   /** When the blinkingTimer reaches 10 (equal to blinkingPeriod), the LED is toggled */
   private int blinkingPeriod = 10;
-  /** True when light status should be blinking (ex. NO_TAG) */
-  private boolean currentlyBlinking = false;
+  /** If we are currently blinking, then True would mean the color is currently showing */
+  private boolean blinkingColorOn = false;
 
   public Lights() {
-    ledBuffer = new AddressableLEDBuffer(60);
-    led.setLength(ledBuffer.getLength());
+    ledBufferOff = new AddressableLEDBuffer(Constants.LED_LENGTH);
+    led.setLength(ledBufferOff.getLength());
+
+    // sets the rgb values for each of the AddressableLEDBuffers
+    for (int i = 0; i < ledBufferCone.getLength(); i = i + spacing) {
+      ledBufferCone.setRGB(i, 255, 255, 0);
+    }
+
+    for (int i = 0; i < ledBufferCube.getLength(); i = i + spacing) {
+      ledBufferCube.setRGB(i, 255, 0, 255);
+    }
+
+    for (int i = 0; i < ledBufferGameObject.getLength(); i = i + spacing) {
+      ledBufferCube.setRGB(i, 0, 255, 0);
+    }
+
+    for (int i = 0; i < ledBufferNoTag.getLength(); i = i + spacing) {
+      ledBufferNoTag.setRGB(i, 0, 255, 0);
+    }
+
+    for (int i = 0; i < ledBufferWorking.getLength(); i = i + spacing) {
+      ledBufferWorking.setRGB(i, 255, 0, 0);
+    }
+
+    for (int i = 0; i < ledBufferReadyToScore.getLength(); i = i + spacing) {
+      ledBufferReadyToScore.setRGB(i, 0, 0, 255);
+    }
+
+    for (int i = 0; i < ledBufferOff.getLength(); i = i + spacing) {
+      ledBufferOff.setRGB(i, 0, 0, 0);
+    }
+
+    lightOptionsMap = new TreeMap<LightCode, AddressableLEDBuffer>();
+    lightOptionsMap.put(LightCode.CONE, ledBufferCone);
+    lightOptionsMap.put(LightCode.CUBE, ledBufferCube);
+    lightOptionsMap.put(LightCode.GAME_OBJECT, ledBufferGameObject);
+    lightOptionsMap.put(LightCode.NO_TAG, ledBufferNoTag);
+    lightOptionsMap.put(LightCode.WORKING, ledBufferWorking);
+    lightOptionsMap.put(LightCode.READY_TO_SCORE, ledBufferReadyToScore);
+    lightOptionsMap.put(LightCode.OFF, ledBufferOff);
   }
 
   public enum LightCode {
@@ -42,15 +89,13 @@ public class Lights extends SubsystemBase {
     } else {
       currentLightStatus = light;
     }
-    setColor(currentLightStatus);
-    led.setData(ledBuffer);
+    led.setData(lightOptionsMap.get(currentLightStatus));
     led.start();
   }
 
   public void setLight(LightCode light) {
     currentLightStatus = light;
-    setColor(currentLightStatus);
-    led.setData(ledBuffer);
+    led.setData(lightOptionsMap.get(currentLightStatus));
     led.start();
   }
 
@@ -59,74 +104,19 @@ public class Lights extends SubsystemBase {
     spacing = s;
   }
 
-  /** sets the color of the LEDs in RGB */
-  public void setColor(LightCode light) {
-    int r = 0;
-    int g = 0;
-    int b = 0;
-    switch (light) {
-      case CONE:
-        r = 255;
-        g = 255;
-        b = 0;
-        currentlyBlinking = false;
-        break;
-      case CUBE:
-        r = 255;
-        g = 0;
-        b = 255;
-        currentlyBlinking = false;
-        break;
-      case GAME_OBJECT:
-        r = 0;
-        g = 255;
-        b = 0;
-        currentlyBlinking = false;
-        break;
-      case NO_TAG:
-        r = 0;
-        g = 255;
-        b = 0;
-        currentlyBlinking = true;
-        break;
-      case WORKING:
-        r = 255;
-        g = 0;
-        b = 0;
-        currentlyBlinking = false;
-        break;
-      case READY_TO_SCORE:
-        r = 0;
-        g = 0;
-        b = 255;
-        currentlyBlinking = false;
-        break;
-      case OFF:
-        r = 0;
-        g = 0;
-        b = 0;
-        currentlyBlinking = false;
-        break;
-      default:
-        // this should never trigger
-        r = 0;
-        g = 0;
-        b = 0;
-    }
-
-    for (int i = 0; i < ledBuffer.getLength(); i = i + spacing) {
-      ledBuffer.setRGB(i, r, g, b);
-    }
-  }
-
   @Override
   public void periodic() {
-    if (currentlyBlinking) {
+    /** NO_TAG is the only LightCode that requires blinking */
+    if (currentLightStatus == LightCode.NO_TAG) {
       if (blinkingTimer >= blinkingPeriod) {
-        toggleCode(LightCode.NO_TAG);
-        blinkingTimer = 0;
+        if (blinkingColorOn) {
+          led.setData(ledBufferOff);
+        } else {
+          led.setData(ledBufferNoTag);
+        }
+        blinkingColorOn = !blinkingColorOn;
       }
-      blinkingTimer ++;
+      blinkingTimer++;
     }
   }
 }

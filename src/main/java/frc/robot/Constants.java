@@ -27,6 +27,9 @@ public final class Constants {
 
   public static final double REVOLUTIONS_TO_DEGREES = 360.0;
 
+  /** Length of LED strip for Lights Subsystem */
+  public static final int LED_LENGTH = PLACEHOLDER_INT;
+
   /**
    * Pitch angle from horizontal of the limelight in degrees (0 = straight ahead, 90 = straight up)
    */
