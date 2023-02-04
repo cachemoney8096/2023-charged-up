@@ -23,9 +23,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+
 public class DriveSubsystem extends SubsystemBase {
   private double targetHeadingDegrees;
 
@@ -70,7 +68,7 @@ public class DriveSubsystem extends SubsystemBase {
             rearRight.getPosition()
           });
 
-  private boolean halfSpeed = false; //TODO use this
+  private boolean halfSpeed = false; // TODO use this
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {}
@@ -285,7 +283,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void toggleSkids() {
-    //TODO do this once we can add skids
+    // TODO do this once we can add skids
   }
 
   public void halfSpeedToggle() {

@@ -21,13 +21,12 @@ import frc.robot.commands.startScore;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
 import frc.robot.subsystems.Lift;
+import frc.robot.subsystems.Lift.LiftPosition;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.TagLimelight;
-import frc.robot.subsystems.Lift.LiftPosition;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.JoystickUtil;
 import frc.robot.utils.ScoringLocationUtil;
-import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -121,7 +120,9 @@ public class RobotContainer {
     driverController.x().onTrue(new InstantCommand(lift::cancelScore, lift));
     driverController.y().whileTrue(new InstantCommand(lift::manualPrepScore, lift));
 
-    driverController.back().onTrue(new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.STARTING), lift));
+    driverController
+        .back()
+        .onTrue(new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.STARTING), lift));
     driverController.start().onTrue(new InstantCommand(drive::halfSpeedToggle, drive));
 
     // TODO Maybe: steal
@@ -130,15 +131,39 @@ public class RobotContainer {
     driverController.rightTrigger().onTrue(new startScore());
     driverController.rightTrigger().onFalse(new finishScore());
 
-    operatorController.povDown().onTrue(new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.SHELF)));
-    operatorController.povLeft().onTrue(new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
-    operatorController.povRight().onTrue(new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
-    operatorController.povUp().onTrue(new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH)));
+    operatorController
+        .povDown()
+        .onTrue(
+            new InstantCommand(
+                () -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.SHELF)));
+    operatorController
+        .povLeft()
+        .onTrue(
+            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
+    operatorController
+        .povRight()
+        .onTrue(
+            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
+    operatorController
+        .povUp()
+        .onTrue(
+            new InstantCommand(
+                () -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH)));
 
-    operatorController.x().onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.LEFT)));
-    operatorController.a().onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER)));
-    operatorController.y().onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER)));
-    operatorController.b().onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.RIGHT)));
+    operatorController
+        .x()
+        .onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.LEFT)));
+    operatorController
+        .a()
+        .onTrue(
+            new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER)));
+    operatorController
+        .y()
+        .onTrue(
+            new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER)));
+    operatorController
+        .b()
+        .onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.RIGHT)));
 
     operatorController.back().onTrue(new InstantCommand(intake::retract, intake));
     operatorController.start().onTrue(new InstantCommand(intake::deploy, intake));
@@ -150,7 +175,7 @@ public class RobotContainer {
     operatorController.rightTrigger().onTrue(new InstantCommand(scoreLoc::toggleMiddleGrid));
     operatorController.rightTrigger().onFalse(new InstantCommand(scoreLoc::toggleMiddleGrid));
 
-    //TODO add manual arm and elevator control
+    // TODO add manual arm and elevator control
 
     // Drive controls
     drive.setDefaultCommand(

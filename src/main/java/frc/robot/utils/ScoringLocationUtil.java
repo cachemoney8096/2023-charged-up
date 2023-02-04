@@ -24,11 +24,11 @@ public class ScoringLocationUtil {
     middleGrid = !middleGrid;
   }
 
-  //TODO map scoreCol and scoreHeight to tag IDs.
+  // TODO map scoreCol and scoreHeight to tag IDs.
   public void setScoreCol(ScoreCol chooseCol) {
     scoreCol = chooseCol;
   }
-  
+
   public ScoreCol getScoreCol() {
     return scoreCol;
   }
