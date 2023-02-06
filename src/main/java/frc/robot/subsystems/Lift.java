@@ -74,7 +74,7 @@ public class Lift extends SubsystemBase {
   private final int SMART_MOTION_SLOT = 0;
   private LiftPosition latestPosition = LiftPosition.STARTING;
   private LiftPosition desiredPosition = LiftPosition.STARTING;
-  private boolean desiredGrabberClosed = false;
+  private boolean desiredGrabberClosed = true;
 
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
@@ -382,7 +382,7 @@ public class Lift extends SubsystemBase {
     }
 
     // If the grabber is set to open and it is safe to open, open the grabber. Otherwise, close it.
-    if (desiredGrabberClosed
+    if (!desiredGrabberClosed
         && (armEncoder.getPosition() > Cal.Lift.GRABBER_CLOSED_ZONE_TOP_DEGREES
             || armEncoder.getPosition() < Cal.Lift.GRABBER_CLOSED_ZONE_BOTTOM_DEGREES)) {
       grabber.set(Value.kForward);
