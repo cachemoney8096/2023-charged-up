@@ -385,9 +385,9 @@ public class Lift extends SubsystemBase {
     if (!desiredGrabberClosed
         && (armEncoder.getPosition() > Cal.Lift.GRABBER_CLOSED_ZONE_TOP_DEGREES
             || armEncoder.getPosition() < Cal.Lift.GRABBER_CLOSED_ZONE_BOTTOM_DEGREES)) {
-      grabber.set(Value.kForward);
+      grabber.set(Value.kForward); // grab
     } else {
-      grabber.set(Value.kReverse);
+      grabber.set(Value.kReverse); // drop
     }
   }
 
