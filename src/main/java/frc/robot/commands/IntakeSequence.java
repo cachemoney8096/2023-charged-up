@@ -24,7 +24,7 @@ public class IntakeSequence extends CommandBase {
     if (!lift.seeGamePiece()) {
       intake.intakeGamePiece();
     } else {
-      lift.grab();
+      lift.closeGrabber();
     }
     // TODO fix this
   }
