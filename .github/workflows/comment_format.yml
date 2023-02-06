@@ -49,3 +49,14 @@ jobs:
           git add -A
           git diff-index --quiet HEAD || git commit -m "Formatting fixes"
           git push
+      - name: React Party Hat
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const {owner, repo} = context.issue
+            github.reactions.createForIssueComment({
+              owner,
+              repo,
+              comment_id: context.payload.comment.id,
+              content: "hooray",
+            });
