@@ -381,7 +381,8 @@ public class Lift extends SubsystemBase {
       goToPosition(desiredPosition);
     }
 
-    // If the grabber is set to open and it is safe to open, open the grabber (drop). Otherwise, close it (grab).
+    // If the grabber is set to open and it is safe to open, open the grabber (drop). Otherwise,
+    // close it (grab).
     if (!desiredGrabberClosed
         && (armEncoder.getPosition() > Cal.Lift.GRABBER_CLOSED_ZONE_TOP_DEGREES
             || armEncoder.getPosition() < Cal.Lift.GRABBER_CLOSED_ZONE_BOTTOM_DEGREES)) {

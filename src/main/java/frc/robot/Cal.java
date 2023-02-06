@@ -140,7 +140,7 @@ public final class Cal {
         ARM_MARGIN_DEGREES = 2.0,
         ELEVATOR_START_MARGIN_INCHES = 1.0,
         ARM_START_MARGIN_DEGREES = 4.0;
-    
+
     /** Zone where the grabber must be closed, in degrees. Bottom is closer to intake. */
     public static final double GRABBER_CLOSED_ZONE_BOTTOM_DEGREES = PLACEHOLDER_DOUBLE,
         GRABBER_CLOSED_ZONE_TOP_DEGREES = PLACEHOLDER_DOUBLE;
