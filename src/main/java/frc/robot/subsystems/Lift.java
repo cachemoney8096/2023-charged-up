@@ -423,6 +423,10 @@ public class Lift extends SubsystemBase {
     }
   }
 
+  public boolean readyToIntake(){
+    return atPosition(LiftPosition.GRAB_FROM_INTAKE) && seeGamePiece();
+  }
+
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation

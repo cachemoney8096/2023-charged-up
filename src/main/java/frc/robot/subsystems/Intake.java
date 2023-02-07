@@ -192,7 +192,7 @@ public class Intake extends SubsystemBase {
     clamp.set(false);
   }
 
-  private void unclampIntake() {
+  public void unclampIntake() {
     clamp.set(true);
   }
 
