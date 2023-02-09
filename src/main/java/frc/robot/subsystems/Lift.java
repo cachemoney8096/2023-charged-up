@@ -33,9 +33,12 @@ public class Lift extends SubsystemBase {
   /** Overall position of the lift including both elevator and arm */
   public enum LiftPosition {
     GRAB_FROM_INTAKE,
-    SHELF,
-    SCORE_MID,
-    SCORE_HIGH,
+    SCORE_LOW_CUBE,
+    SCORE_LOW_CONE,
+    SCORE_MID_CUBE,
+    SCORE_MID_CONE,
+    SCORE_HIGH_CUBE,
+    SCORE_HIGH_CONE,
     STARTING
   }
 
@@ -93,14 +96,23 @@ public class Lift extends SubsystemBase {
         LiftPosition.GRAB_FROM_INTAKE,
         new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
     liftPositionMap.put(
-        LiftPosition.SHELF,
+        LiftPosition.SCORE_LOW_CUBE,
         new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
     liftPositionMap.put(
-        LiftPosition.SCORE_MID,
+      LiftPosition.SCORE_LOW_CONE,
+      new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+    liftPositionMap.put(
+        LiftPosition.SCORE_MID_CUBE,
         new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
     liftPositionMap.put(
-        LiftPosition.SCORE_HIGH,
+      LiftPosition.SCORE_MID_CONE,
+      new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+    liftPositionMap.put(
+        LiftPosition.SCORE_HIGH_CUBE,
         new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+    liftPositionMap.put(
+      LiftPosition.SCORE_HIGH_CONE,
+      new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
     liftPositionMap.put(
         LiftPosition.STARTING,
         new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
@@ -342,9 +354,12 @@ public class Lift extends SubsystemBase {
     switch (pos) {
       case STARTING:
         return LiftPositionStartRelative.AT_START;
-      case SCORE_MID:
-      case SCORE_HIGH:
-      case SHELF:
+      case SCORE_MID_CUBE:
+      case SCORE_MID_CONE:
+      case SCORE_HIGH_CUBE:
+      case SCORE_HIGH_CONE:
+      case SCORE_LOW_CUBE:
+      case SCORE_LOW_CONE:
         return LiftPositionStartRelative.ABOVE_START;
       case GRAB_FROM_INTAKE:
         return LiftPositionStartRelative.BELOW_START;
