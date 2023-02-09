@@ -237,12 +237,7 @@ public class Intake extends SubsystemBase {
 
   /** If the intake has achieved its desired position, return true */
   public boolean atDesiredPosition() {
-    if (Math.abs(intakeDesiredPositionDegrees - deployMotorEncoder.getPosition())
-        < Cal.Intake.POSITION_MARGIN_DEGREES) {
-      return true;
-    } else {
-      return false;
-    }
+    return (Math.abs(intakeDesiredPositionDegrees - deployMotorEncoder.getPosition()) < Cal.Intake.POSITION_MARGIN_DEGREES)
   }
 
   @Override
