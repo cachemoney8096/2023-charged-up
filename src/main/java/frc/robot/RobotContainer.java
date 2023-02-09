@@ -116,7 +116,6 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    OuttakeSequence o = new OuttakeSequence(lift);
     driverController.a().onTrue(new InstantCommand(drive::toggleSkids, drive));
     driverController.b().onTrue(new OuttakeSequence(lift));
     driverController.x().onTrue(new InstantCommand(lift::cancelScore, lift));

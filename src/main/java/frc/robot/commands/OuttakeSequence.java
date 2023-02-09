@@ -8,9 +8,9 @@ import frc.robot.Cal;
 import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lift.LiftPosition;
 
+/** moves lift to OUTTAKING position, opens the grabber, waits, closes the grabber */
 public class OuttakeSequence extends SequentialCommandGroup {
 
-  /** moves lift to OUTTAKING position, opens the grabber, waits, closes the grabber */
   public OuttakeSequence(Lift lift) {
     addCommands(
         new RunCommand(() -> lift.setDesiredPosition(LiftPosition.OUTTAKING), lift)
