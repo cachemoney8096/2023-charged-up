@@ -135,8 +135,7 @@ public class RobotContainer {
     operatorController
         .povDown()
         .onTrue(
-            new InstantCommand(
-                () -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.LOW)));
+            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.LOW)));
     operatorController
         .povLeft()
         .onTrue(
