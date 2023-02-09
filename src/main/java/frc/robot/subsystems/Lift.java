@@ -424,8 +424,8 @@ public class Lift extends SubsystemBase {
   }
 
   /** Returns true when the lift is at the intake position and the robot sees an object */
-  public boolean readyToIntake() {
-    return atPosition(LiftPosition.GRAB_FROM_INTAKE) && seeGamePiece();
+  public boolean atIntakePos() {
+    return atPosition(LiftPosition.GRAB_FROM_INTAKE);
   }
 
   @Override

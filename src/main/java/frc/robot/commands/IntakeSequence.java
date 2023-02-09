@@ -5,6 +5,8 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Cal;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Lift;
@@ -16,11 +18,11 @@ public class IntakeSequence extends SequentialCommandGroup {
 
   // deploy intake for specified amount of time
   private ParallelRaceGroup deployIntake =
-      new RunCommand(intake::deploy, intake).withTimeout(Cal.Intake.AUTO_CLAMP_WAIT_TIME_SECONDS);
+      new RunCommand(intake::deploy, intake).until(intake::atDesiredPosition);
 
-  // run intake infinitely (until parallel command ends)
-  private RunCommand runIntake = new RunCommand(intake::intakeGamePiece, intake);
-  
+  // run intake
+  private InstantCommand runIntake = new InstantCommand(intake::intakeGamePiece, intake);
+
   // trigger the lift to move to the intake position. This does not need a timeout because it is
   // running in the parallel group, which is controlled by lift.readyToIntake()
   private InstantCommand liftToIntakePos =
@@ -30,16 +32,28 @@ public class IntakeSequence extends SequentialCommandGroup {
   // the parallel group.
   private InstantCommand openGrabber = new InstantCommand(lift::openGrabber, lift);
 
+  // completes when the lift is at the correct position and the intake sees a game piece
+  private WaitUntilCommand waitUntilReadyToIntake =
+      new WaitUntilCommand(() -> (lift.atIntakePos() && intake.seeGamePiece()));
+
   // run intake, move lift to intake position, and open the grabber, until the robot sees an object
   // and the lift is in position
-  private ParallelRaceGroup intakePrep =
-      new ParallelCommandGroup(runIntake, liftToIntakePos, openGrabber).until(lift::readyToIntake);
+  private SequentialCommandGroup intakePrep =
+      new ParallelCommandGroup(runIntake, liftToIntakePos, openGrabber)
+          .andThen(waitUntilReadyToIntake);
+
+  // stop intake
+  private InstantCommand stopIntake = new InstantCommand(intake::stopIntakingGamePiece, intake);
 
   // triggers the grabber to close
-  private InstantCommand closeGrabber = new InstantCommand(lift::closeGrabber, lift);
+  private SequentialCommandGroup closeGrabber =
+      new InstantCommand(lift::closeGrabber, lift)
+          .andThen(new WaitCommand(Cal.Lift.GRABBER_CLOSE_TIME_SECONDS));
 
   // immediately unclamps the intake.
-  private InstantCommand unclampIntake = new InstantCommand(intake::unclampIntake, intake);
+  private SequentialCommandGroup unclampIntake =
+      new InstantCommand(intake::unclampIntake, intake)
+          .andThen(new WaitCommand(Cal.Intake.UNCLAMP_TIME_SECONDS));
 
   // triggers the lift to move to the starting position. This does not need a timeout even though it
   // is a longer action, because it is the final action in the sequence
@@ -49,6 +63,6 @@ public class IntakeSequence extends SequentialCommandGroup {
   public IntakeSequence(Intake intake, Lift lift) {
     this.intake = intake;
     this.lift = lift;
-    addCommands(deployIntake, intakePrep, closeGrabber, unclampIntake, liftToStartPos);
+    addCommands(deployIntake, intakePrep, stopIntake, closeGrabber, unclampIntake, liftToStartPos);
   }
 }
