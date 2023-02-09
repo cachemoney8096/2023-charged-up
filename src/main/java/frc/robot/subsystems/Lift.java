@@ -423,11 +423,6 @@ public class Lift extends SubsystemBase {
     }
   }
 
-  /** Returns true when the lift is at the intake position and the robot sees an object */
-  public boolean atIntakePos() {
-    return atPosition(LiftPosition.GRAB_FROM_INTAKE);
-  }
-
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation

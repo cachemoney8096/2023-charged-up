@@ -18,6 +18,8 @@ public class IntakeSequence extends SequentialCommandGroup {
   public IntakeSequence(Intake intake, Lift lift) {
     this.intake = intake;
     this.lift = lift;
+    addRequirements(intake, lift);
+
     // addCommands(deployIntake, intakePrep, stopIntake, closeGrabber, unclampIntake,
     // liftToStartPos);
     addCommands(
@@ -42,13 +44,15 @@ public class IntakeSequence extends SequentialCommandGroup {
                 // because it is in
                 // the parallel group.
                 new InstantCommand(lift::openGrabber, lift))
-            .andThen(new WaitUntilCommand(() -> (lift.atIntakePos() && intake.seeGamePiece()))),
+            .andThen(new WaitUntilCommand(() -> (lift.atPosition(Lift.LiftPosition.GRAB_FROM_INTAKE) && intake.seeGamePiece()))),
         // stop intake
         new InstantCommand(intake::stopIntakingGamePiece, intake),
 
         // triggers the grabber to close
-        new InstantCommand(lift::closeGrabber, lift)
-            .andThen(new WaitCommand(Cal.Lift.GRABBER_CLOSE_TIME_SECONDS)),
+        new InstantCommand(lift::closeGrabber, lift),
+        
+        // wait until the grabber has closed
+        new WaitCommand(Cal.Lift.GRABBER_CLOSE_TIME_SECONDS),
 
         // immediately unclamps the intake.
         new InstantCommand(intake::unclampIntake, intake)

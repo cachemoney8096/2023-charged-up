@@ -82,7 +82,7 @@ public final class Cal {
         INTAKE_DEPLOY_MOTOR_NEGATIVE_LIMIT_DEGREES = PLACEHOLDER_FLOAT;
     
     /** Time for the intake to unclamp, in seconds */
-    public static final double UNCLAMP_TIME_SECONDS = PLACEHOLDER_DOUBLE;
+    public static final double UNCLAMP_TIME_SECONDS = 0.2;
   }
 
   public static final class Lift {
