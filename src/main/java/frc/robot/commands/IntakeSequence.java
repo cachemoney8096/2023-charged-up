@@ -20,8 +20,6 @@ public class IntakeSequence extends SequentialCommandGroup {
     this.lift = lift;
     addRequirements(intake, lift);
 
-    // addCommands(deployIntake, intakePrep, stopIntake, closeGrabber, unclampIntake,
-    // liftToStartPos);
     addCommands(
         // deploy intake for specified amount of time
         new RunCommand(intake::deploy, intake).until(intake::atDesiredPosition),
@@ -31,32 +29,38 @@ public class IntakeSequence extends SequentialCommandGroup {
         // and the lift is in position
         new ParallelCommandGroup(
 
-                // run intake
-                new InstantCommand(intake::intakeGamePiece, intake),
+            // run intake
+            new InstantCommand(intake::intakeGamePiece, intake),
 
-                // trigger the lift to move to the intake position. This does not need a timeout
-                // because it is
-                // running in the parallel group, which is controlled by readyToIntake()
-                new InstantCommand(
-                    () -> lift.setDesiredPosition(LiftPosition.GRAB_FROM_INTAKE), lift),
+            // trigger the lift to move to the intake position. This does not need a timeout
+            // because it is
+            // running in the parallel group, which is controlled by readyToIntake()
+            new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.GRAB_FROM_INTAKE), lift),
 
-                // triggers the grabber to open when it is safe. Again, we do not care about time
-                // because it is in
-                // the parallel group.
-                new InstantCommand(lift::openGrabber, lift))
-            .andThen(new WaitUntilCommand(() -> (lift.atPosition(Lift.LiftPosition.GRAB_FROM_INTAKE) && intake.seeGamePiece()))),
+            // triggers the grabber to open when it is safe. Again, we do not care about time
+            // because it is in
+            // the parallel group.
+            new InstantCommand(lift::openGrabber, lift)),
+
+        // wait until the lift is in position and the intake sees a game piece
+        new WaitUntilCommand(
+            () -> (lift.atPosition(Lift.LiftPosition.GRAB_FROM_INTAKE) && intake.seeGamePiece())),
+
         // stop intake
         new InstantCommand(intake::stopIntakingGamePiece, intake),
 
         // triggers the grabber to close
         new InstantCommand(lift::closeGrabber, lift),
-        
+
         // wait until the grabber has closed
         new WaitCommand(Cal.Lift.GRABBER_CLOSE_TIME_SECONDS),
 
         // immediately unclamps the intake.
-        new InstantCommand(intake::unclampIntake, intake)
-            .andThen(new WaitCommand(Cal.Intake.UNCLAMP_TIME_SECONDS)),
+        // TODO this may not work
+        new InstantCommand(intake::unclampIntake, intake),
+
+        // give the intake time to unclamp
+        new WaitCommand(Cal.Intake.UNCLAMP_TIME_SECONDS),
 
         // triggers the lift to move to the starting position. This does not need a timeout even
         // though it
