@@ -12,6 +12,7 @@ import frc.robot.subsystems.Lift.LiftPosition;
 public class OuttakeSequence extends SequentialCommandGroup {
 
   public OuttakeSequence(Lift lift) {
+    addRequirements(lift);
     addCommands(
         new RunCommand(() -> lift.setDesiredPosition(LiftPosition.OUTTAKING), lift)
             .until(() -> lift.atPosition(LiftPosition.OUTTAKING)),
