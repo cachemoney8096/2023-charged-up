@@ -24,6 +24,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
+import frc.robot.utils.ScoringLocationUtil;
+import frc.robot.utils.ScoringLocationUtil.ScoreCol;
+import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 import frc.robot.utils.SparkMaxUtils;
 import java.util.TreeMap;
 
@@ -34,8 +37,11 @@ public class Lift extends SubsystemBase {
   public enum LiftPosition {
     GRAB_FROM_INTAKE,
     SHELF,
-    SCORE_MID,
-    SCORE_HIGH,
+    SCORE_LOW,
+    SCORE_MID_CUBE,
+    SCORE_MID_CONE,
+    SCORE_HIGH_CUBE,
+    SCORE_HIGH_CONE,
     OUTTAKING,
     STARTING
   }
@@ -76,6 +82,7 @@ public class Lift extends SubsystemBase {
   private LiftPosition latestPosition = LiftPosition.STARTING;
   private LiftPosition desiredPosition = LiftPosition.STARTING;
   private boolean desiredGrabberClosed = true;
+  private ScoringLocationUtil scoreLoc;
 
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
@@ -85,7 +92,7 @@ public class Lift extends SubsystemBase {
   TreeMap<LiftPosition, Pair<Double, Double>> liftPositionMap;
 
   /** Creates a new Lift */
-  public Lift() {
+  public Lift(ScoringLocationUtil scoreLoc) {
     SparkMaxUtils.initWithRetry(this::initSparks, Cal.SPARK_INIT_RETRY_ATTEMPTS);
 
     // Map of all LiftPosition with according values
@@ -97,14 +104,25 @@ public class Lift extends SubsystemBase {
         LiftPosition.SHELF,
         new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
     liftPositionMap.put(
-        LiftPosition.SCORE_MID,
+        LiftPosition.SCORE_LOW,
         new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
     liftPositionMap.put(
-        LiftPosition.SCORE_HIGH,
+        LiftPosition.SCORE_MID_CUBE,
+        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+    liftPositionMap.put(
+        LiftPosition.SCORE_MID_CONE,
+        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+    liftPositionMap.put(
+        LiftPosition.SCORE_HIGH_CUBE,
+        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+    liftPositionMap.put(
+        LiftPosition.SCORE_HIGH_CONE,
         new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
     liftPositionMap.put(
         LiftPosition.STARTING,
         new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+
+    this.scoreLoc = scoreLoc;
   }
 
   /** Does all the initialization for the sparks, return true on success */
@@ -339,8 +357,11 @@ public class Lift extends SubsystemBase {
     switch (pos) {
       case STARTING:
         return LiftPositionStartRelative.AT_START;
-      case SCORE_MID:
-      case SCORE_HIGH:
+      case SCORE_MID_CUBE:
+      case SCORE_MID_CONE:
+      case SCORE_HIGH_CUBE:
+      case SCORE_HIGH_CONE:
+      case SCORE_LOW:
       case SHELF:
         return LiftPositionStartRelative.ABOVE_START;
       case GRAB_FROM_INTAKE:
@@ -421,5 +442,35 @@ public class Lift extends SubsystemBase {
     builder.addDoubleProperty("Arm Position", armEncoder::getPosition, armEncoder::setPosition);
     builder.addBooleanProperty("Done Scoring", this::doneScoring, null);
     builder.addBooleanProperty("See Game Piece", this::seeGamePiece, null);
+  }
+
+  /**
+   * takes the column and height from ScoringLocationUtil.java and converts that to a LiftPosition
+   * then gives the position to the given lift
+   */
+  public void ManualPrepScoreSequence() {
+    ScoreHeight height = scoreLoc.getScoreHeight();
+    ScoreCol col = scoreLoc.getScoreCol();
+
+    // low for all columns is the same height
+    if (height == ScoreHeight.LOW) {
+      setDesiredPosition(LiftPosition.SCORE_LOW);
+    }
+    // left and right columns are for cones
+    else if (col == ScoreCol.LEFT || col == ScoreCol.RIGHT) {
+      if (height == ScoreHeight.MID) {
+        setDesiredPosition(LiftPosition.SCORE_MID_CONE);
+      } else {
+        setDesiredPosition(LiftPosition.SCORE_HIGH_CONE);
+      }
+    }
+    // middle columns are for cubes
+    else {
+    }
+    if (height == ScoreHeight.MID) {
+      setDesiredPosition(LiftPosition.SCORE_MID_CUBE);
+    } else {
+      setDesiredPosition(LiftPosition.SCORE_HIGH_CUBE);
+    }
   }
 }

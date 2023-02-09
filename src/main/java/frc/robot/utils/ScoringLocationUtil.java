@@ -3,7 +3,7 @@ package frc.robot.utils;
 public class ScoringLocationUtil {
   /** Height to score at */
   public enum ScoreHeight {
-    SHELF,
+    LOW,
     MID,
     HIGH
   }
