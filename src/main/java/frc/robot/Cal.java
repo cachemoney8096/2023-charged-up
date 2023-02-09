@@ -144,6 +144,9 @@ public final class Cal {
     /** Zone where the grabber must be closed, in degrees. Bottom is closer to intake. */
     public static final double GRABBER_CLOSED_ZONE_BOTTOM_DEGREES = PLACEHOLDER_DOUBLE,
         GRABBER_CLOSED_ZONE_TOP_DEGREES = PLACEHOLDER_DOUBLE;
+
+    /** The time in seconds for the grabber to open in OuttakeSequence */
+    public static final double OUTTAKE_GRABBER_WAIT_TIME_SECONDS = PLACEHOLDER_DOUBLE;
   }
 
   public static final class AutoBalance {

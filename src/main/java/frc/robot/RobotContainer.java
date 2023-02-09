@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoChargeStationSequence;
 import frc.robot.commands.AutoScoreAndBalance;
 import frc.robot.commands.IntakeSequence;
+import frc.robot.commands.OuttakeSequence;
 import frc.robot.commands.finishScore;
 import frc.robot.commands.startScore;
 import frc.robot.subsystems.Intake;
@@ -116,7 +117,7 @@ public class RobotContainer {
    */
   private void configureBindings() {
     driverController.a().onTrue(new InstantCommand(drive::toggleSkids, drive));
-    driverController.b().onTrue(new InstantCommand(lift::getRidOfObject, lift));
+    driverController.b().onTrue(new OuttakeSequence(lift));
     driverController.x().onTrue(new InstantCommand(lift::cancelScore, lift));
     driverController.y().whileTrue(new InstantCommand(lift::manualPrepScore, lift));
 
