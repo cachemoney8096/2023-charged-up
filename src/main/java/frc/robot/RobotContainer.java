@@ -199,7 +199,7 @@ public class RobotContainer {
     intake.setDefaultCommand(new RunCommand(intake::retract, intake));
   }
 
-public Command getAutonomousCommand() {
+  public Command getAutonomousCommand() {
     return autonChooser.getSelected();
   }
 }
