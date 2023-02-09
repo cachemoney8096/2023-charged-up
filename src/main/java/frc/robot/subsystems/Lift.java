@@ -36,6 +36,7 @@ public class Lift extends SubsystemBase {
     SHELF,
     SCORE_MID,
     SCORE_HIGH,
+    OUTTAKING,
     STARTING
   }
 
@@ -282,16 +283,12 @@ public class Lift extends SubsystemBase {
     // TODO do this
   }
 
-  public void getRidOfObject() {
-    // TODO do this
-  }
-
   public void cancelScore() {
     // TODO do this
   }
 
   public void home() {
-    // TODO do this
+    setDesiredPosition(LiftPosition.STARTING);
   }
 
   public void prepScore() {
@@ -312,7 +309,7 @@ public class Lift extends SubsystemBase {
   }
 
   /** True if the lift is at the queried position. */
-  private boolean atPosition(LiftPosition positionToCheck) {
+  public boolean atPosition(LiftPosition positionToCheck) {
     double armThresholdDegrees =
         positionToCheck == LiftPosition.STARTING
             ? Cal.Lift.ARM_START_MARGIN_DEGREES
