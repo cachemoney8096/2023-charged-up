@@ -81,7 +81,7 @@ public class Lift extends SubsystemBase {
   private LiftPosition latestPosition = LiftPosition.STARTING;
   private LiftPosition desiredPosition = LiftPosition.STARTING;
   private boolean desiredGrabberClosed = true;
-  private ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
+  private ScoringLocationUtil scoreLoc;
 
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
@@ -91,7 +91,7 @@ public class Lift extends SubsystemBase {
   TreeMap<LiftPosition, Pair<Double, Double>> liftPositionMap;
 
   /** Creates a new Lift */
-  public Lift() {
+  public Lift(ScoringLocationUtil scoreLoc) {
     SparkMaxUtils.initWithRetry(this::initSparks, Cal.SPARK_INIT_RETRY_ATTEMPTS);
 
     // Map of all LiftPosition with according values
@@ -120,6 +120,8 @@ public class Lift extends SubsystemBase {
     liftPositionMap.put(
         LiftPosition.STARTING,
         new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+
+    this.scoreLoc = scoreLoc;
   }
 
   /** Does all the initialization for the sparks, return true on success */

@@ -37,11 +37,11 @@ import frc.robot.utils.ScoringLocationUtil;
 public class RobotContainer {
   private final Intake intake = new Intake();
   private final DriveSubsystem drive = new DriveSubsystem();
-  private final Lift lift = new Lift();
   private final IntakeLimelight intakeLimelight;
   private final TagLimelight tagLimelight;
   private final Lights lights = new Lights();
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
+  private final Lift lift = new Lift(scoreLoc);
 
   // A chooser for autonomous commands
   private SendableChooser<Command> autonChooser = new SendableChooser<>();
