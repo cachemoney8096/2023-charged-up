@@ -136,9 +136,6 @@ public final class Constants {
     /** Scalar for the difference in the elevator's absolute encoders in inches per degree */
     public static final double ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE =
         Constants.PLACEHOLDER_DOUBLE;
-
-    /** The time in seconds for the grabber to open in OuttakeSequence*/
-    public static final double GRABBER_WAIT_TIME_SECONDS = PLACEHOLDER_DOUBLE;
   }
 
   public static final class Intake {
