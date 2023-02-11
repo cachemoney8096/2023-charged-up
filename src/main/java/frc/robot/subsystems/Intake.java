@@ -192,7 +192,7 @@ public class Intake extends SubsystemBase {
     clamp.set(false);
   }
 
-  private void unclampIntake() {
+  public void unclampIntake() {
     clamp.set(true);
   }
 
@@ -230,10 +230,14 @@ public class Intake extends SubsystemBase {
     }
 
     // If the intake has achieved its desired position, then cut power
-    if (Math.abs(intakeDesiredPositionDegrees - deployMotorEncoder.getPosition())
-        < Cal.Intake.POSITION_MARGIN_DEGREES) {
+    if (atDesiredPosition()) {
       deployMotorPID.setReference(0.0, CANSparkMax.ControlType.kVoltage);
     }
+  }
+
+  /** If the intake has achieved its desired position, return true */
+  public boolean atDesiredPosition() {
+    return (Math.abs(intakeDesiredPositionDegrees - deployMotorEncoder.getPosition()) < Cal.Intake.POSITION_MARGIN_DEGREES);
   }
 
   @Override

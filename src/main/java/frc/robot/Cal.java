@@ -80,6 +80,9 @@ public final class Cal {
     /** Sets the min and max positions that the intake deploy motor will be allowed to reach */
     public static final float INTAKE_DEPLOY_MOTOR_POSITIVE_LIMIT_DEGREES = PLACEHOLDER_FLOAT,
         INTAKE_DEPLOY_MOTOR_NEGATIVE_LIMIT_DEGREES = PLACEHOLDER_FLOAT;
+    
+    /** Time for the intake to unclamp, in seconds */
+    public static final double UNCLAMP_TIME_SECONDS = 0.2;
   }
 
   public static final class Lift {
@@ -144,6 +147,9 @@ public final class Cal {
     /** Zone where the grabber must be closed, in degrees. Bottom is closer to intake. */
     public static final double GRABBER_CLOSED_ZONE_BOTTOM_DEGREES = PLACEHOLDER_DOUBLE,
         GRABBER_CLOSED_ZONE_TOP_DEGREES = PLACEHOLDER_DOUBLE;
+    
+    /** Time between when the grabber closes and the intake unclamps, in seconds */
+    public static final double GRABBER_CLOSE_TIME_SECONDS = 0.2;
 
     /** The time in seconds for the grabber to open in OuttakeSequence */
     public static final double OUTTAKE_GRABBER_WAIT_TIME_SECONDS = PLACEHOLDER_DOUBLE;
