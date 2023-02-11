@@ -29,6 +29,25 @@ public final class Cal {
   }
 
   public static final class SwerveSubsystem {
+
+    /**
+     * Angular offset of the modules relative to the zeroing fixture in radians. COmmon to all
+     * modules
+     */
+    public static final double SWERVE_COMMON_ANGULAR_OFFSET_RAD = PLACEHOLDER_DOUBLE;
+
+    /**
+     * Angular offsets of the modules relative to the chassis in radians. The modules form an O when
+     * fixtured, so they are iteratively 90 deg from each other.
+     */
+    public static final double
+        FRONT_LEFT_CHASSIS_ANGULAR_OFFSET_RAD =
+            SWERVE_COMMON_ANGULAR_OFFSET_RAD - (3.0 * Math.PI / 4.0),
+        FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET_RAD = SWERVE_COMMON_ANGULAR_OFFSET_RAD - (Math.PI / 4.0),
+        BACK_LEFT_CHASSIS_ANGULAR_OFFSET_RAD =
+            SWERVE_COMMON_ANGULAR_OFFSET_RAD + (3.0 * Math.PI / 4.0),
+        BACK_RIGHT_CHASSIS_ANGULAR_OFFSET_RAD = SWERVE_COMMON_ANGULAR_OFFSET_RAD + (Math.PI / 4.0);
+
     /**
      * Controller on module speed for rotating to target, input degrees [-180,180], output [0,1].
      */
@@ -50,8 +69,6 @@ public final class Cal {
     public static final double INTAKING_POWER = 1.0;
     public static final double EJECTION_POWER = -1.0;
 
-    public static final double AUTO_CLAMP_WAIT_TIME_SECONDS = 0.5;
-
     /** Input degrees, output [0,1] */
     public static final double DEPLOY_MOTOR_P = Cal.PLACEHOLDER_DOUBLE,
         DEPLOY_MOTOR_I = Cal.PLACEHOLDER_DOUBLE,
@@ -61,8 +78,11 @@ public final class Cal {
     public static final double STARTING_POSITION_DEGREES = 40.0,
         DEPLOYED_POSITION_DEGREES = Cal.PLACEHOLDER_DOUBLE;
 
-    /** Difference in what the intake absolute encoder says is 0 and what is actually 0 */
-    public static final double ABSOLUTE_ENCODER_OFFSET_DEG = Cal.PLACEHOLDER_DOUBLE;
+    /** Past this position, the intake is free to clamp */
+    public static final double CLAMP_POSITION_THRESHOLD_DEGREES = Cal.PLACEHOLDER_DOUBLE;
+
+    /** Absolute encoder position when the arm is at 0 degrees */
+    public static final double ABSOLUTE_ENCODER_START_POS_DEG = Cal.PLACEHOLDER_DOUBLE;
 
     /** Voltage required to hold the intake in the horizontal position */
     public static final double ARBITRARY_FEED_FORWARD_VOLTS = Cal.PLACEHOLDER_DOUBLE;
@@ -77,9 +97,10 @@ public final class Cal {
     /** Margin for having achieved the desired intake position (in degrees) */
     public static final double POSITION_MARGIN_DEGREES = 3.0;
 
-    /** Sets the min and max positions that the intake deploy motor will be allowed to reach */
-    public static final float INTAKE_DEPLOY_MOTOR_POSITIVE_LIMIT_DEGREES = PLACEHOLDER_FLOAT,
-        INTAKE_DEPLOY_MOTOR_NEGATIVE_LIMIT_DEGREES = PLACEHOLDER_FLOAT;
+    /** Sets the min and max positions that the intake deploy motor will be allowed to reach. */
+    public static final float
+        INTAKE_DEPLOY_MOTOR_POSITIVE_LIMIT_DEGREES = (float) DEPLOYED_POSITION_DEGREES,
+        INTAKE_DEPLOY_MOTOR_NEGATIVE_LIMIT_DEGREES = (float) STARTING_POSITION_DEGREES;
 
     /** Time for the intake to unclamp, in seconds */
     public static final double UNCLAMP_TIME_SECONDS = 0.2;
