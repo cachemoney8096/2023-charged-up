@@ -146,7 +146,6 @@ public class Intake extends SubsystemBase {
         Cal.Intake.ARBITRARY_FEED_FORWARD_VOLTS * getCosineIntakeAngle(),
         ArbFFUnits.kVoltage);
     intakeDesiredPositionDegrees = Cal.Intake.DEPLOYED_POSITION_DEGREES;
-
   }
 
   /** Brings the intake back in */
@@ -202,8 +201,6 @@ public class Intake extends SubsystemBase {
         deployMotorEncoder.getPosition() - Constants.Intake.POSITION_WHEN_HORIZONTAL_DEGREES);
   }
 
-
-
   @Override
   public void periodic() {
     // If the intake has achieved its desired position, then cut power
@@ -211,15 +208,14 @@ public class Intake extends SubsystemBase {
         < Cal.Intake.POSITION_MARGIN_DEGREES) {
       deployMotorPID.setReference(0.0, CANSparkMax.ControlType.kVoltage);
     }
-    //only clamp if it is safe to do so and clamping is desired
-    if(desireClamped && deployMotorEncoder.getPosition() > Constants.PLACEHOLDER_INT){
+    // only clamp if it is safe to do so and clamping is desired
+    if (desireClamped && deployMotorEncoder.getPosition() > Constants.PLACEHOLDER_INT) {
       clampIntake();
-    }
-    else{
+    } else {
       unclampIntake();
     }
   }
-  
+
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
