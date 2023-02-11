@@ -54,7 +54,12 @@ public class Intake extends SubsystemBase {
    * or already deployed (check timer for whether to clamp). Elapsed means we should clamp or stay
    * clamped.
    */
-  private Optional<Timer> clampTimer = Optional.empty();
+  //private Optional<Timer> clampTimer = Optional.empty();
+
+  /** Instead of a timer, use a boolean which can be set and is checked periodically */
+  //private boolean clampingDesired = false;
+
+  private boolean desireClamped = false;
 
   private double intakeDesiredPositionDegrees = Cal.Intake.STARTING_POSITION_DEGREES;
 
@@ -142,6 +147,8 @@ public class Intake extends SubsystemBase {
 
   /** Deploys the intake out. */
   public void deploy() {
+    //toggle desire clamped
+    desireClamped = true;
     // Set the desired intake position
     deployMotorPID.setReference(
         Cal.Intake.DEPLOYED_POSITION_DEGREES,
@@ -153,17 +160,16 @@ public class Intake extends SubsystemBase {
 
     // Set a timer only if we're newly deploying
     // If we have already set a timer, we shouldn't restart the timer
-    if (!clampTimer.isPresent()) {
-      clampTimer = Optional.of(new Timer());
-      clampTimer.get().start();
-    }
+    //if (!clampTimer.isPresent()) {
+    //  clampTimer = Optional.of(new Timer());
+    //  clampTimer.get().start();
+    //}
   }
 
   /** Brings the intake back in */
   public void retract() {
     // Kill the timer to indicate retraction for clamping
-    clampTimer = Optional.empty();
-
+    desireClamped = true;
     // Set the desired intake position
     deployMotorPID.setReference(
         Cal.Intake.STARTING_POSITION_DEGREES,
@@ -196,6 +202,11 @@ public class Intake extends SubsystemBase {
     clamp.set(true);
   }
 
+  /** Set desired clamping or unclamping (these might not be needed)*/
+  public void toggleDesireClamped(){
+    desireClamped = !desireClamped;
+  }
+
   /** Returns true if the game piece sensor sees a game piece */
   public boolean seeGamePiece() {
     // Sensor is false if there's a game piece
@@ -213,9 +224,11 @@ public class Intake extends SubsystemBase {
         deployMotorEncoder.getPosition() - Constants.Intake.POSITION_WHEN_HORIZONTAL_DEGREES);
   }
 
+
+
   @Override
   public void periodic() {
-    if (clampTimer.isPresent()) {
+    /*if (clampTimer.isPresent()) {
       // If present, that means we're deployed or in the process of deploying
       if (clampTimer.get().hasElapsed(Cal.Intake.AUTO_CLAMP_WAIT_TIME_SECONDS)) {
         // If the time has elapsed, that means we've deployed enough to clamp
@@ -227,15 +240,20 @@ public class Intake extends SubsystemBase {
     } else {
       // When there's no timer, we're retracting or retracted so we should unclamp
       unclampIntake();
-    }
+    }*/
 
     // If the intake has achieved its desired position, then cut power
     if (Math.abs(intakeDesiredPositionDegrees - deployMotorEncoder.getPosition())
         < Cal.Intake.POSITION_MARGIN_DEGREES) {
       deployMotorPID.setReference(0.0, CANSparkMax.ControlType.kVoltage);
     }
+    if(desireClamped && deployMotorEncoder.getPosition() > Constants.PLACEHOLDER_INT){
+      clampIntake();
+    }
+    else{
+      unclampIntake();
+    }
   }
-
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
