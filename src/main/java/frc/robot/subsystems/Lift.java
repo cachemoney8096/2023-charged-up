@@ -69,12 +69,8 @@ public class Lift extends SubsystemBase {
 
   // Sensors
   private final RelativeEncoder elevatorLeftEncoder = elevatorLeft.getEncoder();
-  /* Returns [0,1] in revolutions */
-  private final DutyCycleEncoder elevatorDutyCycleEncoderOne =
-      new DutyCycleEncoder(RobotMap.ELEVATOR_ENCODER_ONE_DIO);
-  /* Returns [0,1] in revolutions */
-  private final DutyCycleEncoder elevatorDutyCycleEncoderTwo =
-      new DutyCycleEncoder(RobotMap.ELEVATOR_ENCODER_TWO_DIO);
+  private final AbsoluteEncoder elevatorLeftAbsEncoder = elevatorLeft.getAbsoluteEncoder(Type.kDutyCycle);
+  private final AbsoluteEncoder elevatorRightAbsEncoder = elevatorRight.getAbsoluteEncoder(Type.kDutyCycle);
   private final RelativeEncoder armEncoder = arm.getEncoder();
   private final AbsoluteEncoder armAbsoluteEncoder = arm.getAbsoluteEncoder(Type.kDutyCycle);
   private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
@@ -138,6 +134,8 @@ public class Lift extends SubsystemBase {
     errors += SparkMaxUtils.check(elevatorRight.follow(elevatorLeft, true));
 
     // Get positions and degrees of elevator through encoder in inches
+    errors += SparkMaxUtils.check(SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(elevatorLeftAbsEncoder, 1.0));
+    errors += SparkMaxUtils.check(SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(elevatorRightAbsEncoder, Constants.Lift.ELEVATOR_RIGHT_ABSOLUTE_ENCODER_RATIO));
     errors +=
         SparkMaxUtils.check(
             elevatorLeftEncoder.setPositionConversionFactor(
@@ -281,10 +279,9 @@ public class Lift extends SubsystemBase {
 
     // Set elevator encoder position from absolute encoders
     double elevatorDutyCycleEncodersDifferenceDegrees =
-        ((elevatorDutyCycleEncoderOne.getAbsolutePosition()
-                    - elevatorDutyCycleEncoderTwo.getAbsolutePosition())
-                * Constants.REVOLUTIONS_TO_DEGREES)
-            % 360;
+        (elevatorRightAbsEncoder.getPosition()
+                    - elevatorLeftEncoder.getPosition())
+            % Constants.REVOLUTIONS_TO_DEGREES;
     if (elevatorDutyCycleEncodersDifferenceDegrees < 0.0) {
       elevatorDutyCycleEncodersDifferenceDegrees += Constants.REVOLUTIONS_TO_DEGREES;
     }
