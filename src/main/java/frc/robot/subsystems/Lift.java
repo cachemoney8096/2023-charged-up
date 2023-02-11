@@ -87,7 +87,7 @@ public class Lift extends SubsystemBase {
   private LiftPosition latestPosition = LiftPosition.STARTING;
   private LiftPosition desiredPosition = LiftPosition.STARTING;
   private boolean desiredGrabberClosed = true;
-  private ScoringLocationUtil scoreLoc;
+  public ScoringLocationUtil scoreLoc;
 
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
@@ -334,7 +334,7 @@ public class Lift extends SubsystemBase {
   }
 
   public void startScore() {
-    if (!(scoreLoc.getScoreCol() == ScoreCol.CENTER)) {
+    if (!scoreLoc.isCone()) {
       if (scoreLoc.getScoreHeight() == ScoreHeight.HIGH) {
         setDesiredPosition(LiftPosition.PRE_SCORE_HIGH_CONE);
       } else if (scoreLoc.getScoreHeight() == ScoreHeight.MID) {
@@ -453,11 +453,6 @@ public class Lift extends SubsystemBase {
     }
   }
 
-  /** Returns true if the lift is scoring in a high location */
-  public boolean isScoringHigh(){
-    return scoreLoc.getScoreHeight() == ScoreHeight.HIGH ? true : false;
-  }
-
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
@@ -501,11 +496,11 @@ public class Lift extends SubsystemBase {
     }
     // middle columns are for cubes
     else {
-    }
-    if (height == ScoreHeight.MID) {
-      setDesiredPosition(LiftPosition.SCORE_MID_CUBE);
-    } else {
-      setDesiredPosition(LiftPosition.SCORE_HIGH_CUBE);
+      if (height == ScoreHeight.MID) {
+        setDesiredPosition(LiftPosition.SCORE_MID_CUBE);
+      } else {
+        setDesiredPosition(LiftPosition.SCORE_HIGH_CUBE);
+      }
     }
   }
 }

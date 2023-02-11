@@ -153,6 +153,12 @@ public final class Cal {
 
     /** The time in seconds for the grabber to open in OuttakeSequence */
     public static final double OUTTAKE_GRABBER_WAIT_TIME_SECONDS = PLACEHOLDER_DOUBLE;
+
+    /**
+     * The time in seconds it takes for it to be safe to return to the starting position, from the
+     * scoring high position
+     */
+    public static final double SAFE_TO_RETURN_TO_START_SECONDS = PLACEHOLDER_DOUBLE;
   }
 
   public static final class AutoBalance {
