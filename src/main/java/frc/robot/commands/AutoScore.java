@@ -28,15 +28,12 @@ public class AutoScore extends SequentialCommandGroup{
     "ScoringLocToChargeStation",
         new PathConstraints(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
     private HashMap<String, Command> eventMap = new HashMap<>();
-    private FollowPathWithEvents pathWithEvents = new FollowPathWithEvents(
-        getPathFollowingCommand(trajInit),
-         trajInit.getMarkers(), eventMap);
     private boolean isFirstPath = true;
+    private FollowPathWithEvents pathWithEvents;
     
     public AutoScore(Lift lift, Intake intake){
-        eventMap.put("deployIntake", new InstantCommand(intake::deploy, intake));
-        eventMap.put("closeIntake", new InstantCommand(intake::retract, intake));
-        addRequirements(lift, intake);
+        eventMap.put("deployIntake", new InstantCommand(()->{intake.setDesiredDeployed(true);}, intake));
+        eventMap.put("closeIntake", new InstantCommand(()->{intake.setDesiredDeployed(false);}, intake));
         addCommands(
             new InstantCommand(lift::manualPrepScore, lift),
             new WaitUntilCommand(()->lift.atPosition(LiftPosition.MANUAL_PREP_SCORE)),
@@ -44,10 +41,9 @@ public class AutoScore extends SequentialCommandGroup{
             new WaitUntilCommand(()->lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
             new finishScore(),
             new WaitUntilCommand(()->lift.atPosition(LiftPosition.STARTING)),
-            drive.followTrajectoryCommand(trajInit, isFirstPath),
-            /*these might be triggered by the drive command with a traj with an event map attached to it*/
-            /*some event here */
-            /*another event here */
+            new FollowPathWithEvents(
+                drive.followTrajectoryCommand(trajInit, true),
+                trajInit.getMarkers(), eventMap),
             /*limelight goes here */
             new InstantCommand(lift::manualPrepScore, lift),
             new WaitUntilCommand(()->lift.atPosition(LiftPosition.MANUAL_PREP_SCORE)),
