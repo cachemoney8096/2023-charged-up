@@ -42,15 +42,11 @@ public class ScoringLocationUtil {
   }
 
   public boolean isCone() {
-    if (scoreHeight == ScoreHeight.LOW || scoreCol == ScoreCol.CENTER) {
-      return false;
-    } else {
-      return true;
-    }
+    return !(scoreHeight == ScoreHeight.LOW || scoreCol == ScoreCol.CENTER);
   }
 
   /** Returns true if the lift is scoring in a high location */
   public boolean isScoringHigh() {
-    return getScoreHeight() == ScoreHeight.HIGH ? true : false;
+    return getScoreHeight() == ScoreHeight.HIGH;
   }
 }

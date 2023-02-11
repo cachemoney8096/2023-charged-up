@@ -392,6 +392,10 @@ public class Lift extends SubsystemBase {
       case SCORE_HIGH_CUBE:
       case SCORE_HIGH_CONE:
       case SCORE_LOW:
+      case PRE_SCORE_MID_CONE:
+      case PRE_SCORE_HIGH_CONE:
+      case POST_SCORE_HIGH:
+      case OUTTAKING:
       case SHELF:
         return LiftPositionStartRelative.ABOVE_START;
       case GRAB_FROM_INTAKE:
