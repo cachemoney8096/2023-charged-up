@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
@@ -336,14 +337,6 @@ public class Lift extends SubsystemBase {
     }
   }
 
-  public boolean holdingGamePiece() {
-    if (seeGamePiece() && grabber.get() == Value.kForward) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   /** Sets the desired position, which the lift may not go to directly. */
   public void setDesiredPosition(LiftPosition pos) {
     desiredPosition = pos;
@@ -389,7 +382,6 @@ public class Lift extends SubsystemBase {
       case POST_SCORE_HIGH:
       case OUTTAKING:
       case SHELF:
-      case OUTTAKING:
         return LiftPositionStartRelative.ABOVE_START;
       case GRAB_FROM_INTAKE:
         return LiftPositionStartRelative.BELOW_START;
