@@ -24,7 +24,6 @@ import frc.robot.Constants;
 import frc.robot.RobotMap;
 import frc.robot.utils.AngleUtil;
 import frc.robot.utils.ScoringLocationUtil;
-import frc.robot.utils.ScoringLocationUtil.ScoreCol;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 import frc.robot.utils.SparkMaxUtils;
 import java.util.TreeMap;
@@ -336,14 +335,6 @@ public class Lift extends SubsystemBase {
     }
   }
 
-  public boolean holdingGamePiece() {
-    if (seeGamePiece() && grabber.get() == Value.kForward) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   /** Sets the desired position, which the lift may not go to directly. */
   public void setDesiredPosition(LiftPosition pos) {
     desiredPosition = pos;
@@ -389,7 +380,6 @@ public class Lift extends SubsystemBase {
       case POST_SCORE_HIGH:
       case OUTTAKING:
       case SHELF:
-      case OUTTAKING:
         return LiftPositionStartRelative.ABOVE_START;
       case GRAB_FROM_INTAKE:
         return LiftPositionStartRelative.BELOW_START;
@@ -476,7 +466,6 @@ public class Lift extends SubsystemBase {
    */
   public void ManualPrepScoreSequence() {
     ScoreHeight height = scoreLoc.getScoreHeight();
-    ScoreCol col = scoreLoc.getScoreCol();
 
     // low for all columns is the same height
     if (height == ScoreHeight.LOW) {
