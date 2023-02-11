@@ -18,7 +18,6 @@ import frc.robot.commands.AutoScoreAndBalance;
 import frc.robot.commands.IntakeSequence;
 import frc.robot.commands.OuttakeSequence;
 import frc.robot.commands.finishScore;
-import frc.robot.commands.startScore;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
 import frc.robot.subsystems.Lift;
@@ -129,8 +128,8 @@ public class RobotContainer {
     // TODO Maybe: steal
     driverController.rightBumper().onTrue(new InstantCommand(lift::prepScore, lift));
     driverController.leftTrigger().onTrue(new IntakeSequence(intake, lift));
-    driverController.rightTrigger().onTrue(new startScore());
-    driverController.rightTrigger().onFalse(new finishScore());
+    driverController.rightTrigger().onTrue(new InstantCommand(lift::startScore, lift));
+    driverController.rightTrigger().onFalse(new finishScore(lift));
 
     operatorController
         .povDown()

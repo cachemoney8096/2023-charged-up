@@ -42,6 +42,9 @@ public class Lift extends SubsystemBase {
     SCORE_MID_CONE,
     SCORE_HIGH_CUBE,
     SCORE_HIGH_CONE,
+    PRE_SCORE_MID_CONE,
+    PRE_SCORE_HIGH_CONE,
+    POST_SCORE_HIGH,
     OUTTAKING,
     STARTING
   }
@@ -119,6 +122,18 @@ public class Lift extends SubsystemBase {
         new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
     liftPositionMap.put(
         LiftPosition.SCORE_HIGH_CONE,
+        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+    liftPositionMap.put(
+        LiftPosition.PRE_SCORE_MID_CONE,
+        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+    liftPositionMap.put(
+        LiftPosition.PRE_SCORE_HIGH_CONE,
+        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+    liftPositionMap.put(
+        LiftPosition.POST_SCORE_HIGH,
+        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+    liftPositionMap.put(
+        LiftPosition.OUTTAKING,
         new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
     liftPositionMap.put(
         LiftPosition.STARTING,
@@ -318,6 +333,16 @@ public class Lift extends SubsystemBase {
     // TODO do this
   }
 
+  public void startScore() {
+    if (!(scoreLoc.getScoreCol() == ScoreCol.CENTER)) {
+      if (scoreLoc.getScoreHeight() == ScoreHeight.HIGH) {
+        setDesiredPosition(LiftPosition.PRE_SCORE_HIGH_CONE);
+      } else if (scoreLoc.getScoreHeight() == ScoreHeight.MID) {
+        setDesiredPosition(LiftPosition.PRE_SCORE_MID_CONE);
+      }
+    }
+  }
+
   public boolean holdingGamePiece() {
     if (seeGamePiece() && grabber.get() == Value.kForward) {
       return true;
@@ -428,6 +453,11 @@ public class Lift extends SubsystemBase {
     }
   }
 
+  /** Returns true if the lift is scoring in a high location */
+  public boolean isScoringHigh(){
+    return scoreLoc.getScoreHeight() == ScoreHeight.HIGH ? true : false;
+  }
+
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
@@ -462,7 +492,7 @@ public class Lift extends SubsystemBase {
       setDesiredPosition(LiftPosition.SCORE_LOW);
     }
     // left and right columns are for cones
-    else if (col == ScoreCol.LEFT || col == ScoreCol.RIGHT) {
+    else if (scoreLoc.isCone()) {
       if (height == ScoreHeight.MID) {
         setDesiredPosition(LiftPosition.SCORE_MID_CONE);
       } else {

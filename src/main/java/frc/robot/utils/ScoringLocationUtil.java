@@ -40,4 +40,12 @@ public class ScoringLocationUtil {
   public ScoreHeight getScoreHeight() {
     return scoreHeight;
   }
+
+  public boolean isCone(){
+    if(scoreHeight == ScoreHeight.LOW || scoreCol == ScoreCol.CENTER){
+      return false;
+    } else{
+      return true;
+    }
+  }
 }
