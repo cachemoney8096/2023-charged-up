@@ -18,14 +18,12 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
 import frc.robot.utils.AngleUtil;
 import frc.robot.utils.ScoringLocationUtil;
-import frc.robot.utils.ScoringLocationUtil.ScoreCol;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 import frc.robot.utils.SparkMaxUtils;
 import java.util.TreeMap;
@@ -468,7 +466,6 @@ public class Lift extends SubsystemBase {
    */
   public void ManualPrepScoreSequence() {
     ScoreHeight height = scoreLoc.getScoreHeight();
-    ScoreCol col = scoreLoc.getScoreCol();
 
     // low for all columns is the same height
     if (height == ScoreHeight.LOW) {
