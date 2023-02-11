@@ -36,13 +36,13 @@ import frc.robot.utils.ScoringLocationUtil;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  private final Intake intake = new Intake();
   private final DriveSubsystem drive = new DriveSubsystem();
+  private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
+  private final Lift lift = new Lift(scoreLoc);
+  private final Intake intake = new Intake(lift::clearOfIntakeZone);
   private final IntakeLimelight intakeLimelight;
   private final TagLimelight tagLimelight;
   private final Lights lights = new Lights();
-  private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
-  private final Lift lift = new Lift(scoreLoc);
 
   // A chooser for autonomous commands
   private SendableChooser<Command> autonChooser = new SendableChooser<>();
@@ -165,8 +165,22 @@ public class RobotContainer {
         .b()
         .onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.RIGHT)));
 
-    operatorController.back().onTrue(new InstantCommand(intake::retract, intake));
-    operatorController.start().onTrue(new InstantCommand(intake::deploy, intake));
+    operatorController
+        .start()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  intake.setDesiredDeployed(true);
+                },
+                intake));
+    operatorController
+        .back()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  intake.setDesiredDeployed(false);
+                },
+                intake));
 
     operatorController
         .leftBumper()
@@ -195,7 +209,12 @@ public class RobotContainer {
                 drive)
             .withName("Manual Drive"));
 
-    intake.setDefaultCommand(new RunCommand(intake::retract, intake));
+    intake.setDefaultCommand(
+        new InstantCommand(
+            () -> {
+              intake.setDesiredDeployed(false);
+            },
+            intake));
   }
 
   public Command getAutonomousCommand() {

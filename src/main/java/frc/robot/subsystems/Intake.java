@@ -22,6 +22,8 @@ import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
 import frc.robot.utils.SparkMaxUtils;
+import java.util.Optional;
+import java.util.function.BooleanSupplier;
 
 /**
  * The game piece intake.
@@ -40,6 +42,8 @@ public class Intake extends SubsystemBase {
       new CANSparkMax(RobotMap.INTAKE_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
   private CANSparkMax intakeRight =
       new CANSparkMax(RobotMap.INTAKE_RIGHT_MOTOR_CAN_ID, MotorType.kBrushless);
+  private BooleanSupplier clearOfIntake;
+  private Optional<Boolean> desiredDeployed = Optional.empty();
 
   // Sensors
   private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.INTAKE_GAME_PIECE_DIO);
@@ -56,9 +60,10 @@ public class Intake extends SubsystemBase {
   private final int SMART_MOTION_SLOT = 0;
 
   /** Creates a new Intake. */
-  public Intake() {
+  public Intake(BooleanSupplier clearOfIntakeZone) {
     SparkMaxUtils.initWithRetry(this::setUpDeploySpark, Cal.SPARK_INIT_RETRY_ATTEMPTS);
     SparkMaxUtils.initWithRetry(this::setUpIntakeWheelSparks, Cal.SPARK_INIT_RETRY_ATTEMPTS);
+    clearOfIntake = clearOfIntakeZone;
   }
 
   /** Does all the initialization for the sparks, return true on success */
@@ -122,6 +127,12 @@ public class Intake extends SubsystemBase {
     return errors == 0;
   }
 
+  /*Setter for whether intake is desired deploy is true retract is false */
+  public void setDesiredDeployed(boolean desired) {
+    desiredDeployed = Optional.of(desired);
+    ;
+  }
+
   /**
    * Burns the current settings to sparks so they keep current settings on reboot. Should be done
    * after all settings are set.
@@ -136,8 +147,9 @@ public class Intake extends SubsystemBase {
   }
 
   /** Deploys the intake out. */
-  public void deploy() {
+  private void deploy() {
     desireClamped = true;
+
     // Set the desired intake position
     deployMotorPID.setReference(
         Cal.Intake.DEPLOYED_POSITION_DEGREES,
@@ -149,7 +161,7 @@ public class Intake extends SubsystemBase {
   }
 
   /** Brings the intake back in */
-  public void retract() {
+  private void retract() {
     // Kill the timer to indicate retraction for clamping
     desireClamped = false;
     // Set the desired intake position
@@ -203,6 +215,16 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if (clearOfIntake.getAsBoolean()) {
+      if (desiredDeployed.isPresent()) {
+        if (desiredDeployed.get() == true) {
+          deploy();
+        } else {
+          retract();
+        }
+      }
+    }
+
     // If the intake has achieved its desired position, then cut power
     if (atDesiredPosition()) {
       deployMotorPID.setReference(0.0, CANSparkMax.ControlType.kVoltage);
@@ -217,7 +239,8 @@ public class Intake extends SubsystemBase {
 
   /** If the intake has achieved its desired position, return true */
   public boolean atDesiredPosition() {
-    return (Math.abs(intakeDesiredPositionDegrees - deployMotorEncoder.getPosition()) < Cal.Intake.POSITION_MARGIN_DEGREES);
+    return (Math.abs(intakeDesiredPositionDegrees - deployMotorEncoder.getPosition())
+        < Cal.Intake.POSITION_MARGIN_DEGREES);
   }
 
   @Override

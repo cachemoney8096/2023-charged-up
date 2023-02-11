@@ -18,7 +18,12 @@ public class IntakeSequence extends SequentialCommandGroup {
 
     addCommands(
         // deploy intake for specified amount of time
-        new RunCommand(intake::deploy, intake).until(intake::atDesiredPosition),
+        new RunCommand(
+                () -> {
+                  intake.setDesiredDeployed(true);
+                },
+                intake)
+            .until(intake::atDesiredPosition),
 
         // run intake and move lift to intake position, until the robot sees an
         // object and the lift is in position
