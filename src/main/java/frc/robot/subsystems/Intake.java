@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
+import frc.robot.utils.AngleUtil;
 import frc.robot.utils.SparkMaxUtils;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
@@ -125,8 +126,10 @@ public class Intake extends SubsystemBase {
 
   public void initialize() {
     deployMotorEncoder.setPosition(
-        deployMotorAbsoluteEncoder.getPosition()
-            - (Cal.Intake.ABSOLUTE_ENCODER_START_POS_DEG - Cal.Intake.STARTING_POSITION_DEGREES));
+        AngleUtil.wrapAngle(
+            deployMotorAbsoluteEncoder.getPosition()
+                - (Cal.Intake.ABSOLUTE_ENCODER_START_POS_DEG
+                    - Cal.Intake.STARTING_POSITION_DEGREES)));
   }
 
   /**

@@ -117,8 +117,8 @@ public final class Cal {
         ARM_I = Cal.PLACEHOLDER_DOUBLE,
         ARM_D = Cal.PLACEHOLDER_DOUBLE;
 
-    /** Difference in what the arm absolute encoder says is 0 and what is actually 0 */
-    public static final double ARM_ABSOLUTE_ENCODER_OFFSET_DEG = Cal.PLACEHOLDER_DOUBLE;
+    /** Absolute encoder position when the arm is at 0 degrees */
+    public static final double ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG = Cal.PLACEHOLDER_DOUBLE;
 
     /** Voltage required to hold the arm in the horizontal position */
     public static final double ARBITRARY_ARM_FEED_FORWARD_VOLTS = Cal.PLACEHOLDER_DOUBLE;

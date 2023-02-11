@@ -32,13 +32,10 @@ public final class RobotMap {
   public static final int INTAKE_CLAMP_FORWARD_CHANNEL = 0;
 
   /** Lift grabbing pneumatic channels */
-  public static final int LIFT_GRABBING_FORWARD_CHANNEL = 1, LIFT_GRABBING_REVERSE_CHANNEL = 2;
+  public static final int LIFT_GRABBING_CHANNEL = 1;
 
   /** Sensor DIO */
-  public static final int LIFT_GAME_PIECE_DIO = 0,
-      INTAKE_GAME_PIECE_DIO = 1,
-      ELEVATOR_ENCODER_ONE_DIO = 2,
-      ELEVATOR_ENCODER_TWO_DIO = 3;
+  public static final int LIFT_GAME_PIECE_DIO = 0, INTAKE_GAME_PIECE_DIO = 1;
 
   /** PWM Port for LEDs */
   public static final int LED_PWM_PORT = 0;
