@@ -33,25 +33,25 @@ public class DriveSubsystem extends SubsystemBase {
       new SwerveModule(
           RobotMap.FRONT_LEFT_DRIVING_CAN_ID,
           RobotMap.FRONT_LEFT_TURNING_CAN_ID,
-          Constants.SwerveDrive.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET);
+          Cal.SwerveSubsystem.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET_RAD);
 
   private final SwerveModule frontRight =
       new SwerveModule(
           RobotMap.FRONT_RIGHT_DRIVING_CAN_ID,
           RobotMap.FRONT_RIGHT_TURNING_CAN_ID,
-          Constants.SwerveDrive.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET);
+          Cal.SwerveSubsystem.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET_RAD);
 
   private final SwerveModule rearLeft =
       new SwerveModule(
           RobotMap.REAR_LEFT_DRIVING_CAN_ID,
           RobotMap.REAR_LEFT_TURNING_CAN_ID,
-          Constants.SwerveDrive.BACK_LEFT_CHASSIS_ANGULAR_OFFSET);
+          Cal.SwerveSubsystem.BACK_LEFT_CHASSIS_ANGULAR_OFFSET_RAD);
 
   private final SwerveModule rearRight =
       new SwerveModule(
           RobotMap.REAR_RIGHT_DRIVING_CAN_ID,
           RobotMap.REAR_RIGHT_TURNING_CAN_ID,
-          Constants.SwerveDrive.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
+          Cal.SwerveSubsystem.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET_RAD);
 
   // The gyro sensor
   private final WPI_Pigeon2 gyro = new WPI_Pigeon2(RobotMap.PIGEON_CAN_ID);

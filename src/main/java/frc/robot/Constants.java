@@ -108,12 +108,6 @@ public final class Constants {
             new Translation2d(-WHEEL_BASE_METERS / 2, TRACK_WIDTH_METERS / 2),
             new Translation2d(-WHEEL_BASE_METERS / 2, -TRACK_WIDTH_METERS / 2));
 
-    /** Angular offsets of the modules relative to the chassis in radians */
-    public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = -Math.PI / 2,
-        FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = 0,
-        BACK_LEFT_CHASSIS_ANGULAR_OFFSET = Math.PI,
-        BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.PI / 2;
-
     public static final boolean GYRO_REVERSED = false;
   }
 
@@ -145,6 +139,7 @@ public final class Constants {
   public static final class Intake {
     public static final double DEPLOY_MOTOR_GEAR_RATIO = 225.0;
 
-    public static final double POSITION_WHEN_HORIZONTAL_DEGREES = 180;
+    /** Intake position when the intake is horizontal and pointing up / forward */
+    public static final double POSITION_WHEN_HORIZONTAL_DEGREES = 0;
   }
 }

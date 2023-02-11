@@ -15,14 +15,14 @@ import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
+import frc.robot.utils.AngleUtil;
 import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreCol;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
@@ -60,11 +60,8 @@ public class Lift extends SubsystemBase {
   private SparkMaxPIDController elevatorLeftPID = elevatorLeft.getPIDController();
   private CANSparkMax arm = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
   private SparkMaxPIDController armPID = arm.getPIDController();
-  private DoubleSolenoid grabber =
-      new DoubleSolenoid(
-          PneumaticsModuleType.REVPH,
-          RobotMap.LIFT_GRABBING_FORWARD_CHANNEL,
-          RobotMap.LIFT_GRABBING_REVERSE_CHANNEL);
+  private Solenoid grabber =
+      new Solenoid(PneumaticsModuleType.REVPH, RobotMap.LIFT_GRABBING_CHANNEL);
 
   // Sensors
   private final RelativeEncoder elevatorLeftEncoder = elevatorLeft.getEncoder();
@@ -286,15 +283,13 @@ public class Lift extends SubsystemBase {
   public void initialize() {
     // Set arm encoder position from absolute
     armEncoder.setPosition(
-        armAbsoluteEncoder.getPosition() + Cal.Lift.ARM_ABSOLUTE_ENCODER_OFFSET_DEG);
+        AngleUtil.wrapAngle(
+            armAbsoluteEncoder.getPosition() - Cal.Lift.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG));
 
     // Set elevator encoder position from absolute encoders
     double elevatorDutyCycleEncodersDifferenceDegrees =
-        (elevatorRightAbsEncoder.getPosition() - elevatorLeftEncoder.getPosition())
-            % Constants.REVOLUTIONS_TO_DEGREES;
-    if (elevatorDutyCycleEncodersDifferenceDegrees < 0.0) {
-      elevatorDutyCycleEncodersDifferenceDegrees += Constants.REVOLUTIONS_TO_DEGREES;
-    }
+        AngleUtil.wrapAngle(
+            elevatorRightAbsEncoder.getPosition() - elevatorLeftEncoder.getPosition());
     elevatorLeftEncoder.setPosition(
         elevatorDutyCycleEncodersDifferenceDegrees
             * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE);
@@ -316,14 +311,6 @@ public class Lift extends SubsystemBase {
     // TODO do this
   }
 
-  public boolean holdingGamePiece() {
-    if (seeGamePiece() && grabber.get() == Value.kForward) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   /** Sets the desired position, which the lift may not go to directly. */
   public void setDesiredPosition(LiftPosition pos) {
     desiredPosition = pos;
@@ -331,11 +318,11 @@ public class Lift extends SubsystemBase {
 
   /** True if the lift is at the queried position. */
   public boolean atPosition(LiftPosition positionToCheck) {
-    double armThresholdDegrees =
+    double armMarginDegrees =
         positionToCheck == LiftPosition.STARTING
             ? Cal.Lift.ARM_START_MARGIN_DEGREES
             : Cal.Lift.ARM_MARGIN_DEGREES;
-    double elevatorThresholdInches =
+    double elevatorMarginInches =
         positionToCheck == LiftPosition.STARTING
             ? Cal.Lift.ELEVATOR_START_MARGIN_INCHES
             : Cal.Lift.ELEVATOR_MARGIN_INCHES;
@@ -343,12 +330,11 @@ public class Lift extends SubsystemBase {
     double armPositionToCheckDegrees = liftPositionMap.get(positionToCheck).getSecond();
     double elevatorPositionInches = elevatorLeftEncoder.getPosition();
     double armPositionDegrees = armEncoder.getPosition();
-    if (Math.abs(armPositionDegrees - armPositionToCheckDegrees) > armThresholdDegrees) {
+    if (Math.abs(armPositionDegrees - armPositionToCheckDegrees) > armMarginDegrees) {
       return false;
     }
 
-    if (Math.abs(elevatorPositionInches - elevatorPositionToCheckInches)
-        > elevatorThresholdInches) {
+    if (Math.abs(elevatorPositionInches - elevatorPositionToCheckInches) > elevatorMarginInches) {
       return false;
     }
 
@@ -366,13 +352,13 @@ public class Lift extends SubsystemBase {
       case SCORE_HIGH_CONE:
       case SCORE_LOW:
       case SHELF:
+      case OUTTAKING:
         return LiftPositionStartRelative.ABOVE_START;
       case GRAB_FROM_INTAKE:
         return LiftPositionStartRelative.BELOW_START;
-      default:
-        // should never be used?
-        return LiftPositionStartRelative.ABOVE_START;
     }
+    // should never be used?
+    return LiftPositionStartRelative.ABOVE_START;
   }
 
   /** Called every scheduler run */
@@ -407,9 +393,9 @@ public class Lift extends SubsystemBase {
     if (!desiredGrabberClosed
         && (armEncoder.getPosition() > Cal.Lift.GRABBER_CLOSED_ZONE_TOP_DEGREES
             || armEncoder.getPosition() < Cal.Lift.GRABBER_CLOSED_ZONE_BOTTOM_DEGREES)) {
-      grabber.set(Value.kReverse); // drop
+      grabber.set(false); // drop
     } else {
-      grabber.set(Value.kForward); // grab
+      grabber.set(true); // grab
     }
   }
 

@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
+import frc.robot.utils.AngleUtil;
 import frc.robot.utils.SparkMaxUtils;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
@@ -42,8 +43,6 @@ public class Intake extends SubsystemBase {
       new CANSparkMax(RobotMap.INTAKE_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
   private CANSparkMax intakeRight =
       new CANSparkMax(RobotMap.INTAKE_RIGHT_MOTOR_CAN_ID, MotorType.kBrushless);
-  private BooleanSupplier clearOfIntake;
-  private Optional<Boolean> desiredDeployed = Optional.empty();
 
   // Sensors
   private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.INTAKE_GAME_PIECE_DIO);
@@ -52,12 +51,11 @@ public class Intake extends SubsystemBase {
       deployMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
   // Members
-
-  private boolean desireClamped = false;
-
-  private double intakeDesiredPositionDegrees = Cal.Intake.STARTING_POSITION_DEGREES;
-
   private final int SMART_MOTION_SLOT = 0;
+  private double intakeDesiredPositionDegrees = Cal.Intake.STARTING_POSITION_DEGREES;
+  private Optional<Boolean> desiredDeployed = Optional.empty();
+  private boolean desireClamped = false;
+  private BooleanSupplier clearOfIntake;
 
   /** Creates a new Intake. */
   public Intake(BooleanSupplier clearOfIntakeZone) {
@@ -87,8 +85,7 @@ public class Intake extends SubsystemBase {
                 deployMotorEncoder, Constants.Intake.DEPLOY_MOTOR_GEAR_RATIO));
     errors +=
         SparkMaxUtils.check(
-            deployMotorAbsoluteEncoder.setPositionConversionFactor(
-                Constants.REVOLUTIONS_TO_DEGREES));
+            SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(deployMotorAbsoluteEncoder, 1.0));
     errors += SparkMaxUtils.check(deployMotorPID.setP(Cal.Intake.DEPLOY_MOTOR_P));
     errors += SparkMaxUtils.check(deployMotorPID.setI(Cal.Intake.DEPLOY_MOTOR_I));
     errors += SparkMaxUtils.check(deployMotorPID.setD(Cal.Intake.DEPLOY_MOTOR_D));
@@ -127,10 +124,12 @@ public class Intake extends SubsystemBase {
     return errors == 0;
   }
 
-  /*Setter for whether intake is desired deploy is true retract is false */
-  public void setDesiredDeployed(boolean desired) {
-    desiredDeployed = Optional.of(desired);
-    ;
+  public void initialize() {
+    deployMotorEncoder.setPosition(
+        AngleUtil.wrapAngle(
+            deployMotorAbsoluteEncoder.getPosition()
+                - (Cal.Intake.ABSOLUTE_ENCODER_START_POS_DEG
+                    - Cal.Intake.STARTING_POSITION_DEGREES)));
   }
 
   /**
@@ -162,8 +161,8 @@ public class Intake extends SubsystemBase {
 
   /** Brings the intake back in */
   private void retract() {
-    // Kill the timer to indicate retraction for clamping
     desireClamped = false;
+
     // Set the desired intake position
     deployMotorPID.setReference(
         Cal.Intake.STARTING_POSITION_DEGREES,
@@ -172,6 +171,35 @@ public class Intake extends SubsystemBase {
         Cal.Intake.ARBITRARY_FEED_FORWARD_VOLTS * getCosineIntakeAngle(),
         ArbFFUnits.kVoltage);
     intakeDesiredPositionDegrees = Cal.Intake.STARTING_POSITION_DEGREES;
+  }
+
+  /*Setter for whether intake is desired deploy is true retract is false */
+  public void setDesiredDeployed(boolean desired) {
+    desiredDeployed = Optional.of(desired);
+  }
+
+  /** Returns the cosine of the intake angle in degrees off of the horizontal. */
+  private double getCosineIntakeAngle() {
+    return Math.cos(
+        deployMotorEncoder.getPosition() - Constants.Intake.POSITION_WHEN_HORIZONTAL_DEGREES);
+  }
+
+  /** If the intake has achieved its desired position, return true */
+  public boolean atDesiredPosition() {
+    return (Math.abs(intakeDesiredPositionDegrees - deployMotorEncoder.getPosition())
+        < Cal.Intake.POSITION_MARGIN_DEGREES);
+  }
+
+  public void setDesiredClamped(boolean clamp) {
+    desireClamped = clamp;
+  }
+
+  private void clampIntake() {
+    clamp.set(false);
+  }
+
+  private void unclampIntake() {
+    clamp.set(true);
   }
 
   /** Runs the intake wheels inward */
@@ -188,29 +216,10 @@ public class Intake extends SubsystemBase {
     intakeLeft.set(0.0);
   }
 
-  private void clampIntake() {
-    clamp.set(false);
-  }
-
-  public void unclampIntake() {
-    clamp.set(true);
-  }
-
   /** Returns true if the game piece sensor sees a game piece */
   public boolean seeGamePiece() {
     // Sensor is false if there's a game piece
     return !gamePieceSensor.get();
-  }
-
-  public void initialize() {
-    deployMotorEncoder.setPosition(
-        deployMotorAbsoluteEncoder.getPosition() + Cal.Intake.ABSOLUTE_ENCODER_OFFSET_DEG);
-  }
-
-  /** Returns the cosine of the intake angle in degrees off of the horizontal. */
-  public double getCosineIntakeAngle() {
-    return Math.cos(
-        deployMotorEncoder.getPosition() - Constants.Intake.POSITION_WHEN_HORIZONTAL_DEGREES);
   }
 
   @Override
@@ -230,17 +239,12 @@ public class Intake extends SubsystemBase {
       deployMotorPID.setReference(0.0, CANSparkMax.ControlType.kVoltage);
     }
     // only clamp if it is safe to do so and clamping is desired
-    if (desireClamped && deployMotorEncoder.getPosition() > Constants.PLACEHOLDER_INT) {
+    if (desireClamped
+        && deployMotorEncoder.getPosition() > Cal.Intake.CLAMP_POSITION_THRESHOLD_DEGREES) {
       clampIntake();
     } else {
       unclampIntake();
     }
-  }
-
-  /** If the intake has achieved its desired position, return true */
-  public boolean atDesiredPosition() {
-    return (Math.abs(intakeDesiredPositionDegrees - deployMotorEncoder.getPosition())
-        < Cal.Intake.POSITION_MARGIN_DEGREES);
   }
 
   @Override

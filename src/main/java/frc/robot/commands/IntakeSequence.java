@@ -53,8 +53,11 @@ public class IntakeSequence extends SequentialCommandGroup {
         new WaitCommand(Cal.Lift.GRABBER_CLOSE_TIME_SECONDS),
 
         // immediately unclamps the intake.
-        // TODO this may not work
-        new InstantCommand(intake::unclampIntake, intake),
+        new InstantCommand(
+            () -> {
+              intake.setDesiredClamped(false);
+            },
+            intake),
 
         // give the intake time to unclamp
         new WaitCommand(Cal.Intake.UNCLAMP_TIME_SECONDS),
