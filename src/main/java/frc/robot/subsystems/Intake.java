@@ -22,7 +22,6 @@ import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
 import frc.robot.utils.SparkMaxUtils;
-import java.util.Optional;
 
 /**
  * The game piece intake.
@@ -49,15 +48,6 @@ public class Intake extends SubsystemBase {
       deployMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
   // Members
-  /**
-   * Timer for clamping. Not present means retracted or retracting (clamp!). Exists means deploying
-   * or already deployed (check timer for whether to clamp). Elapsed means we should clamp or stay
-   * clamped.
-   */
-  //private Optional<Timer> clampTimer = Optional.empty();
-
-  /** Instead of a timer, use a boolean which can be set and is checked periodically */
-  //private boolean clampingDesired = false;
 
   private boolean desireClamped = false;
 
@@ -147,7 +137,6 @@ public class Intake extends SubsystemBase {
 
   /** Deploys the intake out. */
   public void deploy() {
-    //toggle desire clamped
     desireClamped = true;
     // Set the desired intake position
     deployMotorPID.setReference(
@@ -158,18 +147,12 @@ public class Intake extends SubsystemBase {
         ArbFFUnits.kVoltage);
     intakeDesiredPositionDegrees = Cal.Intake.DEPLOYED_POSITION_DEGREES;
 
-    // Set a timer only if we're newly deploying
-    // If we have already set a timer, we shouldn't restart the timer
-    //if (!clampTimer.isPresent()) {
-    //  clampTimer = Optional.of(new Timer());
-    //  clampTimer.get().start();
-    //}
   }
 
   /** Brings the intake back in */
   public void retract() {
     // Kill the timer to indicate retraction for clamping
-    desireClamped = true;
+    desireClamped = false;
     // Set the desired intake position
     deployMotorPID.setReference(
         Cal.Intake.STARTING_POSITION_DEGREES,
@@ -202,11 +185,6 @@ public class Intake extends SubsystemBase {
     clamp.set(true);
   }
 
-  /** Set desired clamping or unclamping (these might not be needed)*/
-  public void toggleDesireClamped(){
-    desireClamped = !desireClamped;
-  }
-
   /** Returns true if the game piece sensor sees a game piece */
   public boolean seeGamePiece() {
     // Sensor is false if there's a game piece
@@ -228,25 +206,12 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    /*if (clampTimer.isPresent()) {
-      // If present, that means we're deployed or in the process of deploying
-      if (clampTimer.get().hasElapsed(Cal.Intake.AUTO_CLAMP_WAIT_TIME_SECONDS)) {
-        // If the time has elapsed, that means we've deployed enough to clamp
-        clampIntake();
-      } else {
-        // If time has not elapsed, we are still in the process of deploying and shouldn't clamp yet
-        unclampIntake();
-      }
-    } else {
-      // When there's no timer, we're retracting or retracted so we should unclamp
-      unclampIntake();
-    }*/
-
     // If the intake has achieved its desired position, then cut power
     if (Math.abs(intakeDesiredPositionDegrees - deployMotorEncoder.getPosition())
         < Cal.Intake.POSITION_MARGIN_DEGREES) {
       deployMotorPID.setReference(0.0, CANSparkMax.ControlType.kVoltage);
     }
+    //only clamp if it is safe to do so and clamping is desired
     if(desireClamped && deployMotorEncoder.getPosition() > Constants.PLACEHOLDER_INT){
       clampIntake();
     }
@@ -254,6 +219,7 @@ public class Intake extends SubsystemBase {
       unclampIntake();
     }
   }
+  
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
