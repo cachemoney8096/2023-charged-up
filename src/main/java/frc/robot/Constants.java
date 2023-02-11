@@ -35,12 +35,12 @@ public final class Constants {
    */
   public static final double INTAKE_LIMELIGHT_PITCH_DEGREES = PLACEHOLDER_DOUBLE;
 
-  public static final double TAG_LIMELIGHT_PITCH_DEGREES = PLACEHOLDER_DOUBLE;
+  public static final double TAG_LIMELIGHT_PITCH_DEGREES = 20;
 
   /** Height of the limelight on the robot from the carpet in meters */
   public static final double INTAKE_LIMELIGHT_HEIGHT_METERS = PLACEHOLDER_DOUBLE;
 
-  public static final double TAG_LIMELIGHT_HEIGHT_METERS = PLACEHOLDER_DOUBLE;
+  public static final double TAG_LIMELIGHT_HEIGHT_METERS = Units.inchesToMeters(14.625);
 
   /** Height of the vision targets above the carpet */
   public static final double INTAKE_TARGET_HEIGHT_METERS = PLACEHOLDER_DOUBLE;
@@ -59,8 +59,8 @@ public final class Constants {
         WHEEL_DIAMETER_METERS = Units.inchesToMeters(3),
         WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
 
-    public static final double DRIVING_MOTOR_REDUCTION = PLACEHOLDER_DOUBLE;
-    public static final double DRIVE_WHEEL_FREE_SPEED_FUDGE_FACTOR = 1.0;
+    public static final double DRIVING_MOTOR_REDUCTION = 4.8;
+    public static final double DRIVE_WHEEL_FREE_SPEED_FUDGE_FACTOR = 0.9;
     public static final double DRIVE_WHEEL_FREE_SPEED_METERS_PER_SECOND =
         DRIVE_WHEEL_FREE_SPEED_FUDGE_FACTOR
             * ((DRIVING_MOTOR_FREE_SPEED_RPS * WHEEL_CIRCUMFERENCE_METERS)
@@ -95,10 +95,10 @@ public final class Constants {
         MAX_ANGULAR_SPEED_RAD_PER_SECONDS = 2 * Math.PI; // radians per second
 
     /** Chassis configuration */
-    public static final double TRACK_WIDTH_METERS = PLACEHOLDER_DOUBLE;
+    public static final double TRACK_WIDTH_METERS = Units.inchesToMeters(20.48);
 
     /** Distance between centers of right and left wheels on robot */
-    public static final double WHEEL_BASE_METERS = PLACEHOLDER_DOUBLE;
+    public static final double WHEEL_BASE_METERS = Units.inchesToMeters(20.48);
 
     /** Distance between front and back wheels on robot */
     public static final SwerveDriveKinematics DRIVE_KINEMATICS =
@@ -118,6 +118,11 @@ public final class Constants {
   }
 
   public static final class Lift {
+    /** */
+    public static final double ELEVATOR_WINCH_CIRCUMFERENCE_INCHES = Math.PI * 1.125;
+    
+    public static final double ELEVATOR_MOTOR_GEAR_RATIO = 29.51;
+
     /* Scalar for elevator motor encoder from RPM to real inches per seconds */
     public static final double ELEVATOR_MOTOR_ENCODER_VELOCITY_SCALAR =
         Constants.PLACEHOLDER_DOUBLE;
@@ -125,12 +130,10 @@ public final class Constants {
     /* Scalar for elevator motor encoder from rotations to real inches */
     public static final double ELEVATOR_MOTOR_ENCODER_SCALAR = Constants.PLACEHOLDER_DOUBLE;
 
-    /* Scalar for arm motor encoder from RPM to real degrees per seconds */
-    public static final double ARM_MOTOR_ENCODER_VELOCITY_SCALAR = Constants.PLACEHOLDER_DOUBLE;
+    /** Gear ratio for the arm motor */
+    public static final double ARM_MOTOR_GEAR_RATIO = 75.0;
 
-    /* Scalar for arm motor encoder from rotations to real degrees */
-    public static final double ARM_MOTOR_ENCODER_SCALAR = Constants.PLACEHOLDER_DOUBLE;
-
+    /** When are is at this position, the arm is horizontal and pointing up */
     public static final double ARM_POSITION_WHEN_HORIZONTAL_DEGREES = 90;
 
     /** Scalar for the difference in the elevator's absolute encoders in inches per degree */
@@ -139,7 +142,7 @@ public final class Constants {
   }
 
   public static final class Intake {
-    public static final double DEPLOY_MOTOR_GEAR_RATIO = Constants.PLACEHOLDER_DOUBLE;
+    public static final double DEPLOY_MOTOR_GEAR_RATIO = 225.0;
 
     public static final double POSITION_WHEN_HORIZONTAL_DEGREES = 180;
   }

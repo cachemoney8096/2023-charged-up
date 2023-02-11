@@ -189,17 +189,8 @@ public class Lift extends SubsystemBase {
             armPID.setSmartMotionAllowedClosedLoopError(
                 Cal.Lift.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG, SMART_MOTION_SLOT));
 
-    // Get positions and degrees of arm through encoder in degrees
-    errors +=
-        SparkMaxUtils.check(
-            armEncoder.setPositionConversionFactor(Constants.Lift.ARM_MOTOR_ENCODER_SCALAR));
-    errors +=
-        SparkMaxUtils.check(
-            armEncoder.setVelocityConversionFactor(
-                Constants.Lift.ARM_MOTOR_ENCODER_VELOCITY_SCALAR));
-    errors +=
-        SparkMaxUtils.check(
-            armAbsoluteEncoder.setPositionConversionFactor(Constants.REVOLUTIONS_TO_DEGREES));
+    errors += SparkMaxUtils.check(SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(armEncoder, Constants.Lift.ARM_MOTOR_GEAR_RATIO));
+    errors += SparkMaxUtils.check(SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(armAbsoluteEncoder, 1.0));
 
     errors +=
         SparkMaxUtils.check(

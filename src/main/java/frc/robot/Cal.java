@@ -58,7 +58,7 @@ public final class Cal {
         DEPLOY_MOTOR_D = Cal.PLACEHOLDER_DOUBLE;
 
     /** Intake positions in degrees */
-    public static final double STARTING_POSITION_DEGREES = Cal.PLACEHOLDER_DOUBLE,
+    public static final double STARTING_POSITION_DEGREES = 40.0,
         DEPLOYED_POSITION_DEGREES = Cal.PLACEHOLDER_DOUBLE;
 
     /** Difference in what the intake absolute encoder says is 0 and what is actually 0 */
