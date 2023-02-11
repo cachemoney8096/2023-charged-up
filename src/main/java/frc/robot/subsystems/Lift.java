@@ -46,7 +46,8 @@ public class Lift extends SubsystemBase {
     PRE_SCORE_HIGH_CONE,
     POST_SCORE_HIGH,
     OUTTAKING,
-    STARTING
+    STARTING,
+    MANUAL_PREP_SCORE
   }
 
   /** Position of the lift relative to to the start position */
