@@ -119,17 +119,17 @@ public final class Constants {
 
   public static final class Lift {
     public static final double ELEVATOR_WINCH_CIRCUMFERENCE_INCHES = Math.PI * 1.125;
-    
+
     public static final double ELEVATOR_MOTOR_GEAR_RATIO = 29.51;
 
-    public static final double ELEVATOR_RIGHT_ABSOLUTE_ENCODER_RATIO = 26/28;
-    
+    public static final double ELEVATOR_RIGHT_ABSOLUTE_ENCODER_RATIO = 26 / 28;
+
     /* Scalar for elevator motor encoder from rotations to real inches */
-    public static final double ELEVATOR_MOTOR_ENCODER_SCALAR = ELEVATOR_MOTOR_GEAR_RATIO;
-    
+    public static final double ELEVATOR_MOTOR_ENCODER_IN_PER_REV = ELEVATOR_MOTOR_GEAR_RATIO;
+
     /* Scalar for elevator motor encoder from RPM to real inches per seconds */
-    public static final double ELEVATOR_MOTOR_ENCODER_VELOCITY_SCALAR =
-      ELEVATOR_MOTOR_ENCODER_SCALAR / 60;
+    public static final double ELEVATOR_MOTOR_ENCODER_IPS_PER_RPM =
+        ELEVATOR_MOTOR_ENCODER_IN_PER_REV / 60;
 
     /** Gear ratio for the arm motor */
     public static final double ARM_MOTOR_GEAR_RATIO = 75.0;
@@ -139,7 +139,7 @@ public final class Constants {
 
     /** Scalar for the difference in the elevator's absolute encoders in inches per degree */
     public static final double ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE =
-      ELEVATOR_WINCH_CIRCUMFERENCE_INCHES * (26/(28-26)) / REVOLUTIONS_TO_DEGREES;
+        ELEVATOR_WINCH_CIRCUMFERENCE_INCHES * (26 / (28 - 26)) / REVOLUTIONS_TO_DEGREES;
   }
 
   public static final class Intake {
