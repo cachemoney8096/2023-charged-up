@@ -18,7 +18,6 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 
 public class AutoScore extends SequentialCommandGroup{
     private DriveSubsystem drive;
-    private TagLimelight tagLimelight;
     private PathPlannerTrajectory trajInit =
         PathPlanner.loadPath(
     "InitScoreAndGetGamePiece",
@@ -29,9 +28,8 @@ public class AutoScore extends SequentialCommandGroup{
         new PathConstraints(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
     private HashMap<String, Command> eventMap = new HashMap<>();
     private boolean isFirstPath = true;
-    private FollowPathWithEvents pathWithEvents;
     
-    public AutoScore(Lift lift, Intake intake){
+    public AutoScore(Lift lift, Intake intake, DriveSubsystem drive, TagLimelight tagLimelight){
         eventMap.put("deployIntake", new InstantCommand(()->{intake.setDesiredDeployed(true);}, intake));
         eventMap.put("closeIntake", new InstantCommand(()->{intake.setDesiredDeployed(false);}, intake));
         addCommands(
