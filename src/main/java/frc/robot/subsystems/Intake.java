@@ -129,7 +129,8 @@ public class Intake extends SubsystemBase {
 
   /*Setter for whether intake is desired deploy is true retract is false */
   public void setDesiredDeployed(boolean desired) {
-    desiredDeployed = Optional.of(desired);;
+    desiredDeployed = Optional.of(desired);
+    ;
   }
 
   /**
@@ -238,7 +239,8 @@ public class Intake extends SubsystemBase {
 
   /** If the intake has achieved its desired position, return true */
   public boolean atDesiredPosition() {
-    return (Math.abs(intakeDesiredPositionDegrees - deployMotorEncoder.getPosition()) < Cal.Intake.POSITION_MARGIN_DEGREES);
+    return (Math.abs(intakeDesiredPositionDegrees - deployMotorEncoder.getPosition())
+        < Cal.Intake.POSITION_MARGIN_DEGREES);
   }
 
   @Override
