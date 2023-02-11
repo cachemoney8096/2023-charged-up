@@ -135,7 +135,7 @@ public class Lift extends SubsystemBase {
     errors += SparkMaxUtils.check(elevatorRight.restoreFactoryDefaults());
     errors += SparkMaxUtils.check(arm.restoreFactoryDefaults());
 
-    errors += SparkMaxUtils.check(elevatorRight.follow(elevatorLeft,true));
+    errors += SparkMaxUtils.check(elevatorRight.follow(elevatorLeft, true));
 
     // Get positions and degrees of elevator through encoder in inches
     errors +=

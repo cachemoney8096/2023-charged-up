@@ -24,7 +24,9 @@ public final class RobotMap {
       INTAKE_RIGHT_MOTOR_CAN_ID = 23;
 
   /** Lift Spark MAX CAN IDs */
-  public static final int ELEVATOR_MOTOR_LEFT_CAN_ID = 37, ARM_MOTOR_CAN_ID = 38, ELEVATOR_MOTOR_RIGHT_CAN_ID = 39;
+  public static final int ELEVATOR_MOTOR_LEFT_CAN_ID = 37,
+      ARM_MOTOR_CAN_ID = 38,
+      ELEVATOR_MOTOR_RIGHT_CAN_ID = 39;
 
   /** Intake clamp pneumatic channels */
   public static final int INTAKE_CLAMP_FORWARD_CHANNEL = 0;
