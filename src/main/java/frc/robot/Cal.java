@@ -169,11 +169,17 @@ public final class Cal {
     public static final double GRABBER_CLOSED_ZONE_BOTTOM_DEGREES = PLACEHOLDER_DOUBLE,
         GRABBER_CLOSED_ZONE_TOP_DEGREES = PLACEHOLDER_DOUBLE;
 
-    /** Time between when the grabber closes and the intake unclamps, in seconds */
-    public static final double GRABBER_CLOSE_TIME_SECONDS = 0.2;
+    /** Time between when the grabber opens or closes and the intake unclamps, in seconds */
+    public static final double GRABBER_CLOSE_TIME_SECONDS = 0.2, GRABBER_OPEN_TIME_SECONDS = 0.2;
 
     /** The time in seconds for the grabber to open in OuttakeSequence */
     public static final double OUTTAKE_GRABBER_WAIT_TIME_SECONDS = PLACEHOLDER_DOUBLE;
+
+    /**
+     * The time in seconds it takes for it to be safe to return to the starting position, from the
+     * scoring high position
+     */
+    public static final double SAFE_TO_RETURN_TO_START_SECONDS = PLACEHOLDER_DOUBLE;
   }
 
   public static final class AutoBalance {

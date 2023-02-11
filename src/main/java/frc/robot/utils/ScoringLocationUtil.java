@@ -40,4 +40,13 @@ public class ScoringLocationUtil {
   public ScoreHeight getScoreHeight() {
     return scoreHeight;
   }
+
+  public boolean isCone() {
+    return !(scoreHeight == ScoreHeight.LOW || scoreCol == ScoreCol.CENTER);
+  }
+
+  /** Returns true if the lift is scoring in a high location */
+  public boolean isScoringHigh() {
+    return getScoreHeight() == ScoreHeight.HIGH;
+  }
 }
