@@ -22,7 +22,6 @@ import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
 import frc.robot.utils.SparkMaxUtils;
-import java.util.Optional;
 
 /**
  * The game piece intake.
@@ -49,12 +48,8 @@ public class Intake extends SubsystemBase {
       deployMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
   // Members
-  /**
-   * Timer for clamping. Not present means retracted or retracting (clamp!). Exists means deploying
-   * or already deployed (check timer for whether to clamp). Elapsed means we should clamp or stay
-   * clamped.
-   */
-  private Optional<Timer> clampTimer = Optional.empty();
+
+  private boolean desireClamped = false;
 
   private double intakeDesiredPositionDegrees = Cal.Intake.STARTING_POSITION_DEGREES;
 
@@ -142,6 +137,7 @@ public class Intake extends SubsystemBase {
 
   /** Deploys the intake out. */
   public void deploy() {
+    desireClamped = true;
     // Set the desired intake position
     deployMotorPID.setReference(
         Cal.Intake.DEPLOYED_POSITION_DEGREES,
@@ -150,20 +146,12 @@ public class Intake extends SubsystemBase {
         Cal.Intake.ARBITRARY_FEED_FORWARD_VOLTS * getCosineIntakeAngle(),
         ArbFFUnits.kVoltage);
     intakeDesiredPositionDegrees = Cal.Intake.DEPLOYED_POSITION_DEGREES;
-
-    // Set a timer only if we're newly deploying
-    // If we have already set a timer, we shouldn't restart the timer
-    if (!clampTimer.isPresent()) {
-      clampTimer = Optional.of(new Timer());
-      clampTimer.get().start();
-    }
   }
 
   /** Brings the intake back in */
   public void retract() {
     // Kill the timer to indicate retraction for clamping
-    clampTimer = Optional.empty();
-
+    desireClamped = false;
     // Set the desired intake position
     deployMotorPID.setReference(
         Cal.Intake.STARTING_POSITION_DEGREES,
@@ -215,23 +203,15 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (clampTimer.isPresent()) {
-      // If present, that means we're deployed or in the process of deploying
-      if (clampTimer.get().hasElapsed(Cal.Intake.AUTO_CLAMP_WAIT_TIME_SECONDS)) {
-        // If the time has elapsed, that means we've deployed enough to clamp
-        clampIntake();
-      } else {
-        // If time has not elapsed, we are still in the process of deploying and shouldn't clamp yet
-        unclampIntake();
-      }
-    } else {
-      // When there's no timer, we're retracting or retracted so we should unclamp
-      unclampIntake();
-    }
-
     // If the intake has achieved its desired position, then cut power
     if (atDesiredPosition()) {
       deployMotorPID.setReference(0.0, CANSparkMax.ControlType.kVoltage);
+    }
+    // only clamp if it is safe to do so and clamping is desired
+    if (desireClamped && deployMotorEncoder.getPosition() > Constants.PLACEHOLDER_INT) {
+      clampIntake();
+    } else {
+      unclampIntake();
     }
   }
 
