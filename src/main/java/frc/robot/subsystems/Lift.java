@@ -17,7 +17,6 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -69,8 +68,10 @@ public class Lift extends SubsystemBase {
 
   // Sensors
   private final RelativeEncoder elevatorLeftEncoder = elevatorLeft.getEncoder();
-  private final AbsoluteEncoder elevatorLeftAbsEncoder = elevatorLeft.getAbsoluteEncoder(Type.kDutyCycle);
-  private final AbsoluteEncoder elevatorRightAbsEncoder = elevatorRight.getAbsoluteEncoder(Type.kDutyCycle);
+  private final AbsoluteEncoder elevatorLeftAbsEncoder =
+      elevatorLeft.getAbsoluteEncoder(Type.kDutyCycle);
+  private final AbsoluteEncoder elevatorRightAbsEncoder =
+      elevatorRight.getAbsoluteEncoder(Type.kDutyCycle);
   private final RelativeEncoder armEncoder = arm.getEncoder();
   private final AbsoluteEncoder armAbsoluteEncoder = arm.getAbsoluteEncoder(Type.kDutyCycle);
   private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
@@ -134,16 +135,21 @@ public class Lift extends SubsystemBase {
     errors += SparkMaxUtils.check(elevatorRight.follow(elevatorLeft, true));
 
     // Get positions and degrees of elevator through encoder in inches
-    errors += SparkMaxUtils.check(SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(elevatorLeftAbsEncoder, 1.0));
-    errors += SparkMaxUtils.check(SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(elevatorRightAbsEncoder, Constants.Lift.ELEVATOR_RIGHT_ABSOLUTE_ENCODER_RATIO));
+    errors +=
+        SparkMaxUtils.check(
+            SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(elevatorLeftAbsEncoder, 1.0));
+    errors +=
+        SparkMaxUtils.check(
+            SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(
+                elevatorRightAbsEncoder, Constants.Lift.ELEVATOR_RIGHT_ABSOLUTE_ENCODER_RATIO));
     errors +=
         SparkMaxUtils.check(
             elevatorLeftEncoder.setPositionConversionFactor(
-                Constants.Lift.ELEVATOR_MOTOR_ENCODER_SCALAR));
+                Constants.Lift.ELEVATOR_MOTOR_ENCODER_IN_PER_REV));
     errors +=
         SparkMaxUtils.check(
             elevatorLeftEncoder.setVelocityConversionFactor(
-                Constants.Lift.ELEVATOR_MOTOR_ENCODER_VELOCITY_SCALAR));
+                Constants.Lift.ELEVATOR_MOTOR_ENCODER_IPS_PER_RPM));
 
     // Set PID of Elevator
     errors += SparkMaxUtils.check(elevatorLeftPID.setP(Cal.Lift.ELEVATOR_P));
@@ -187,8 +193,13 @@ public class Lift extends SubsystemBase {
             armPID.setSmartMotionAllowedClosedLoopError(
                 Cal.Lift.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG, SMART_MOTION_SLOT));
 
-    errors += SparkMaxUtils.check(SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(armEncoder, Constants.Lift.ARM_MOTOR_GEAR_RATIO));
-    errors += SparkMaxUtils.check(SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(armAbsoluteEncoder, 1.0));
+    errors +=
+        SparkMaxUtils.check(
+            SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(
+                armEncoder, Constants.Lift.ARM_MOTOR_GEAR_RATIO));
+    errors +=
+        SparkMaxUtils.check(
+            SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(armAbsoluteEncoder, 1.0));
 
     errors +=
         SparkMaxUtils.check(
@@ -279,8 +290,7 @@ public class Lift extends SubsystemBase {
 
     // Set elevator encoder position from absolute encoders
     double elevatorDutyCycleEncodersDifferenceDegrees =
-        (elevatorRightAbsEncoder.getPosition()
-                    - elevatorLeftEncoder.getPosition())
+        (elevatorRightAbsEncoder.getPosition() - elevatorLeftEncoder.getPosition())
             % Constants.REVOLUTIONS_TO_DEGREES;
     if (elevatorDutyCycleEncodersDifferenceDegrees < 0.0) {
       elevatorDutyCycleEncodersDifferenceDegrees += Constants.REVOLUTIONS_TO_DEGREES;
