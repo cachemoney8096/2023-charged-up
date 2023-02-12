@@ -31,12 +31,11 @@ public class AutoScore extends SequentialCommandGroup{
     
     /** Events include: open intake and close intake before and after obtaining game piece */
     public AutoScore(Lift lift, Intake intake, DriveSubsystem drive, TagLimelight tagLimelight){
-        addRequirements(lift, intake, drive, tagLimelight)
-         /** Events include: open intake and close intake before and after obtaining game piece, */
+        addRequirements(lift, intake, drive, tagLimelight);
+         /** Events include: open intake and close intake before and after obtaining game piece */
         eventMap.put("deployIntake", new InstantCommand(()->{intake.setDesiredDeployed(true);}, intake));
         eventMap.put("closeIntake", new InstantCommand(()->{intake.setDesiredDeployed(false);}, intake));
-        /**TODO: configure limelight to "take over" driving process after certain point 
-        AFTER obtaining game piece to be more accurate with distance */
+        /** TODO: configure limelight to "take over" driving process after certain point AFTER obtaining game piece to be more accurate with distance */
 
 
         /** Initialize sequential commands that run for the "15 second autonomous phase" */
