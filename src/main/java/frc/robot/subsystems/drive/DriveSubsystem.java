@@ -28,7 +28,6 @@ public class DriveSubsystem extends SubsystemBase {
   private double targetHeadingDegrees;
 
   // Create SwerveModules
-  // TODO: add angular offsets specific to the position of the module
   private final SwerveModule frontLeft =
       new SwerveModule(
           RobotMap.FRONT_LEFT_DRIVING_CAN_ID,

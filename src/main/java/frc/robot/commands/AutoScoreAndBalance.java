@@ -14,9 +14,12 @@ public class AutoScoreAndBalance extends SequentialCommandGroup {
   private PathPlannerTrajectory traj =
       PathPlanner.loadPath(
           "ScoreAndBalanceTraj",
-          new PathConstraints(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+          new PathConstraints(
+              Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
+              Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
   public AutoScoreAndBalance(boolean isFirstPath, Lift lift, DriveSubsystem drive) {
+    // TODO update this since scoreGamePiece and doneScoring are stubbed
     addCommands(
         new RunCommand(lift::scoreGamePiece, lift).until(lift::doneScoring),
         drive.followTrajectoryCommand(traj, isFirstPath),

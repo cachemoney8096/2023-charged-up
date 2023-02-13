@@ -114,7 +114,7 @@ public final class Constants {
   public static final class Lift {
     public static final double ELEVATOR_WINCH_CIRCUMFERENCE_INCHES = Math.PI * 1.125;
 
-    public static final double ELEVATOR_MOTOR_GEAR_RATIO = 29.51;
+    public static final double ELEVATOR_MOTOR_GEAR_RATIO = 14.11;
 
     public static final double ELEVATOR_RIGHT_ABSOLUTE_ENCODER_RATIO = 26 / 28;
 
@@ -137,7 +137,7 @@ public final class Constants {
   }
 
   public static final class Intake {
-    public static final double DEPLOY_MOTOR_GEAR_RATIO = 225.0;
+    public static final double DEPLOY_MOTOR_GEAR_RATIO = 75.0;
 
     /** Intake position when the intake is horizontal and pointing up / forward */
     public static final double POSITION_WHEN_HORIZONTAL_DEGREES = 0;

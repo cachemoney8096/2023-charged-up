@@ -97,40 +97,39 @@ public class Lift extends SubsystemBase {
     liftPositionMap = new TreeMap<LiftPosition, Pair<Double, Double>>();
     liftPositionMap.put(
         LiftPosition.GRAB_FROM_INTAKE,
-        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 77.0));
     liftPositionMap.put(
-        LiftPosition.SHELF,
-        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+        LiftPosition.SHELF, new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 196.0));
     liftPositionMap.put(
         LiftPosition.SCORE_LOW,
-        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 265.0));
     liftPositionMap.put(
         LiftPosition.SCORE_MID_CUBE,
-        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 224.0));
     liftPositionMap.put(
         LiftPosition.SCORE_MID_CONE,
-        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 224.0));
     liftPositionMap.put(
         LiftPosition.SCORE_HIGH_CUBE,
-        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 224.0));
     liftPositionMap.put(
         LiftPosition.SCORE_HIGH_CONE,
-        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 224.0));
     liftPositionMap.put(
         LiftPosition.PRE_SCORE_MID_CONE,
-        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 216.0));
     liftPositionMap.put(
         LiftPosition.PRE_SCORE_HIGH_CONE,
-        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 216.0));
     liftPositionMap.put(
         LiftPosition.POST_SCORE_HIGH,
-        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 210.0));
     liftPositionMap.put(
         LiftPosition.OUTTAKING,
-        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 196.0));
     liftPositionMap.put(
         LiftPosition.STARTING,
-        new Pair<Double, Double>(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 148.0));
 
     this.scoreLoc = scoreLoc;
   }
@@ -306,11 +305,8 @@ public class Lift extends SubsystemBase {
             elevatorRightAbsEncoder.getPosition() - elevatorLeftEncoder.getPosition());
     elevatorLeftEncoder.setPosition(
         elevatorDutyCycleEncodersDifferenceDegrees
-            * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE);
-  }
-
-  public void manualPrepScore() {
-    // TODO do this
+                * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE
+            - Cal.Lift.ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES);
   }
 
   public void cancelScore() {
@@ -431,12 +427,7 @@ public class Lift extends SubsystemBase {
    * move as soon as the lift is clear of that zone
    */
   public boolean clearOfIntakeZone() {
-    if ((elevatorLeftEncoder.getPosition() > Cal.Lift.ELEVATOR_INTAKE_ZONE_THRESHOLD_INCHES)
-        || (armEncoder.getPosition() > Cal.Lift.ARM_INTAKE_ZONE_THRESHOLD_DEGREES)) {
-      return true;
-    } else {
-      return false;
-    }
+    return armEncoder.getPosition() > Cal.Lift.ARM_INTAKE_ZONE_THRESHOLD_DEGREES;
   }
 
   @Override
