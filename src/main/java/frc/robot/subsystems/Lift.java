@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
@@ -230,6 +231,10 @@ public class Lift extends SubsystemBase {
         SparkMaxUtils.check(
             arm.setSoftLimit(SoftLimitDirection.kReverse, Cal.Lift.ARM_NEGATIVE_LIMIT_DEGREES));
     errors += SparkMaxUtils.check(arm.enableSoftLimit(SoftLimitDirection.kReverse, true));
+
+    errors += SparkMaxUtils.check(arm.setIdleMode(IdleMode.kBrake));
+    errors += SparkMaxUtils.check(elevatorLeft.setIdleMode(IdleMode.kBrake));
+    errors += SparkMaxUtils.check(elevatorRight.setIdleMode(IdleMode.kBrake));
 
     return errors == 0;
   }
