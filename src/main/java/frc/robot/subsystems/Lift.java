@@ -112,6 +112,13 @@ public class Lift extends SubsystemBase {
   public Lift(ScoringLocationUtil scoreLoc) {
     SparkMaxUtils.initWithRetry(this::initSparks, Cal.SPARK_INIT_RETRY_ATTEMPTS);
 
+    armController.setTolerance(Cal.Lift.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG);
+    armController.enableContinuousInput(0.0, 2 * Math.PI);
+    armController.reset(armEncoder.getPosition());
+
+    elevatorController.setTolerance(Cal.Lift.ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN);
+    elevatorController.reset(elevatorLeftEncoder.getPosition());
+
     // Map of all LiftPosition with according values
     liftPositionMap = new TreeMap<LiftPosition, Pair<Double, Double>>();
     liftPositionMap.put(
@@ -210,7 +217,7 @@ public class Lift extends SubsystemBase {
                 SoftLimitDirection.kReverse, Cal.Lift.ARM_NEGATIVE_LIMIT_DEGREES));
     errors += SparkMaxUtils.check(armMotor.enableSoftLimit(SoftLimitDirection.kReverse, true));
 
-    errors += SparkMaxUtils.check(arm.setIdleMode(IdleMode.kBrake));
+    errors += SparkMaxUtils.check(armMotor.setIdleMode(IdleMode.kBrake));
     errors += SparkMaxUtils.check(elevatorLeft.setIdleMode(IdleMode.kBrake));
     errors += SparkMaxUtils.check(elevatorRight.setIdleMode(IdleMode.kBrake));
 

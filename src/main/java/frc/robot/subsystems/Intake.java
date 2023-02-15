@@ -77,7 +77,6 @@ public class Intake extends SubsystemBase {
 
     deployMotorController.setTolerance(Cal.Intake.DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG);
     deployMotorController.enableContinuousInput(0.0, 2 * Math.PI);
-    deployMotorController.reset(0.0);
   }
 
   /** Does all the initialization for the sparks, return true on success */
@@ -132,6 +131,8 @@ public class Intake extends SubsystemBase {
             deployMotorAbsoluteEncoder.getPosition()
                 - (Cal.Intake.ABSOLUTE_ENCODER_START_POS_DEG
                     - Cal.Intake.STARTING_POSITION_DEGREES)));
+
+    deployMotorController.reset(deployMotorEncoder.getPosition());
   }
 
   /**
