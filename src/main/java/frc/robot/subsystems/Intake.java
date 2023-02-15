@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
@@ -71,6 +72,10 @@ public class Intake extends SubsystemBase {
 
     errors += SparkMaxUtils.check(intakeRight.restoreFactoryDefaults());
     errors += SparkMaxUtils.check(intakeRight.follow(intakeLeft, true));
+
+    errors += SparkMaxUtils.check(deployMotor.setIdleMode(IdleMode.kCoast));
+    errors += SparkMaxUtils.check(deployMotor.setIdleMode(IdleMode.kCoast));
+
     return errors == 0;
   }
 
@@ -120,6 +125,8 @@ public class Intake extends SubsystemBase {
                 SoftLimitDirection.kReverse,
                 Cal.Intake.INTAKE_DEPLOY_MOTOR_NEGATIVE_LIMIT_DEGREES));
     errors += SparkMaxUtils.check(deployMotor.enableSoftLimit(SoftLimitDirection.kReverse, true));
+
+    errors += SparkMaxUtils.check(deployMotor.setIdleMode(IdleMode.kBrake));
 
     return errors == 0;
   }
