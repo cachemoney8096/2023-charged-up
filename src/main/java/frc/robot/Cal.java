@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 
 /** This class provides a place for Calibrations: arbitrary but tuned values, like PID values. */
 public final class Cal {
@@ -73,11 +74,6 @@ public final class Cal {
     public static final double INTAKING_POWER = 1.0;
     public static final double EJECTION_POWER = -1.0;
 
-    /** Input deg/s, output [0,1] */
-    public static final double DEPLOY_MOTOR_P = Cal.PLACEHOLDER_DOUBLE,
-        DEPLOY_MOTOR_I = Cal.PLACEHOLDER_DOUBLE,
-        DEPLOY_MOTOR_D = Cal.PLACEHOLDER_DOUBLE;
-
     /** Intake positions in degrees */
     public static final double STARTING_POSITION_DEGREES = 38.0, DEPLOYED_POSITION_DEGREES = 180.0;
 
@@ -93,18 +89,24 @@ public final class Cal {
     // Ratio: 0.73 V
     public static final double ARBITRARY_FEED_FORWARD_VOLTS = 0.7;
 
-    /** Parameters for intake SmartMotion */
+    /** Parameters for intake controller */
     public static final double
         // angular accel = Torque / Inertia. 3.36 Nm * 75 / (6 * 0.26^2) kg-m^2 * (360 deg / 2pi
         // rad) = 35600 deg/s^2
         DEPLOY_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = 1600.0,
         // 5880 rpm / (60 sec/min) * (360 deg/rev) / 75 = 470.4
         DEPLOY_MAX_VELOCITY_DEG_PER_SECOND = 400.0,
-        DEPLOY_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND = 3.0,
-        DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG = 3.0;
+        // Functional not logical
+        DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG = 2.0;
 
-    /** Margin for having achieved the desired intake position (in degrees) */
-    public static final double POSITION_MARGIN_DEGREES = 3.0;
+    /** Input deg, output Volts */
+    public static final double DEPLOY_MOTOR_P = Cal.PLACEHOLDER_DOUBLE,
+        DEPLOY_MOTOR_I = 0.0,
+        DEPLOY_MOTOR_D = Cal.PLACEHOLDER_DOUBLE;
+
+    /** Input deg/s, output volts. From recalc */
+    public static final SimpleMotorFeedforward DEPLOY_FEEDFORWARD =
+        new SimpleMotorFeedforward(0.0, 1.46 * 360 / (2 * Math.PI), 0.02 * 360 / (2 * Math.PI));
 
     /** Sets the min and max positions that the intake deploy motor will be allowed to reach. */
     public static final float
@@ -116,14 +118,14 @@ public final class Cal {
   }
 
   public static final class Lift {
-    /** Input in/s, output [0,1] */
+    /** Input in, output Volts */
     public static final double ELEVATOR_P = Cal.PLACEHOLDER_DOUBLE,
-        ELEVATOR_I = Cal.PLACEHOLDER_DOUBLE,
+        ELEVATOR_I = 0.0,
         ELEVATOR_D = Cal.PLACEHOLDER_DOUBLE;
 
-    /** Input deg/s, output [0,1] */
+    /** Input deg, output Volts */
     public static final double ARM_P = Cal.PLACEHOLDER_DOUBLE,
-        ARM_I = Cal.PLACEHOLDER_DOUBLE,
+        ARM_I = 0.0,
         ARM_D = Cal.PLACEHOLDER_DOUBLE;
 
     /** Absolute encoder position when the arm is at 0 degrees */
@@ -146,7 +148,7 @@ public final class Cal {
     // Ratio: 0.32 V
     public static final double ARBITRARY_ELEVATOR_FEED_FORWARD_VOLTS = 0.3;
 
-    /** Parameters for arm SmartMotion */
+    /** Parameters for arm controller */
     public static final double
         // Angular accel = Torque / Inertia.
         // Stall torque: 3.36 Nm * 75 = 252 Nm
@@ -155,10 +157,10 @@ public final class Cal {
         ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = 1600.0,
         // 5880 rpm / (60 sec/min) / 75 * (360 deg / rev) = 470
         ARM_MAX_VELOCITY_DEG_PER_SECOND = 400.0,
-        ARM_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND = 3.0,
+        // functional not logical
         ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG = 1.0;
 
-    /** Parameters for elevator SmartMotion */
+    /** Parameters for elevator controller */
     public static final double
         // accel = Force / mass.
         // Stall force: 2 * 1.08 Nm * 14.11 / (0.5625 / 39.37) m = 2133 N
@@ -167,8 +169,26 @@ public final class Cal {
         ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED = 160.0,
         // 11710 rpm / (60 sec/min) * / 14.11 * (pi * 1.125 in) = 48.9 in/s
         ELEVATOR_MAX_VELOCITY_IN_PER_SECOND = 40.0,
-        ELEVATOR_MIN_OUTPUT_VELOCITY_IN_PER_SECOND = 0.5,
+        // functional not logical
         ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN = 0.25;
+
+    /** Input deg/s, output volts. From recalc */
+    public static final SimpleMotorFeedforward ARM_FEEDFORWARD =
+        new SimpleMotorFeedforward(
+            0.0, 1.46 * 360.0 / (2.0 * Math.PI), 0.08 * 360.0 / (2.0 * Math.PI));
+
+    /** Input in/s, output volts. From recalc */
+    public static final SimpleMotorFeedforward ELEVATOR_FEEDFORWARD =
+        new SimpleMotorFeedforward(
+            ARBITRARY_ELEVATOR_FEED_FORWARD_VOLTS,
+            9.66
+                / (39.37
+                /** in per meter */
+                ),
+            0.04
+                / (39.37
+                /** in per meter */
+                ));
 
     public static final double ELEVATOR_LOW_POSITION_INCHES = 0.0,
         ELEVATOR_HIGH_POSITION_INCHES = 20.83;
