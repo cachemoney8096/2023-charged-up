@@ -11,9 +11,9 @@ import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -26,6 +26,7 @@ import frc.robot.RobotMap;
 import frc.robot.utils.AngleUtil;
 import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
+import frc.robot.utils.SendableHelper;
 import frc.robot.utils.SparkMaxUtils;
 import java.util.TreeMap;
 
@@ -60,9 +61,27 @@ public class Lift extends SubsystemBase {
       new CANSparkMax(RobotMap.ELEVATOR_MOTOR_LEFT_CAN_ID, MotorType.kBrushless);
   private CANSparkMax elevatorRight =
       new CANSparkMax(RobotMap.ELEVATOR_MOTOR_RIGHT_CAN_ID, MotorType.kBrushless);
-  private SparkMaxPIDController elevatorLeftPID = elevatorLeft.getPIDController();
-  private CANSparkMax arm = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
-  private SparkMaxPIDController armPID = arm.getPIDController();
+
+  /** Input in, output Volts */
+  private ProfiledPIDController elevatorController =
+      new ProfiledPIDController(
+          Cal.Lift.ELEVATOR_P,
+          Cal.Lift.ELEVATOR_I,
+          Cal.Lift.ELEVATOR_D,
+          new TrapezoidProfile.Constraints(
+              Cal.Lift.ELEVATOR_MAX_VELOCITY_IN_PER_SECOND,
+              Cal.Lift.ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED));
+  /** Input deg, output Volts */
+  private ProfiledPIDController armController =
+      new ProfiledPIDController(
+          Cal.Lift.ARM_P,
+          Cal.Lift.ARM_I,
+          Cal.Lift.ARM_D,
+          new TrapezoidProfile.Constraints(
+              Cal.Lift.ARM_MAX_VELOCITY_DEG_PER_SECOND,
+              Cal.Lift.ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED));
+
+  private CANSparkMax armMotor = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
   private Solenoid grabber =
       new Solenoid(PneumaticsModuleType.REVPH, RobotMap.LIFT_GRABBING_CHANNEL);
 
@@ -72,12 +91,11 @@ public class Lift extends SubsystemBase {
       elevatorLeft.getAbsoluteEncoder(Type.kDutyCycle);
   private final AbsoluteEncoder elevatorRightAbsEncoder =
       elevatorRight.getAbsoluteEncoder(Type.kDutyCycle);
-  private final RelativeEncoder armEncoder = arm.getEncoder();
-  private final AbsoluteEncoder armAbsoluteEncoder = arm.getAbsoluteEncoder(Type.kDutyCycle);
+  private final RelativeEncoder armEncoder = armMotor.getEncoder();
+  private final AbsoluteEncoder armAbsoluteEncoder = armMotor.getAbsoluteEncoder(Type.kDutyCycle);
   private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
 
   // Members
-  private final int SMART_MOTION_SLOT = 0;
   private LiftPosition latestPosition = LiftPosition.STARTING;
   private LiftPosition desiredPosition = LiftPosition.STARTING;
   private boolean desiredGrabberClosed = true;
@@ -141,7 +159,7 @@ public class Lift extends SubsystemBase {
 
     errors += SparkMaxUtils.check(elevatorLeft.restoreFactoryDefaults());
     errors += SparkMaxUtils.check(elevatorRight.restoreFactoryDefaults());
-    errors += SparkMaxUtils.check(arm.restoreFactoryDefaults());
+    errors += SparkMaxUtils.check(armMotor.restoreFactoryDefaults());
 
     errors += SparkMaxUtils.check(elevatorRight.follow(elevatorLeft, true));
 
@@ -161,48 +179,6 @@ public class Lift extends SubsystemBase {
         SparkMaxUtils.check(
             elevatorLeftEncoder.setVelocityConversionFactor(
                 Constants.Lift.ELEVATOR_MOTOR_ENCODER_IPS_PER_RPM));
-
-    // Set PID of Elevator
-    errors += SparkMaxUtils.check(elevatorLeftPID.setP(Cal.Lift.ELEVATOR_P));
-    errors += SparkMaxUtils.check(elevatorLeftPID.setI(Cal.Lift.ELEVATOR_I));
-    errors += SparkMaxUtils.check(elevatorLeftPID.setD(Cal.Lift.ELEVATOR_D));
-    errors +=
-        SparkMaxUtils.check(
-            elevatorLeftPID.setSmartMotionMaxAccel(
-                Cal.Lift.ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED, SMART_MOTION_SLOT));
-    errors +=
-        SparkMaxUtils.check(
-            elevatorLeftPID.setSmartMotionMaxVelocity(
-                Cal.Lift.ELEVATOR_MAX_VELOCITY_IN_PER_SECOND, SMART_MOTION_SLOT));
-    errors +=
-        SparkMaxUtils.check(
-            elevatorLeftPID.setSmartMotionMinOutputVelocity(
-                Cal.Lift.ELEVATOR_MIN_OUTPUT_VELOCITY_IN_PER_SECOND, SMART_MOTION_SLOT));
-    errors +=
-        SparkMaxUtils.check(
-            elevatorLeftPID.setSmartMotionAllowedClosedLoopError(
-                Cal.Lift.ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN, SMART_MOTION_SLOT));
-
-    // Set PID of Arm
-    errors += SparkMaxUtils.check(armPID.setP(Cal.Lift.ARM_P));
-    errors += SparkMaxUtils.check(armPID.setI(Cal.Lift.ARM_I));
-    errors += SparkMaxUtils.check(armPID.setD(Cal.Lift.ARM_D));
-    errors +=
-        SparkMaxUtils.check(
-            armPID.setSmartMotionMaxAccel(
-                Cal.Lift.ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED, SMART_MOTION_SLOT));
-    errors +=
-        SparkMaxUtils.check(
-            armPID.setSmartMotionMaxVelocity(
-                Cal.Lift.ARM_MAX_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT));
-    errors +=
-        SparkMaxUtils.check(
-            armPID.setSmartMotionMinOutputVelocity(
-                Cal.Lift.ARM_MIN_OUTPUT_VELOCITY_DEG_PER_SECOND, SMART_MOTION_SLOT));
-    errors +=
-        SparkMaxUtils.check(
-            armPID.setSmartMotionAllowedClosedLoopError(
-                Cal.Lift.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG, SMART_MOTION_SLOT));
 
     errors +=
         SparkMaxUtils.check(
@@ -225,12 +201,14 @@ public class Lift extends SubsystemBase {
 
     errors +=
         SparkMaxUtils.check(
-            arm.setSoftLimit(SoftLimitDirection.kForward, Cal.Lift.ARM_POSITIVE_LIMIT_DEGREES));
-    errors += SparkMaxUtils.check(arm.enableSoftLimit(SoftLimitDirection.kForward, true));
+            armMotor.setSoftLimit(
+                SoftLimitDirection.kForward, Cal.Lift.ARM_POSITIVE_LIMIT_DEGREES));
+    errors += SparkMaxUtils.check(armMotor.enableSoftLimit(SoftLimitDirection.kForward, true));
     errors +=
         SparkMaxUtils.check(
-            arm.setSoftLimit(SoftLimitDirection.kReverse, Cal.Lift.ARM_NEGATIVE_LIMIT_DEGREES));
-    errors += SparkMaxUtils.check(arm.enableSoftLimit(SoftLimitDirection.kReverse, true));
+            armMotor.setSoftLimit(
+                SoftLimitDirection.kReverse, Cal.Lift.ARM_NEGATIVE_LIMIT_DEGREES));
+    errors += SparkMaxUtils.check(armMotor.enableSoftLimit(SoftLimitDirection.kReverse, true));
 
     errors += SparkMaxUtils.check(arm.setIdleMode(IdleMode.kBrake));
     errors += SparkMaxUtils.check(elevatorLeft.setIdleMode(IdleMode.kBrake));
@@ -247,22 +225,22 @@ public class Lift extends SubsystemBase {
     Timer.delay(0.005);
     elevatorLeft.burnFlash();
     Timer.delay(0.005);
-    arm.burnFlash();
+    armMotor.burnFlash();
   }
 
-  private void goToPosition(LiftPosition pos) {
-    elevatorLeftPID.setReference(
-        liftPositionMap.get(pos).getFirst(),
-        CANSparkMax.ControlType.kSmartMotion,
-        SMART_MOTION_SLOT,
-        Cal.Lift.ARBITRARY_ELEVATOR_FEED_FORWARD_VOLTS,
-        ArbFFUnits.kVoltage);
-    armPID.setReference(
-        liftPositionMap.get(pos).getSecond(),
-        CANSparkMax.ControlType.kSmartMotion,
-        SMART_MOTION_SLOT,
-        Cal.Lift.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle(),
-        ArbFFUnits.kVoltage);
+  /** Sends voltage commands to the arm and elevator motors, needs to be called every cycle */
+  private void controlPosition(LiftPosition pos) {
+    elevatorController.setGoal(liftPositionMap.get(pos).getFirst());
+    double elevatorDemandVolts = elevatorController.calculate(elevatorLeftEncoder.getPosition());
+    elevatorDemandVolts +=
+        Cal.Lift.ELEVATOR_FEEDFORWARD.calculate(elevatorController.getSetpoint().velocity);
+    elevatorLeft.setVoltage(elevatorDemandVolts);
+
+    armController.setGoal(liftPositionMap.get(pos).getSecond());
+    double demand = armController.calculate(armEncoder.getPosition());
+    demand += Cal.Lift.ARM_FEEDFORWARD.calculate(armController.getSetpoint().velocity);
+    demand += Cal.Lift.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle();
+    armMotor.setVoltage(demand);
   }
 
   public void closeGrabber() {
@@ -405,15 +383,15 @@ public class Lift extends SubsystemBase {
     LiftPositionStartRelative desiredPositionStartRelative =
         getRelativeLiftPosition(desiredPosition);
     if (!seeGamePiece()) {
-      goToPosition(desiredPosition);
+      controlPosition(desiredPosition);
     } else if (desiredPositionStartRelative == LiftPositionStartRelative.BELOW_START
         && latestPositionStartRelative == LiftPositionStartRelative.ABOVE_START) {
-      goToPosition(LiftPosition.STARTING);
+      controlPosition(LiftPosition.STARTING);
     } else if (desiredPositionStartRelative == LiftPositionStartRelative.ABOVE_START
         && latestPositionStartRelative == LiftPositionStartRelative.BELOW_START) {
-      goToPosition(LiftPosition.STARTING);
+      controlPosition(LiftPosition.STARTING);
     } else {
-      goToPosition(desiredPosition);
+      controlPosition(desiredPosition);
     }
 
     // If the grabber is set to open and it is safe to open, open the grabber (drop). Otherwise,
@@ -443,14 +421,10 @@ public class Lift extends SubsystemBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
-    builder.addDoubleProperty("Elevator kP", elevatorLeftPID::getP, elevatorLeftPID::setP);
-    builder.addDoubleProperty("Elevator kI", elevatorLeftPID::getI, elevatorLeftPID::setI);
-    builder.addDoubleProperty("Elevator kD", elevatorLeftPID::getD, elevatorLeftPID::setD);
+    SendableHelper.addChild(builder, this, armController, "ArmController");
+    SendableHelper.addChild(builder, this, elevatorController, "ElevatorController");
     builder.addDoubleProperty(
         "Elevator Position", elevatorLeftEncoder::getPosition, elevatorLeftEncoder::setPosition);
-    builder.addDoubleProperty("Arm kP", armPID::getP, armPID::setP);
-    builder.addDoubleProperty("Arm kI", armPID::getI, armPID::setI);
-    builder.addDoubleProperty("Arm kD", armPID::getD, armPID::setD);
     builder.addDoubleProperty("Arm Position", armEncoder::getPosition, armEncoder::setPosition);
     builder.addBooleanProperty("Done Scoring", this::doneScoring, null);
     builder.addBooleanProperty("See Game Piece", this::seeGamePiece, null);
