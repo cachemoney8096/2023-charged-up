@@ -19,12 +19,12 @@ public final class RobotMap {
       REAR_RIGHT_TURNING_CAN_ID = 16;
 
   /** Intake SPARK MAX CAN IDs */
-  public static final int INTAKE_DEPLOY_MOTOR_CAN_ID = 18,
+  public static final int INTAKE_DEPLOY_MOTOR_CAN_ID = 37,
       INTAKE_LEFT_MOTOR_CAN_ID = 22,
       INTAKE_RIGHT_MOTOR_CAN_ID = 23;
 
   /** Lift Spark MAX CAN IDs */
-  public static final int ELEVATOR_MOTOR_LEFT_CAN_ID = 37,
+  public static final int ELEVATOR_MOTOR_LEFT_CAN_ID = 18,
       ARM_MOTOR_CAN_ID = 38,
       ELEVATOR_MOTOR_RIGHT_CAN_ID = 39;
 
