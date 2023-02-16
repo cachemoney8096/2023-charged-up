@@ -439,10 +439,42 @@ public class Lift extends SubsystemBase {
     SendableHelper.addChild(builder, this, armController, "ArmController");
     SendableHelper.addChild(builder, this, elevatorController, "ElevatorController");
     builder.addDoubleProperty(
-        "Elevator Position", elevatorLeftEncoder::getPosition, elevatorLeftEncoder::setPosition);
-    builder.addDoubleProperty("Arm Position", armEncoder::getPosition, armEncoder::setPosition);
-    builder.addBooleanProperty("Done Scoring", this::doneScoring, null);
+        "Elevator Position (in)",
+        elevatorLeftEncoder::getPosition,
+        elevatorLeftEncoder::setPosition);
+    builder.addDoubleProperty(
+        "Elevator Vel (in)", elevatorLeftEncoder::getVelocity, elevatorLeftEncoder::setPosition);
+    builder.addDoubleProperty(
+        "Elevator Left Abs Pos (deg)", elevatorLeftAbsEncoder::getPosition, null);
+    builder.addDoubleProperty(
+        "Elevator Right Abs Pos (deg)", elevatorRightAbsEncoder::getPosition, null);
+    builder.addBooleanProperty("Clear of intake", this::clearOfIntakeZone, null);
+    builder.addDoubleProperty(
+        "Arm Abs Position (deg)", armAbsoluteEncoder::getPosition, armEncoder::setPosition);
+    builder.addDoubleProperty(
+        "Arm Position (deg)", armEncoder::getPosition, armEncoder::setPosition);
+    builder.addDoubleProperty("Arm Vel (deg/s)", armEncoder::getVelocity, armEncoder::setPosition);
     builder.addBooleanProperty("See Game Piece", this::seeGamePiece, null);
+    builder.addBooleanProperty(
+        "At desired position",
+        () -> {
+          return atPosition(desiredPosition);
+        },
+        null);
+    builder.addStringProperty(
+        "Desired position",
+        () -> {
+          return desiredPosition.toString();
+        },
+        null);
+    builder.addStringProperty(
+        "Latest position",
+        () -> {
+          return latestPosition.toString();
+        },
+        null);
+    builder.addDoubleProperty("Elevator output", elevatorLeft::get, null);
+    builder.addDoubleProperty("Arm output", armMotor::get, null);
   }
 
   /**

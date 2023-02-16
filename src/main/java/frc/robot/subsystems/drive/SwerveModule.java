@@ -233,5 +233,19 @@ public class SwerveModule implements Sendable {
     builder.addDoubleProperty("Turning kD", turningPIDController::getD, turningPIDController::setD);
     builder.addDoubleProperty(
         "Turning kFF", turningPIDController::getFF, turningPIDController::setFF);
+    builder.addDoubleProperty("Driving Vel (m/s)", drivingEncoder::getVelocity, null);
+    builder.addDoubleProperty("Steering Pos (rad)", turningEncoder::getPosition, null);
+    builder.addDoubleProperty(
+        "Desired Vel (m/s)",
+        () -> {
+          return desiredState.speedMetersPerSecond;
+        },
+        null);
+    builder.addDoubleProperty(
+        "Desired Steer (rad)",
+        () -> {
+          return desiredState.angle.getRadians();
+        },
+        null);
   }
 }
