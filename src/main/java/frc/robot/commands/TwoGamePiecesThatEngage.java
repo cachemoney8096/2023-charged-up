@@ -18,7 +18,7 @@ import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreCol;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 
-public class AutoScore extends SequentialCommandGroup{
+public class TwoGamePiecesThatEngage extends SequentialCommandGroup{
     private PathPlannerTrajectory trajInit =
         PathPlanner.loadPath(
     "InitScoreAndGetGamePiece",
@@ -32,7 +32,7 @@ public class AutoScore extends SequentialCommandGroup{
     private HashMap<String, Command> eventMap = new HashMap<>();
     
     /** Events include: open intake and close intake before and after obtaining game piece */
-    public AutoScore(Lift lift, Intake intake, DriveSubsystem drive, TagLimelight tagLimelight, ScoringLocationUtil scoringLocationUtil){
+    public TwoGamePiecesThatEngage(Lift lift, Intake intake, DriveSubsystem drive, TagLimelight tagLimelight, ScoringLocationUtil scoringLocationUtil){
         addRequirements(lift, intake, drive, tagLimelight);
          /** Events include: open intake and close intake before and after obtaining game piece */
         eventMap.put("deployIntake", new InstantCommand(()->{intake.setDesiredDeployed(true);}, intake));
