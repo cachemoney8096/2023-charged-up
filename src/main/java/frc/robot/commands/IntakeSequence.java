@@ -36,8 +36,8 @@ public class IntakeSequence extends SequentialCommandGroup {
             // it is running in the parallel group, which is controlled by readyToIntake()
             new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.GRAB_FROM_INTAKE), lift)),
 
-        // triggers the grabber to open when it is safe
-        new InstantCommand(lift::openGrabber, lift),
+        // triggers the claw to open when it is safe
+        new InstantCommand(lift::openClaw, lift),
 
         // wait until the lift is in position and the intake sees a game piece
         new WaitUntilCommand(
@@ -46,11 +46,11 @@ public class IntakeSequence extends SequentialCommandGroup {
         // stop intake
         new InstantCommand(intake::stopIntakingGamePiece, intake),
 
-        // triggers the grabber to close
-        new InstantCommand(lift::closeGrabber, lift),
+        // triggers the claw to close
+        new InstantCommand(lift::closeClaw, lift),
 
-        // wait until the grabber has closed
-        new WaitCommand(Cal.Lift.GRABBER_CLOSE_TIME_SECONDS),
+        // wait until the claw has closed
+        new WaitCommand(Cal.Lift.CLAW_CLOSE_TIME_SECONDS),
 
         // immediately unclamps the intake.
         new InstantCommand(

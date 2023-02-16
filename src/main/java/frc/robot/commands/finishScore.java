@@ -12,9 +12,9 @@ public class finishScore extends SequentialCommandGroup {
   public finishScore(Lift lift) {
     addRequirements(lift);
     addCommands(
-        new InstantCommand(lift::openGrabber, lift),
-        new WaitCommand(Cal.Lift.GRABBER_OPEN_TIME_SECONDS),
-        new InstantCommand(lift::closeGrabber, lift),
+        new InstantCommand(lift::openClaw, lift),
+        new WaitCommand(Cal.Lift.CLAW_OPEN_TIME_SECONDS),
+        new InstantCommand(lift::closeClaw, lift),
         new ConditionalCommand(
             // TODO consider whether we even need POST_SCORE_HIGH
             new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.POST_SCORE_HIGH), lift)

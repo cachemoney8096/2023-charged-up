@@ -223,15 +223,15 @@ public final class Cal {
         ELEVATOR_START_MARGIN_INCHES = 1.0,
         ARM_START_MARGIN_DEGREES = 8.0;
 
-    /** Zone where the grabber must be closed, in degrees. Bottom is closer to intake. */
-    public static final double GRABBER_CLOSED_ZONE_BOTTOM_DEGREES = PLACEHOLDER_DOUBLE,
-        GRABBER_CLOSED_ZONE_TOP_DEGREES = PLACEHOLDER_DOUBLE;
+    /** Zone where the claw must be closed, in degrees. Bottom is closer to intake. */
+    public static final double CLAW_CLOSED_ZONE_BOTTOM_DEGREES = PLACEHOLDER_DOUBLE,
+        CLAW_CLOSED_ZONE_TOP_DEGREES = PLACEHOLDER_DOUBLE;
 
-    /** Time between when the grabber opens or closes and the intake unclamps, in seconds */
-    public static final double GRABBER_CLOSE_TIME_SECONDS = 0.2, GRABBER_OPEN_TIME_SECONDS = 0.2;
+    /** Time between when the claw opens or closes and the intake unclamps, in seconds */
+    public static final double CLAW_CLOSE_TIME_SECONDS = 0.2, CLAW_OPEN_TIME_SECONDS = 0.2;
 
-    /** The time in seconds for the grabber to open in OuttakeSequence */
-    public static final double OUTTAKE_GRABBER_WAIT_TIME_SECONDS = 0.2;
+    /** The time in seconds for the claw to open in OuttakeSequence */
+    public static final double OUTTAKE_CLAW_WAIT_TIME_SECONDS = 0.2;
 
     /**
      * The time in seconds it takes for it to be safe to return to the starting position, from the

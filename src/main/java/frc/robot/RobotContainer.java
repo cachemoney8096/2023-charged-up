@@ -189,8 +189,8 @@ public class RobotContainer {
     operatorController
         .rightBumper()
         .onTrue(new InstantCommand(() -> lights.toggleCode(Lights.LightCode.CONE), lights));
-    operatorController.leftTrigger().onTrue(new InstantCommand(lift::openGrabber, lift));
-    operatorController.leftTrigger().onFalse(new InstantCommand(lift::closeGrabber, lift));
+    operatorController.leftTrigger().onTrue(new InstantCommand(lift::openClaw, lift));
+    operatorController.leftTrigger().onFalse(new InstantCommand(lift::closeClaw, lift));
     operatorController.rightTrigger().onTrue(new InstantCommand(scoreLoc::toggleMiddleGrid));
     operatorController.rightTrigger().onFalse(new InstantCommand(scoreLoc::toggleMiddleGrid));
 

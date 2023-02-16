@@ -30,7 +30,7 @@ import frc.robot.utils.SendableHelper;
 import frc.robot.utils.SparkMaxUtils;
 import java.util.TreeMap;
 
-/** Contains code for elevator, arm, and game piece grabber */
+/** Contains code for elevator, arm, and game piece claw */
 public class Lift extends SubsystemBase {
 
   /** Overall position of the lift including both elevator and arm */
@@ -82,8 +82,8 @@ public class Lift extends SubsystemBase {
               Cal.Lift.ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED));
 
   private CANSparkMax armMotor = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
-  private Solenoid grabber =
-      new Solenoid(PneumaticsModuleType.REVPH, RobotMap.LIFT_GRABBING_CHANNEL);
+  private Solenoid claw =
+      new Solenoid(PneumaticsModuleType.REVPH, RobotMap.LIFT_CLAW_CHANNEL);
 
   // Sensors
   private final RelativeEncoder elevatorLeftEncoder = elevatorLeft.getEncoder();
@@ -98,7 +98,7 @@ public class Lift extends SubsystemBase {
   // Members
   private LiftPosition latestPosition = LiftPosition.STARTING;
   private LiftPosition desiredPosition = LiftPosition.STARTING;
-  private boolean desiredGrabberClosed = true;
+  private boolean desiredClawClosed = true;
   public ScoringLocationUtil scoreLoc;
 
   /**
@@ -258,12 +258,12 @@ public class Lift extends SubsystemBase {
     armMotor.setVoltage(demand);
   }
 
-  public void closeGrabber() {
-    desiredGrabberClosed = true;
+  public void closeClaw() {
+    desiredClawClosed = true;
   }
 
-  public void openGrabber() {
-    desiredGrabberClosed = false;
+  public void openClaw() {
+    desiredClawClosed = false;
   }
 
   /** Returns true if the game piece sensor sees a game piece */
@@ -409,14 +409,14 @@ public class Lift extends SubsystemBase {
       controlPosition(desiredPosition);
     }
 
-    // If the grabber is set to open and it is safe to open, open the grabber (drop). Otherwise,
+    // If the claw is set to open and it is safe to open, open the claw (drop). Otherwise,
     // close it (grab).
-    if (!desiredGrabberClosed
-        && (armEncoder.getPosition() > Cal.Lift.GRABBER_CLOSED_ZONE_TOP_DEGREES
-            || armEncoder.getPosition() < Cal.Lift.GRABBER_CLOSED_ZONE_BOTTOM_DEGREES)) {
-      grabber.set(false); // drop
+    if (!desiredClawClosed
+        && (armEncoder.getPosition() > Cal.Lift.CLAW_CLOSED_ZONE_TOP_DEGREES
+            || armEncoder.getPosition() < Cal.Lift.CLAW_CLOSED_ZONE_BOTTOM_DEGREES)) {
+      claw.set(false); // drop
     } else {
-      grabber.set(true); // grab
+      claw.set(true); // grab
     }
   }
 
