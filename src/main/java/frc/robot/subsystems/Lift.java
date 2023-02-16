@@ -320,7 +320,7 @@ public class Lift extends SubsystemBase {
   }
 
   public void startScore() {
-    if (!scoreLoc.isCone()) {
+    if (scoreLoc.isCone()) {
       if (scoreLoc.getScoreHeight() == ScoreHeight.HIGH) {
         setDesiredPosition(LiftPosition.PRE_SCORE_HIGH_CONE);
       } else if (scoreLoc.getScoreHeight() == ScoreHeight.MID) {
