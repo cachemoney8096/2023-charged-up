@@ -40,11 +40,11 @@ public class AutoScore extends SequentialCommandGroup{
 
         /** Initialize sequential commands that run for the "15 second autonomous phase" */
         addCommands(
-            new InstantCommand(lift::manualPrepScore, lift),
+            new InstantCommand(lift::prepScore, lift),
             new WaitUntilCommand(()->lift.atPosition(LiftPosition.MANUAL_PREP_SCORE)),
-            new startScore(),
+            new InstantCommand(lift::startScore, lift),
             new WaitUntilCommand(()->lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
-            new finishScore(),
+            new finishScore(lift),
             new WaitUntilCommand(()->lift.atPosition(LiftPosition.STARTING)),
             new FollowPathWithEvents(
                 drive.followTrajectoryCommand(trajInit, true),
@@ -52,7 +52,7 @@ public class AutoScore extends SequentialCommandGroup{
 
             /** TODO: Limelight code goes here */
 
-            new InstantCommand(lift::manualPrepScore, lift),
+            new InstantCommand(lift::prepScore, lift),
             new WaitUntilCommand(()->lift.atPosition(LiftPosition.MANUAL_PREP_SCORE)),
             drive.followTrajectoryCommand(trajCharge, isFirstPath), //this does not accept the FollowPathWithEvents
             new AutoChargeStationBalance(drive)
