@@ -18,6 +18,15 @@ import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreCol;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 
+/**This does the following: 
+ * Robot starts at right postion at left grid
+ * Score the game piece at the high right position on the left grid
+ * Drive and retreive another game piece from the center
+ * Bring it back to the left grid left side, and score at the high left position
+ * Go to charing station and do the charge station balance sequence 
+*/
+
+
 public class TwoGamePiecesThatEngage extends SequentialCommandGroup{
     private PathPlannerTrajectory trajInit =
         PathPlanner.loadPath(
@@ -31,7 +40,6 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup{
 
     private HashMap<String, Command> eventMap = new HashMap<>();
     
-    /** Events include: open intake and close intake before and after obtaining game piece */
     public TwoGamePiecesThatEngage(Lift lift, Intake intake, DriveSubsystem drive, TagLimelight tagLimelight, ScoringLocationUtil scoringLocationUtil){
         addRequirements(lift, intake, drive, tagLimelight);
          /** Events include: open intake and close intake before and after obtaining game piece */
