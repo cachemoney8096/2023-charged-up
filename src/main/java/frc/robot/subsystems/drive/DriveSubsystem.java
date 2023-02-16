@@ -108,7 +108,7 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void resetOdometry(Pose2d pose) {
     odometry.resetPosition(
-        Rotation2d.fromDegrees(gyro.getAngle()),
+        Rotation2d.fromDegrees(gyro.getYaw()),
         new SwerveModulePosition[] {
           frontLeft.getPosition(),
           frontRight.getPosition(),
@@ -136,7 +136,7 @@ public class DriveSubsystem extends SubsystemBase {
         Constants.SwerveDrive.DRIVE_KINEMATICS.toSwerveModuleStates(
             fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                    xSpeed, ySpeed, rot, Rotation2d.fromDegrees(gyro.getAngle()))
+                    xSpeed, ySpeed, rot, Rotation2d.fromDegrees(gyro.getYaw()))
                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, Constants.SwerveDrive.MAX_SPEED_METERS_PER_SECOND);
@@ -187,7 +187,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeadingDegrees() {
-    return Rotation2d.fromDegrees(gyro.getAngle()).getDegrees();
+    return Rotation2d.fromDegrees(gyro.getYaw()).getDegrees();
   }
 
   /**
@@ -301,5 +301,36 @@ public class DriveSubsystem extends SubsystemBase {
     addChild("Front Left", frontLeft);
     addChild("Back Right", rearLeft);
     addChild("Rear Left", rearLeft);
+    builder.addBooleanProperty(
+        "Half speed?",
+        () -> {
+          return halfSpeed;
+        },
+        null);
+    builder.addDoubleProperty(
+        "Target Heading (deg)",
+        () -> {
+          return targetHeadingDegrees;
+        },
+        null);
+    builder.addDoubleProperty("Gyro Yaw (deg)", gyro::getYaw, null);
+    builder.addDoubleProperty(
+        "Odometry X (m)",
+        () -> {
+          return getPose().getX();
+        },
+        null);
+    builder.addDoubleProperty(
+        "Odometry Y (m)",
+        () -> {
+          return getPose().getY();
+        },
+        null);
+    builder.addDoubleProperty(
+        "Odometry Yaw (deg)",
+        () -> {
+          return getPose().getRotation().getDegrees();
+        },
+        null);
   }
 }

@@ -271,6 +271,33 @@ public class Intake extends SubsystemBase {
         "Intake Current Position (Degrees)",
         deployMotorEncoder::getPosition,
         deployMotorEncoder::setPosition);
+    builder.addDoubleProperty(
+        "Intake Abs Position (deg)", deployMotorAbsoluteEncoder::getPosition, null);
+
+    builder.addDoubleProperty(
+        "Intake Deploy Velocity (deg/s)", deployMotorEncoder::getVelocity, null);
     builder.addBooleanProperty("See Game Piece", this::seeGamePiece, null);
+    builder.addBooleanProperty(
+        "Desire clamped",
+        () -> {
+          return desireClamped;
+        },
+        null);
+    builder.addBooleanProperty("At Desired Pos", this::atDesiredPosition, null);
+    builder.addDoubleProperty("Intake wheel power in [-1,1]", intakeLeft::get, null);
+    builder.addStringProperty(
+        "Desire deployed",
+        () -> {
+          if (desiredDeployed.isPresent()) {
+            if (desiredDeployed.get()) {
+              return "deploy";
+            } else {
+              return "retract";
+            }
+          } else {
+            return "no desire";
+          }
+        },
+        null);
   }
 }
