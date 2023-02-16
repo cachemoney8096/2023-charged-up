@@ -14,6 +14,9 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.FollowPathWithEvents;
 import frc.robot.Cal;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.utils.ScoringLocationUtil;
+import frc.robot.utils.ScoringLocationUtil.ScoreCol;
+import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 
 public class AutoScore extends SequentialCommandGroup{
     private PathPlannerTrajectory trajInit =
@@ -29,7 +32,7 @@ public class AutoScore extends SequentialCommandGroup{
     private HashMap<String, Command> eventMap = new HashMap<>();
     
     /** Events include: open intake and close intake before and after obtaining game piece */
-    public AutoScore(Lift lift, Intake intake, DriveSubsystem drive, TagLimelight tagLimelight){
+    public AutoScore(Lift lift, Intake intake, DriveSubsystem drive, TagLimelight tagLimelight, ScoringLocationUtil scoringLocationUtil){
         addRequirements(lift, intake, drive, tagLimelight);
          /** Events include: open intake and close intake before and after obtaining game piece */
         eventMap.put("deployIntake", new InstantCommand(()->{intake.setDesiredDeployed(true);}, intake));
@@ -39,6 +42,8 @@ public class AutoScore extends SequentialCommandGroup{
 
         /** Initialize sequential commands that run for the "15 second autonomous phase" */
         addCommands(
+            new InstantCommand(()->scoringLocationUtil.setScoreCol(ScoreCol.RIGHT)),
+            new InstantCommand(()->scoringLocationUtil.setScoreHeight(ScoreHeight.HIGH)),
             new InstantCommand(lift::ManualPrepScoreSequence, lift),
             new WaitUntilCommand(()->lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
             new InstantCommand(lift::startScore, lift),
@@ -48,14 +53,12 @@ public class AutoScore extends SequentialCommandGroup{
             new FollowPathWithEvents(
                 drive.followTrajectoryCommand(trajInit, true),
                 trajInit.getMarkers(), eventMap),
-
             /** TODO: Limelight code goes here */
-
+            new InstantCommand(()->scoringLocationUtil.setScoreCol(ScoreCol.LEFT)),
             new InstantCommand(lift::ManualPrepScoreSequence, lift),
             new WaitUntilCommand(()->lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
             drive.followTrajectoryCommand(trajCharge, false), //this does not accept the FollowPathWithEvents
             new AutoChargeStationBalance(drive)
         );
     }
-    
 }
