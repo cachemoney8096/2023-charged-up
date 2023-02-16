@@ -90,8 +90,12 @@ public class Intake extends SubsystemBase {
     errors += SparkMaxUtils.check(deployMotor.setIdleMode(IdleMode.kCoast));
     errors += SparkMaxUtils.check(deployMotor.setIdleMode(IdleMode.kCoast));
 
-    errors += SparkMaxUtils.check(intakeLeft.setSmartCurrentLimit(Cal.Intake.INTAKE_WHEELS_CURRENT_LIMIT_AMPS));
-    errors += SparkMaxUtils.check(intakeRight.setSmartCurrentLimit(Cal.Intake.INTAKE_WHEELS_CURRENT_LIMIT_AMPS));
+    errors +=
+        SparkMaxUtils.check(
+            intakeLeft.setSmartCurrentLimit(Cal.Intake.INTAKE_WHEELS_CURRENT_LIMIT_AMPS));
+    errors +=
+        SparkMaxUtils.check(
+            intakeRight.setSmartCurrentLimit(Cal.Intake.INTAKE_WHEELS_CURRENT_LIMIT_AMPS));
 
     return errors == 0;
   }
@@ -125,7 +129,9 @@ public class Intake extends SubsystemBase {
 
     errors += SparkMaxUtils.check(deployMotor.setIdleMode(IdleMode.kBrake));
 
-    errors += SparkMaxUtils.check(deployMotor.setSmartCurrentLimit(Cal.Intake.INTAKE_DEPLOY_MOTOR_CURRENT_LIMIT_AMPS));
+    errors +=
+        SparkMaxUtils.check(
+            deployMotor.setSmartCurrentLimit(Cal.Intake.INTAKE_DEPLOY_MOTOR_CURRENT_LIMIT_AMPS));
 
     return errors == 0;
   }
