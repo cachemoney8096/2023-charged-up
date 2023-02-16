@@ -284,7 +284,7 @@ public class Intake extends SubsystemBase {
         },
         null);
     builder.addBooleanProperty("At Desired Pos", this::atDesiredPosition, null);
-    builder.addDoubleProperty("Intake wheel power", intakeLeft::get, null);
+    builder.addDoubleProperty("Intake wheel power in [-1,1]", intakeLeft::get, null);
     builder.addStringProperty(
         "Desire deployed",
         () -> {

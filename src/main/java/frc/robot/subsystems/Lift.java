@@ -442,18 +442,17 @@ public class Lift extends SubsystemBase {
         "Elevator Position (in)",
         elevatorLeftEncoder::getPosition,
         elevatorLeftEncoder::setPosition);
+    builder.addDoubleProperty("Elevator Vel (in)", elevatorLeftEncoder::getVelocity, null);
     builder.addDoubleProperty(
-        "Elevator Vel (in)", elevatorLeftEncoder::getVelocity, elevatorLeftEncoder::setPosition);
+        "Elevator Left Abs Pos (in)", elevatorLeftAbsEncoder::getPosition, null);
     builder.addDoubleProperty(
-        "Elevator Left Abs Pos (deg)", elevatorLeftAbsEncoder::getPosition, null);
-    builder.addDoubleProperty(
-        "Elevator Right Abs Pos (deg)", elevatorRightAbsEncoder::getPosition, null);
+        "Elevator Right Abs Pos (in)", elevatorRightAbsEncoder::getPosition, null);
     builder.addBooleanProperty("Clear of intake", this::clearOfIntakeZone, null);
     builder.addDoubleProperty(
         "Arm Abs Position (deg)", armAbsoluteEncoder::getPosition, armEncoder::setPosition);
     builder.addDoubleProperty(
         "Arm Position (deg)", armEncoder::getPosition, armEncoder::setPosition);
-    builder.addDoubleProperty("Arm Vel (deg/s)", armEncoder::getVelocity, armEncoder::setPosition);
+    builder.addDoubleProperty("Arm Vel (deg/s)", armEncoder::getVelocity, null);
     builder.addBooleanProperty("See Game Piece", this::seeGamePiece, null);
     builder.addBooleanProperty(
         "At desired position",
