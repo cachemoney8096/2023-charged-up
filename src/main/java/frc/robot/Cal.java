@@ -237,8 +237,9 @@ public final class Cal {
      */
     public static final double SAFE_TO_RETURN_TO_START_SECONDS = 0.5;
 
-    /** Current limits for elevator sparkmax in amps*/
+    /** Current limits for elevator sparksmax in amps*/
     public static final int ELEVATOR_CURRENT_LIMIT_AMPS = 30;
+    public static final int ARM_CURRENT_LIMIT_AMPS = 40;
   }
 
   public static final class AutoBalance {
