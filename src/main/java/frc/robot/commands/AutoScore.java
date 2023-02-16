@@ -27,7 +27,6 @@ public class AutoScore extends SequentialCommandGroup{
         new PathConstraints(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
 
     private HashMap<String, Command> eventMap = new HashMap<>();
-    private boolean isFirstPath = false;
     
     /** Events include: open intake and close intake before and after obtaining game piece */
     public AutoScore(Lift lift, Intake intake, DriveSubsystem drive, TagLimelight tagLimelight){
@@ -41,7 +40,7 @@ public class AutoScore extends SequentialCommandGroup{
         /** Initialize sequential commands that run for the "15 second autonomous phase" */
         addCommands(
             new InstantCommand(lift::ManualPrepScoreSequence, lift),
-            new WaitUntilCommand(()->lift.atPosition(LiftPosition.MANUAL_PREP_SCORE)),
+            new WaitUntilCommand(()->lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
             new InstantCommand(lift::startScore, lift),
             new WaitUntilCommand(()->lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
             new finishScore(lift),
@@ -53,8 +52,8 @@ public class AutoScore extends SequentialCommandGroup{
             /** TODO: Limelight code goes here */
 
             new InstantCommand(lift::ManualPrepScoreSequence, lift),
-            new WaitUntilCommand(()->lift.atPosition(LiftPosition.MANUAL_PREP_SCORE)),
-            drive.followTrajectoryCommand(trajCharge, isFirstPath), //this does not accept the FollowPathWithEvents
+            new WaitUntilCommand(()->lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
+            drive.followTrajectoryCommand(trajCharge, false), //this does not accept the FollowPathWithEvents
             new AutoChargeStationBalance(drive)
         );
     }
