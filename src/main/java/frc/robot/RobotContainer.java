@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -39,8 +40,16 @@ public class RobotContainer {
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
   private final Lift lift = new Lift(scoreLoc);
   private final Intake intake = new Intake(lift::clearOfIntakeZone);
-  private final IntakeLimelight intakeLimelight;
-  private final TagLimelight tagLimelight;
+  private final IntakeLimelight intakeLimelight =
+      new IntakeLimelight(
+          Constants.INTAKE_LIMELIGHT_PITCH_DEGREES,
+          Constants.INTAKE_LIMELIGHT_HEIGHT_METERS,
+          Constants.INTAKE_TARGET_HEIGHT_METERS);
+  private final TagLimelight tagLimelight =
+      new TagLimelight(
+          Constants.TAG_LIMELIGHT_PITCH_DEGREES,
+          Constants.TAG_LIMELIGHT_HEIGHT_METERS,
+          Constants.TAG_TARGET_HEIGHT_METERS);
   private final Lights lights = new Lights();
 
   // A chooser for autonomous commands
@@ -57,18 +66,11 @@ public class RobotContainer {
     // Configure the trigger bindings
     configureBindings();
 
-    // set up the limelights
-    intakeLimelight =
-        new IntakeLimelight(
-            Constants.INTAKE_LIMELIGHT_PITCH_DEGREES,
-            Constants.INTAKE_LIMELIGHT_HEIGHT_METERS,
-            Constants.INTAKE_TARGET_HEIGHT_METERS);
-
-    tagLimelight =
-        new TagLimelight(
-            Constants.TAG_LIMELIGHT_PITCH_DEGREES,
-            Constants.TAG_LIMELIGHT_HEIGHT_METERS,
-            Constants.TAG_TARGET_HEIGHT_METERS);
+    Shuffleboard.getTab("Subsystems").add(drive.getName(), drive);
+    Shuffleboard.getTab("Subsystems").add(intake.getName(), intake);
+    Shuffleboard.getTab("Subsystems").add(intakeLimelight.getName(), intakeLimelight);
+    Shuffleboard.getTab("Subsystems").add(tagLimelight.getName(), tagLimelight);
+    Shuffleboard.getTab("Subsystems").add(lights.getName(), lights);
   }
 
   public void initialize() {
