@@ -20,7 +20,7 @@ public class finishScore extends SequentialCommandGroup {
             new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.POST_SCORE_HIGH), lift)
                 .andThen(new WaitCommand(Cal.Lift.SAFE_TO_RETURN_TO_START_SECONDS)),
             new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.STARTING)),
-            lift.scoreLoc::isScoringHigh));
-    new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.STARTING));
+            lift.scoreLoc::isScoringHigh),
+        new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.STARTING)));
   }
 }
