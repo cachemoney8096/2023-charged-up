@@ -89,6 +89,9 @@ public class Intake extends SubsystemBase {
 
     errors += SparkMaxUtils.check(deployMotor.setIdleMode(IdleMode.kCoast));
     errors += SparkMaxUtils.check(deployMotor.setIdleMode(IdleMode.kCoast));
+    //invert stuff
+    deployMotor.setInverted(true);
+    intakeRight.setInverted(true);
 
     errors +=
         SparkMaxUtils.check(
