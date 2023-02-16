@@ -45,18 +45,22 @@ public class AutoScore extends SequentialCommandGroup{
             new InstantCommand(()->scoringLocationUtil.setScoreCol(ScoreCol.RIGHT)),
             new InstantCommand(()->scoringLocationUtil.setScoreHeight(ScoreHeight.HIGH)),
             new InstantCommand(lift::ManualPrepScoreSequence, lift),
-            new WaitUntilCommand(()->lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
+            new WaitUntilCommand(()->lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
             new InstantCommand(lift::startScore, lift),
             new WaitUntilCommand(()->lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
             new finishScore(lift),
+            new InstantCommand(()->scoringLocationUtil.setScoreCol(ScoreCol.LEFT)),
             new WaitUntilCommand(()->lift.atPosition(LiftPosition.STARTING)),
             new FollowPathWithEvents(
                 drive.followTrajectoryCommand(trajInit, true),
                 trajInit.getMarkers(), eventMap),
             /** TODO: Limelight code goes here */
-            new InstantCommand(()->scoringLocationUtil.setScoreCol(ScoreCol.LEFT)),
             new InstantCommand(lift::ManualPrepScoreSequence, lift),
+            new WaitUntilCommand(()->lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
+            new InstantCommand(lift::startScore, lift),
             new WaitUntilCommand(()->lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
+            new finishScore(lift),
+            new WaitUntilCommand(()->lift.atPosition(LiftPosition.STARTING)),
             drive.followTrajectoryCommand(trajCharge, false), //this does not accept the FollowPathWithEvents
             new AutoChargeStationBalance(drive)
         );
