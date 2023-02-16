@@ -14,10 +14,12 @@ public class finishScore extends SequentialCommandGroup {
     addCommands(
         new InstantCommand(lift::openGrabber, lift),
         new WaitCommand(Cal.Lift.GRABBER_OPEN_TIME_SECONDS),
+        new InstantCommand(lift::closeGrabber, lift),
         new ConditionalCommand(
             new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.POST_SCORE_HIGH), lift)
                 .andThen(new WaitCommand(Cal.Lift.SAFE_TO_RETURN_TO_START_SECONDS)),
             new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.STARTING)),
             lift.scoreLoc::isScoringHigh));
+        new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.STARTING));
   }
 }
