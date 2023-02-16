@@ -68,6 +68,11 @@ public final class Cal {
 
     /** High profile constraints = pure P controller */
     public static final PIDController PATH_THETA_CONTROLLER = new PIDController(9.0, 0.0, 0.80);
+
+    /** Current limits for swerveSubsystem sparksmax in amps */
+    public static final int DRIVE_CURRENT_LIMIT_AMPS = 50;
+
+    public static final int STEER_CURRENT_LIMIT_AMPS = 35;
   }
 
   public static final class Intake {
@@ -115,6 +120,11 @@ public final class Cal {
 
     /** Time for the intake to unclamp, in seconds */
     public static final double UNCLAMP_TIME_SECONDS = 0.2;
+
+    /** Current limits for intake sparksmax in amps */
+    public static final int INTAKE_DEPLOY_MOTOR_CURRENT_LIMIT_AMPS = 40;
+
+    public static final int INTAKE_WHEELS_CURRENT_LIMIT_AMPS = 30;
   }
 
   public static final class Lift {
@@ -228,6 +238,11 @@ public final class Cal {
      * scoring high position
      */
     public static final double SAFE_TO_RETURN_TO_START_SECONDS = 0.5;
+
+    /** Current limits for elevator sparksmax in amps */
+    public static final int ELEVATOR_CURRENT_LIMIT_AMPS = 30;
+
+    public static final int ARM_CURRENT_LIMIT_AMPS = 40;
   }
 
   public static final class AutoBalance {

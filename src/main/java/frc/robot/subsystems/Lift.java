@@ -221,6 +221,14 @@ public class Lift extends SubsystemBase {
     errors += SparkMaxUtils.check(elevatorLeft.setIdleMode(IdleMode.kBrake));
     errors += SparkMaxUtils.check(elevatorRight.setIdleMode(IdleMode.kBrake));
 
+    errors +=
+        SparkMaxUtils.check(
+            elevatorLeft.setSmartCurrentLimit(Cal.Lift.ELEVATOR_CURRENT_LIMIT_AMPS));
+    errors +=
+        SparkMaxUtils.check(
+            elevatorRight.setSmartCurrentLimit(Cal.Lift.ELEVATOR_CURRENT_LIMIT_AMPS));
+    errors += SparkMaxUtils.check(armMotor.setSmartCurrentLimit(Cal.Lift.ARM_CURRENT_LIMIT_AMPS));
+
     return errors == 0;
   }
 
