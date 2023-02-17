@@ -30,7 +30,7 @@ import frc.robot.utils.SendableHelper;
 import frc.robot.utils.SparkMaxUtils;
 import java.util.TreeMap;
 
-/** Contains code for elevator, arm, and game piece claw */
+/** Contains code for elevator, arm, and game piece claaaaaaw */
 public class Lift extends SubsystemBase {
 
   /** Overall position of the lift including both elevator and arm */
@@ -82,8 +82,8 @@ public class Lift extends SubsystemBase {
               Cal.Lift.ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED));
 
   private CANSparkMax armMotor = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
-  private Solenoid claw =
-      new Solenoid(PneumaticsModuleType.REVPH, RobotMap.LIFT_CLAW_CHANNEL);
+  private Solenoid theClaaaaaaw =
+      new Solenoid(PneumaticsModuleType.REVPH, RobotMap.LIFT_CLAAAAAAW_CHANNEL);
 
   // Sensors
   private final RelativeEncoder elevatorLeftEncoder = elevatorLeft.getEncoder();
@@ -98,7 +98,7 @@ public class Lift extends SubsystemBase {
   // Members
   private LiftPosition latestPosition = LiftPosition.STARTING;
   private LiftPosition desiredPosition = LiftPosition.STARTING;
-  private boolean desiredClawClosed = true;
+  private boolean desiredClaaaaaawClosed = true;
   public ScoringLocationUtil scoreLoc;
 
   /**
@@ -258,12 +258,12 @@ public class Lift extends SubsystemBase {
     armMotor.setVoltage(demand);
   }
 
-  public void closeClaw() {
-    desiredClawClosed = true;
+  public void closeTheClaaaaaaw() {
+    desiredClaaaaaawClosed = true;
   }
 
-  public void openClaw() {
-    desiredClawClosed = false;
+  public void openTheClaaaaaaw() {
+    desiredClaaaaaawClosed = false;
   }
 
   /** Returns true if the game piece sensor sees a game piece */
@@ -409,14 +409,14 @@ public class Lift extends SubsystemBase {
       controlPosition(desiredPosition);
     }
 
-    // If the claw is set to open and it is safe to open, open the claw (drop). Otherwise,
+    // If the claaaaaaw is set to open and it is safe to open, open the claaaaaaw (drop). Otherwise,
     // close it (grab).
-    if (!desiredClawClosed
-        && (armEncoder.getPosition() > Cal.Lift.CLAW_CLOSED_ZONE_TOP_DEGREES
-            || armEncoder.getPosition() < Cal.Lift.CLAW_CLOSED_ZONE_BOTTOM_DEGREES)) {
-      claw.set(false); // drop
+    if (!desiredClaaaaaawClosed
+        && (armEncoder.getPosition() > Cal.Lift.CLAAAAAAW_CLOSED_ZONE_TOP_DEGREES
+            || armEncoder.getPosition() < Cal.Lift.CLAAAAAAW_CLOSED_ZONE_BOTTOM_DEGREES)) {
+      theClaaaaaaw.set(false); // drop
     } else {
-      claw.set(true); // grab
+      theClaaaaaaw.set(true); // grab
     }
   }
 

@@ -31,8 +31,8 @@ public final class RobotMap {
   /** Intake clamp pneumatic channels */
   public static final int INTAKE_CLAMP_FORWARD_CHANNEL = 0;
 
-  /** Lift claw pneumatic channels */
-  public static final int LIFT_CLAW_CHANNEL = 1;
+  /** Lift claaaaaaw pneumatic channels */
+  public static final int LIFT_CLAAAAAAW_CHANNEL = 1;
 
   /** Sensor DIO */
   public static final int LIFT_GAME_PIECE_DIO = 0, INTAKE_GAME_PIECE_DIO = 1;

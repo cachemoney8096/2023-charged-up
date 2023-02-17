@@ -8,7 +8,7 @@ import frc.robot.Cal;
 import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lift.LiftPosition;
 
-/** moves lift to OUTTAKING position, opens the claw, waits, closes the claw */
+/** moves lift to OUTTAKING position, opens the claaaaaaw, waits, closes the claaaaaaw */
 public class OuttakeSequence extends SequentialCommandGroup {
 
   public OuttakeSequence(Lift lift) {
@@ -16,8 +16,8 @@ public class OuttakeSequence extends SequentialCommandGroup {
     addCommands(
         new RunCommand(() -> lift.setDesiredPosition(LiftPosition.OUTTAKING), lift)
             .until(() -> lift.atPosition(LiftPosition.OUTTAKING)),
-        new InstantCommand(lift::openClaw, lift),
-        new WaitCommand(Cal.Lift.OUTTAKE_CLAW_WAIT_TIME_SECONDS),
-        new InstantCommand(lift::closeClaw, lift));
+        new InstantCommand(lift::openTheClaaaaaaw, lift),
+        new WaitCommand(Cal.Lift.OUTTAKE_CLAAAAAAW_WAIT_TIME_SECONDS),
+        new InstantCommand(lift::closeTheClaaaaaaw, lift));
   }
 }
