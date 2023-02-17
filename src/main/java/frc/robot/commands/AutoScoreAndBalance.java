@@ -27,7 +27,6 @@ public class AutoScoreAndBalance extends SequentialCommandGroup {
 
   public AutoScoreAndBalance(boolean isFirstPath, Lift lift, DriveSubsystem drive, ScoringLocationUtil scoringLocationUtil) {
     addCommands(
-      new InstantCommand(()->scoringLocationUtil.toggleMiddleGrid()), //is this needed??
       new InstantCommand(() -> scoringLocationUtil.setScoreCol(ScoreCol.RIGHT)),
       new InstantCommand(() -> scoringLocationUtil.setScoreHeight(ScoreHeight.HIGH)),
       new InstantCommand(lift::ManualPrepScoreSequence, lift),
@@ -35,9 +34,9 @@ public class AutoScoreAndBalance extends SequentialCommandGroup {
       new InstantCommand(lift::startScore, lift),
       new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
       new finishScore(lift),
+      new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
       drive.followTrajectoryCommand(traj, isFirstPath),
-      new AutoChargeStationBalance(drive),
-      new InstantCommand(()->scoringLocationUtil.toggleMiddleGrid())); //i assume i should toggle this back as we want it to by default be at false
+      new AutoChargeStationBalance(drive));
   }
 
   public PathPlannerTrajectory getTrajectory() {
