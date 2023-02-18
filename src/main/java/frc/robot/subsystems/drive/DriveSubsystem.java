@@ -67,7 +67,7 @@ public class DriveSubsystem extends SubsystemBase {
             rearRight.getPosition()
           });
 
-  private boolean halfSpeed = false; // TODO use this
+  private boolean halfSpeed = false;
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {}
@@ -131,6 +131,11 @@ public class DriveSubsystem extends SubsystemBase {
     xSpeed *= Constants.SwerveDrive.MAX_SPEED_METERS_PER_SECOND;
     ySpeed *= Constants.SwerveDrive.MAX_SPEED_METERS_PER_SECOND;
     rot *= Constants.SwerveDrive.MAX_ANGULAR_SPEED_RAD_PER_SECONDS;
+
+    if (halfSpeed) {
+      xSpeed /= 2;
+      ySpeed /= 2;
+    }
 
     var swerveModuleStates =
         Constants.SwerveDrive.DRIVE_KINEMATICS.toSwerveModuleStates(
