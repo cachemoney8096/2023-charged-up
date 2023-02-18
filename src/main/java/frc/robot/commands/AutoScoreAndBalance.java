@@ -27,8 +27,6 @@ public class AutoScoreAndBalance extends SequentialCommandGroup {
 
   public AutoScoreAndBalance(boolean isFirstPath, Lift lift, DriveSubsystem drive, ScoringLocationUtil scoringLocationUtil) {
     addCommands(
-      new InstantCommand(() -> scoringLocationUtil.setScoreCol(ScoreCol.RIGHT)),
-      new InstantCommand(() -> scoringLocationUtil.setScoreHeight(ScoreHeight.HIGH)),
       new InstantCommand(lift::ManualPrepScoreSequence, lift),
       new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
       new InstantCommand(lift::startScore, lift),
