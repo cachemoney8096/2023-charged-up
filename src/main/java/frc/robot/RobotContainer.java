@@ -22,7 +22,6 @@ import frc.robot.commands.finishScore;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
 import frc.robot.subsystems.Lift;
-import frc.robot.subsystems.Lift.LiftPosition;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.TagLimelight;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -117,21 +116,25 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    driverController.a().onTrue(new InstantCommand(drive::toggleSkids, drive));
+    driverController.a().onTrue(new InstantCommand(drive::toggleSkids));
     driverController.b().onTrue(new OuttakeSequence(lift));
     driverController.x().onTrue(new InstantCommand(lift::cancelScore, lift));
-    driverController
-        .y()
-        .whileTrue(new InstantCommand(lift::ManualPrepScoreSequence, lift).repeatedly());
+    driverController.y().onTrue(new InstantCommand(lift::ManualPrepScoreSequence, lift));
 
-    driverController
-        .back()
-        .onTrue(new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.STARTING), lift));
-    driverController.start().onTrue(new InstantCommand(drive::halfSpeedToggle, drive));
+    driverController.back().onTrue(new InstantCommand(lift::home, lift));
+    driverController.start().onTrue(new InstantCommand(drive::halfSpeedToggle));
 
     // TODO Maybe: steal
     driverController.rightBumper().onTrue(new InstantCommand(lift::prepScore, lift));
-    driverController.leftTrigger().onTrue(new IntakeSequence(intake, lift));
+    driverController
+        .leftTrigger()
+        .whileTrue(
+            new IntakeSequence(intake, lift)
+                .finallyDo(
+                    (boolean interrupted) -> {
+                      lift.home();
+                      lift.closeGrabber();
+                    }));
     driverController.rightTrigger().onTrue(new InstantCommand(lift::startScore, lift));
     driverController.rightTrigger().onFalse(new finishScore(lift));
 
