@@ -13,7 +13,7 @@ public class finishScore extends SequentialCommandGroup {
     /** if scoring action is cancelled, then don't run finish score and reset cancelScore */
     if (lift.getCancelScore()) {
       lift.setCancelScore(false);
-      return;
+      this.cancel();
     }
     addRequirements(lift);
     addCommands(
