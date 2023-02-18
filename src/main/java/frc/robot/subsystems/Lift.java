@@ -108,6 +108,12 @@ public class Lift extends SubsystemBase {
    */
   TreeMap<LiftPosition, Pair<Double, Double>> liftPositionMap;
 
+  /**
+   * Passed into finishScore to see if the scoring action was cancelled (true if scoring action is
+   * cancelled)
+   */
+  private boolean cancelScore = false;
+
   /** Creates a new Lift */
   public Lift(ScoringLocationUtil scoreLoc) {
     SparkMaxUtils.initWithRetry(this::initSparks, Cal.SPARK_INIT_RETRY_ATTEMPTS);
@@ -307,8 +313,35 @@ public class Lift extends SubsystemBase {
             - Cal.Lift.ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES);
   }
 
+  /**
+   * if the robot has completed startScore but hasn't started finishScore, then stop the robot from
+   * scoring
+   */
   public void cancelScore() {
-    // TODO do this
+    // means startScore has run
+    if (desiredPosition == LiftPosition.PRE_SCORE_HIGH_CONE
+        || desiredPosition == LiftPosition.PRE_SCORE_MID_CONE) {
+      // but finishScore hasn't run
+      if (desiredGrabberClosed) {
+        // check to see if startScore had changed the desiredPosition to HIGH or MID
+        if (desiredPosition == LiftPosition.PRE_SCORE_HIGH_CONE) {
+          setDesiredPosition(LiftPosition.SCORE_HIGH_CONE);
+        } else {
+          setDesiredPosition(LiftPosition.SCORE_MID_CONE);
+        }
+        setCancelScore(true);
+      }
+    }
+  }
+
+  /** returns cancelScore (true if scoring action is cancelled) */
+  public boolean getCancelScore() {
+    return this.cancelScore;
+  }
+
+  /** sets cancelScore (true if scoring action is cancelled) */
+  public void setCancelScore(boolean cancelled) {
+    this.cancelScore = cancelled;
   }
 
   public void home() {

@@ -10,6 +10,11 @@ import frc.robot.subsystems.Lift.LiftPosition;
 
 public class finishScore extends SequentialCommandGroup {
   public finishScore(Lift lift) {
+    /** if scoring action is cancelled, then don't run finish score and reset cancelScore */
+    if (lift.getCancelScore()) {
+      lift.setCancelScore(false);
+      this.cancel();
+    }
     addRequirements(lift);
     addCommands(
         new InstantCommand(lift::openGrabber, lift),
