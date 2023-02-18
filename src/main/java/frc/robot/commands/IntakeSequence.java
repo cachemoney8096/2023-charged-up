@@ -64,6 +64,6 @@ public class IntakeSequence extends SequentialCommandGroup {
 
         // triggers the lift to move to the starting position. This does not need a timeout even
         // though it is a longer action, because it is the final action in the sequence
-        new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.STARTING), lift));
+        new InstantCommand(lift::home, lift));
   }
 }
