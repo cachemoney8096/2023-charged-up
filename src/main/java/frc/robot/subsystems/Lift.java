@@ -179,7 +179,7 @@ public class Lift extends SubsystemBase {
 
     // inverting stuff
     errors += SparkMaxUtils.check(armAbsoluteEncoder.setInverted(true));
-    errors += SparkMaxUtils.check(elevatorLeftAbsEncoder.setInverted(true));
+    errors += SparkMaxUtils.check(elevatorLeftAbsEncoder.setInverted(false));
     armMotor.setInverted(false);
 
     // Get positions and degrees of elevator through encoder in inches
