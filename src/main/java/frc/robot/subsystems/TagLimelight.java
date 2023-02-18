@@ -30,6 +30,7 @@ public class TagLimelight extends SubsystemBase {
   private SimDouble m_latency;
   private SimDouble m_tx;
   private SimDouble m_ty;
+  private SimDouble m_tid;
   private SimBoolean m_valid;
 
   // NT published variables when using translation api
@@ -41,6 +42,7 @@ public class TagLimelight extends SubsystemBase {
   NetworkTableEntry tx = table.getEntry("tx");
   NetworkTableEntry ty = table.getEntry("ty");
   NetworkTableEntry ta = table.getEntry("ta");
+  NetworkTableEntry tid = table.getEntry("tid");
 
   /**
    * Create an IntakeLimelight object
@@ -64,6 +66,7 @@ public class TagLimelight extends SubsystemBase {
       m_tx = m_simDevice.createDouble("Tx", Direction.kBidir, 0.0);
       m_ty = m_simDevice.createDouble("Ty", Direction.kBidir, 0.0);
       m_valid = m_simDevice.createBoolean("Valid", Direction.kBidir, false);
+      m_tid = m_simDevice.createDouble("Target ID", Direction.kBidir, 0.0);
     }
   }
 
@@ -191,8 +194,18 @@ public class TagLimelight extends SubsystemBase {
   }
 
   /**
+   * @return tid - ID of the April tag that is in view, fetch m_tid if m_simdevice is not null
+   */
+  public double getTid() {
+    if (m_simDevice != null) {
+      return m_tid.get();
+    }
+    return table.getEntry("tid").getDouble(0.0);
+  }
+
+  /**
    * @return latency - The pipeline’s latency contribution in seconds. Add at least 11ms for image
-   *     capture latency.
+   * capture latency.
    */
   public double getLatency() {
     if (m_simDevice != null) {
@@ -326,7 +339,7 @@ public class TagLimelight extends SubsystemBase {
     m_lastY = result.getY();
 
     return result;
-  }
+  }   
 
   /**
    * Get a 2d translation from the camera to the target, including normalization to handle the
