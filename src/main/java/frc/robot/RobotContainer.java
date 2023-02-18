@@ -76,7 +76,7 @@ public class RobotContainer {
   public void initialize() {
     // autons
     autonChooser.setDefaultOption("Balance", new AutoChargeStationSequence(true, drive));
-    autonChooser.addOption("Score, balance", new AutoScoreAndBalance(true, lift, drive));
+    autonChooser.addOption("Score, balance", new AutoScoreAndBalance(true, lift, drive, scoreLoc));
 
     // Put the chooser on the dashboard
     SmartDashboard.putData(autonChooser);
