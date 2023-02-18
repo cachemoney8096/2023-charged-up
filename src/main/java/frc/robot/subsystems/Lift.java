@@ -324,20 +324,13 @@ public class Lift extends SubsystemBase {
    * scoring
    */
   public void cancelScore() {
-    // means startScore has run
-    if (desiredPosition == LiftPosition.PRE_SCORE_HIGH_CONE
-        || desiredPosition == LiftPosition.PRE_SCORE_MID_CONE) {
-      // but finishScore hasn't run
-      if (desiredGrabberClosed) {
-        // check to see if startScore had changed the desiredPosition to HIGH or MID
-        if (desiredPosition == LiftPosition.PRE_SCORE_HIGH_CONE) {
-          setDesiredPosition(LiftPosition.SCORE_HIGH_CONE);
-        } else {
-          setDesiredPosition(LiftPosition.SCORE_MID_CONE);
-        }
-        setCancelScore(true);
-      }
-    }
+    setCancelScore(true);
+  }
+
+  public void finishScoreCancelled(){
+    setCancelScore(false);
+    ManualPrepScoreSequence();
+    openGrabber();
   }
 
   /** returns cancelScore (true if scoring action is cancelled) */
