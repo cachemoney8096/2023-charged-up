@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
@@ -87,6 +88,8 @@ public class Intake extends SubsystemBase {
     errors += SparkMaxUtils.check(intakeRight.restoreFactoryDefaults());
     errors += SparkMaxUtils.check(intakeRight.follow(intakeLeft, true));
 
+    intakeLeft.setInverted(false);
+
     errors += SparkMaxUtils.check(deployMotor.setIdleMode(IdleMode.kCoast));
     errors += SparkMaxUtils.check(deployMotor.setIdleMode(IdleMode.kCoast));
 
@@ -103,6 +106,8 @@ public class Intake extends SubsystemBase {
   /** Does all the initialization for the spark, return true on success */
   private boolean setUpDeploySpark() {
     int errors = 0;
+    //invert it
+    deployMotor.setInverted(true);
 
     errors += SparkMaxUtils.check(deployMotor.restoreFactoryDefaults());
     errors +=

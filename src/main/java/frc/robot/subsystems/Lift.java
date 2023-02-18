@@ -168,6 +168,8 @@ public class Lift extends SubsystemBase {
 
   /** Does all the initialization for the sparks, return true on success */
   private boolean initSparks() {
+    /** TODO: check which way the cables on the elevator are wrapped */ 
+
     int errors = 0;
 
     errors += SparkMaxUtils.check(elevatorLeft.restoreFactoryDefaults());
@@ -175,6 +177,11 @@ public class Lift extends SubsystemBase {
     errors += SparkMaxUtils.check(armMotor.restoreFactoryDefaults());
 
     errors += SparkMaxUtils.check(elevatorRight.follow(elevatorLeft, true));
+
+    //inverting stuff
+    errors += SparkMaxUtils.check(armAbsoluteEncoder.setInverted(true));
+    errors += SparkMaxUtils.check(elevatorLeftAbsEncoder.setInverted(true));
+    armMotor.setInverted(false);
 
     // Get positions and degrees of elevator through encoder in inches
     errors +=
