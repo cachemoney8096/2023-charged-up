@@ -269,6 +269,7 @@ public final class Cal {
 
   public static final int SPARK_INIT_RETRY_ATTEMPTS = 5;
 
-  public static final double DISTANCE_BACK_FROM_TAG_METERS = 1;
+  public static final double DISTANCE_BACK_FROM_TAG_LOW_METERS = 1;
+  public static final double DISTANCE_BACK_FROM_TAG_MID_HIGH_METERS = 0.5;
   public static final double HORIZONTAL_DISTANCE_TAG_TO_RIGHT_CONE_METERS = PLACEHOLDER_DOUBLE;
 }
