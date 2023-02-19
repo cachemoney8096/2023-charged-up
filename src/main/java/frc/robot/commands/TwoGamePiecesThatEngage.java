@@ -29,12 +29,16 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
   private PathPlannerTrajectory trajInit =
       PathPlanner.loadPath(
           "InitScoreAndGetGamePiece",
-          new PathConstraints(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+          new PathConstraints(
+              Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
+              Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
   private PathPlannerTrajectory trajCharge =
       PathPlanner.loadPath(
           "ScoringLocToChargeStation",
-          new PathConstraints(Cal.PLACEHOLDER_DOUBLE, Cal.PLACEHOLDER_DOUBLE));
+          new PathConstraints(
+              Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
+              Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
   private HashMap<String, Command> eventMap = new HashMap<>();
 

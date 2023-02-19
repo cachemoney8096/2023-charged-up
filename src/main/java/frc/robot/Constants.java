@@ -130,6 +130,7 @@ public final class Constants {
     public static final double ARM_MOTOR_GEAR_RATIO = 75.0;
 
     /** When are is at this position, the arm is horizontal and pointing up */
+    // TODO adjust based on arm CoM instead of arm angle
     public static final double ARM_POSITION_WHEN_HORIZONTAL_DEGREES = 90;
 
     /** Scalar for the difference in the elevator's absolute encoders in inches per degree */
@@ -141,6 +142,7 @@ public final class Constants {
     public static final double DEPLOY_MOTOR_GEAR_RATIO = 75.0;
 
     /** Intake position when the intake is horizontal and pointing up / forward */
+    // TODO adjust based on intake CoM instead of intake arm angle
     public static final double POSITION_WHEN_HORIZONTAL_DEGREES = 0;
   }
 }

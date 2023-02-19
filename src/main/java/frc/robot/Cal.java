@@ -85,7 +85,7 @@ public final class Cal {
     /** Past this position, the intake is free to clamp */
     public static final double CLAMP_POSITION_THRESHOLD_DEGREES = 110.0;
 
-    /** Absolute encoder position when the arm is at 0 degrees */
+    /** Absolute encoder position when the intake is at starting position */
     public static final double ABSOLUTE_ENCODER_START_POS_DEG = Cal.PLACEHOLDER_DOUBLE;
 
     /** Voltage required to hold the intake in the horizontal position */
@@ -111,7 +111,8 @@ public final class Cal {
 
     /** Input deg/s, output volts. From recalc */
     public static final SimpleMotorFeedforward DEPLOY_FEEDFORWARD =
-        new SimpleMotorFeedforward(0.0, 1.46 * 360 / (2 * Math.PI), 0.02 * 360 / (2 * Math.PI));
+        new SimpleMotorFeedforward(
+            0.0, 1.46 * (2.0 * Math.PI) / 360.0, 0.02 * (2.0 * Math.PI) / 360.0);
 
     /** Sets the min and max positions that the intake deploy motor will be allowed to reach. */
     public static final float
@@ -185,7 +186,7 @@ public final class Cal {
     /** Input deg/s, output volts. From recalc */
     public static final SimpleMotorFeedforward ARM_FEEDFORWARD =
         new SimpleMotorFeedforward(
-            0.0, 1.46 * 360.0 / (2.0 * Math.PI), 0.08 * 360.0 / (2.0 * Math.PI));
+            0.0, 1.46 * (2.0 * Math.PI) / 360.0, 0.08 * (2.0 * Math.PI) / 360.0);
 
     /** Input in/s, output volts. From recalc */
     public static final SimpleMotorFeedforward ELEVATOR_FEEDFORWARD =
@@ -240,7 +241,7 @@ public final class Cal {
     public static final double SAFE_TO_RETURN_TO_START_SECONDS = 0.5;
 
     /** Current limits for elevator sparksmax in amps */
-    public static final int ELEVATOR_CURRENT_LIMIT_AMPS = 30;
+    public static final int ELEVATOR_CURRENT_LIMIT_AMPS = 25;
 
     public static final int ARM_CURRENT_LIMIT_AMPS = 40;
   }

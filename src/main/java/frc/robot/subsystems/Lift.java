@@ -168,7 +168,6 @@ public class Lift extends SubsystemBase {
 
   /** Does all the initialization for the sparks, return true on success */
   private boolean initSparks() {
-    /** TODO: check which way the cables on the elevator are wrapped */
     int errors = 0;
 
     errors += SparkMaxUtils.check(elevatorLeft.restoreFactoryDefaults());
@@ -284,20 +283,6 @@ public class Lift extends SubsystemBase {
     return !gamePieceSensor.get();
   }
 
-  /**
-   * Scores the currently loaded game piece Currently empty because we don't know exactly what it
-   * will do
-   */
-  public void scoreGamePiece() {}
-
-  /**
-   * Says whether or not the robot is done scoring a game piece Currently empty because we don't
-   * know exactly what it will look like
-   */
-  public boolean doneScoring() {
-    return true; // Placeholder until logic is made
-  }
-
   /** Returns the cosine of the arm angle in degrees off of the horizontal. */
   public double getCosineArmAngle() {
     return Math.cos(armEncoder.getPosition() - Constants.Lift.ARM_POSITION_WHEN_HORIZONTAL_DEGREES);
@@ -354,16 +339,12 @@ public class Lift extends SubsystemBase {
     setDesiredPosition(LiftPosition.STARTING);
   }
 
-  public void prepScore() {
-    // TODO do this
-  }
-
   public void startScore() {
     if (scoreLoc.isCone()) {
       if (scoreLoc.getScoreHeight() == ScoreHeight.HIGH) {
-        setDesiredPosition(LiftPosition.PRE_SCORE_HIGH_CONE);
+        setDesiredPosition(LiftPosition.SCORE_HIGH_CONE);
       } else if (scoreLoc.getScoreHeight() == ScoreHeight.MID) {
-        setDesiredPosition(LiftPosition.PRE_SCORE_MID_CONE);
+        setDesiredPosition(LiftPosition.SCORE_MID_CONE);
       }
     }
   }
@@ -529,9 +510,9 @@ public class Lift extends SubsystemBase {
     // left and right columns are for cones
     else if (scoreLoc.isCone()) {
       if (height == ScoreHeight.MID) {
-        setDesiredPosition(LiftPosition.SCORE_MID_CONE);
+        setDesiredPosition(LiftPosition.PRE_SCORE_MID_CONE);
       } else {
-        setDesiredPosition(LiftPosition.SCORE_HIGH_CONE);
+        setDesiredPosition(LiftPosition.PRE_SCORE_MID_CONE);
       }
     }
     // middle columns are for cubes
