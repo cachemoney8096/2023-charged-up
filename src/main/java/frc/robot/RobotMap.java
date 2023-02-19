@@ -31,7 +31,7 @@ public final class RobotMap {
   /** Intake clamp pneumatic channels */
   public static final int INTAKE_CLAMP_FORWARD_CHANNEL = 0;
 
-  /** Lift grabbing pneumatic channels */
+  /** Lift grabbingf pneumatic channels */
   public static final int LIFT_GRABBING_CHANNEL = 1;
 
   /** Sensor DIO */
