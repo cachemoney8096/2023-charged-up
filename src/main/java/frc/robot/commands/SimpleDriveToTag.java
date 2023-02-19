@@ -11,47 +11,62 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Cal;
 import frc.robot.subsystems.TagLimelight;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.utils.ScoringLocationUtil;
 
 public class SimpleDriveToTag extends CommandBase {
   private TagLimelight limelight;
   private DriveSubsystem drive;
+  private ScoringLocationUtil scoreLoc;
 
-  public SimpleDriveToTag(TagLimelight limelight, DriveSubsystem drive) {
+  public SimpleDriveToTag(
+      TagLimelight limelight, DriveSubsystem drive, ScoringLocationUtil scoreLoc) {
     addRequirements(limelight, drive);
     this.limelight = limelight;
     this.drive = drive;
+    this.scoreLoc = scoreLoc;
   }
 
   @Override
   public void execute() {
-    // Rotation2d robotRotation = drive.getPose().getRotation();
-    // Translation2d robotPos = drive.getPose().getTranslation();
     if (limelight.isValidTarget()) {
-      Translation2d zeroTranslation = new Translation2d(0, 0);
-      Rotation2d zeroRotation = new Rotation2d(0);
-      Pose2d currentPose = drive.getPose();
+      Pose2d robotPose = drive.getPose();
+      double robotAngleRad = robotPose.getRotation().getRadians();
 
       Translation2d tagPosFromRobot = limelight.getTargetTranslation();
-      Rotation2d tagAngleRelativeToRobot =
-          new Rotation2d(tagPosFromRobot.getY() / tagPosFromRobot.getX());
-      Pose2d tagPoseFromRobot = new Pose2d(tagPosFromRobot, tagAngleRelativeToRobot);
 
-      // double correctedXVal = -(tagPos.getX());
-      // double correctedYVal = -(tagPos.getY());
-      // Translation2d correctedTagRelativeToRobot = new Translation2d(correctedXVal,
-      // correctedYVal);
-      // PathPoint robotPoint = new PathPoint(zeroTranslation, zeroRotation);
-      // PathPoint tagPoint = new PathPoint(correctedTagRelativeToRobot, tagAngleRelativeToRobot);
+      Translation2d tagPosFromNormalizedRobot =
+          new Translation2d(
+              Math.cos(robotAngleRad) * tagPosFromRobot.getX()
+                  - Math.sin(robotAngleRad) * tagPosFromRobot.getY(),
+              Math.sin(robotAngleRad) * tagPosFromRobot.getX()
+                  + Math.cos(robotAngleRad) * tagPosFromRobot.getY());
 
-      // TODO get actual limelight position
-      // TODO get translation of intended robot loc vs tag loc
+      double horizTranslationFromTag;
+      if (scoreLoc.getScoreCol() == ScoringLocationUtil.ScoreCol.RIGHT) {
+        horizTranslationFromTag = Cal.HORIZONTAL_DISTANCE_TAG_TO_RIGHT_CONE_METERS;
+      } else if (scoreLoc.getScoreCol() == ScoringLocationUtil.ScoreCol.LEFT) {
+        horizTranslationFromTag = -Cal.HORIZONTAL_DISTANCE_TAG_TO_RIGHT_CONE_METERS;
+      } else {
+        horizTranslationFromTag = 0;
+      }
+
+      Translation2d locationToDriveTo =
+          new Translation2d(
+              tagPosFromNormalizedRobot.getX() + Cal.DISTANCE_BACK_FROM_TAG_METERS,
+              tagPosFromNormalizedRobot.getY() + horizTranslationFromTag);
+
+      double angleToRotate = -robotPose.getRotation().getDegrees();
+
       PathPlannerTrajectory robotToTag =
           PathPlanner.generatePath(
               new PathConstraints(
                   Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
                   Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ),
-              new PathPoint(currentPose.getTranslation(), currentPose.getRotation()),
-              new PathPoint(tagPoseFromRobot.getTranslation(), tagAngleRelativeToRobot));
+              new PathPoint(robotPose.getTranslation(), robotPose.getRotation()),
+              new PathPoint(
+                  locationToDriveTo,
+                  Rotation2d.fromDegrees(180),
+                  Rotation2d.fromDegrees(angleToRotate)));
       drive.followTrajectoryCommand(robotToTag, false);
     }
   }
