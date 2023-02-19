@@ -119,9 +119,7 @@ public class RobotContainer {
   private void configureBindings() {
     driverController.a().onTrue(new InstantCommand(drive::toggleSkids));
     driverController.b().onTrue(new OuttakeSequence(lift));
-    driverController
-        .x()
-        .onTrue(new InstantCommand(lift::cancelScore, lift));
+    driverController.x().onTrue(new InstantCommand(lift::cancelScore, lift));
 
     driverController.y().onTrue(new InstantCommand(lift::ManualPrepScoreSequence, lift));
 
@@ -140,10 +138,13 @@ public class RobotContainer {
                       lift.closeGrabber();
                     }));
     driverController.rightTrigger().onTrue(new InstantCommand(lift::startScore, lift));
-    driverController.rightTrigger().onFalse(new ConditionalCommand(
-        new InstantCommand(lift::finishScoreCancelled, lift),
-        new finishScore(lift),
-        lift::getCancelScore));
+    driverController
+        .rightTrigger()
+        .onFalse(
+            new ConditionalCommand(
+                new InstantCommand(lift::finishScoreCancelled, lift),
+                new finishScore(lift),
+                lift::getCancelScore));
 
     operatorController
         .povDown()

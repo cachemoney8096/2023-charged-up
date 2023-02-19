@@ -325,13 +325,13 @@ public class Lift extends SubsystemBase {
    * scoring
    */
   public void cancelScore() {
-    if (scoringInProgress){
+    if (scoringInProgress) {
       setCancelScore(true);
     }
   }
 
   /** Runs instead of finishScore if cancelScore is true. */
-  public void finishScoreCancelled(){
+  public void finishScoreCancelled() {
     setCancelScore(false);
     ManualPrepScoreSequence();
     closeGrabber();
@@ -348,7 +348,7 @@ public class Lift extends SubsystemBase {
   }
 
   /** sets scoringInProgress */
-  public void setScoringInProgress(boolean isScoring){
+  public void setScoringInProgress(boolean isScoring) {
     scoringInProgress = isScoring;
   }
 
