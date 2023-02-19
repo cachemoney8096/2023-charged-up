@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -119,6 +120,7 @@ public class RobotContainer {
     driverController.a().onTrue(new InstantCommand(drive::toggleSkids));
     driverController.b().onTrue(new OuttakeSequence(lift));
     driverController.x().onTrue(new InstantCommand(lift::cancelScore, lift));
+
     driverController.y().onTrue(new InstantCommand(lift::ManualPrepScoreSequence, lift));
 
     driverController.back().onTrue(new InstantCommand(lift::home, lift));
@@ -137,7 +139,13 @@ public class RobotContainer {
                       lift.closeGrabber();
                     }));
     driverController.rightTrigger().onTrue(new InstantCommand(lift::startScore, lift));
-    driverController.rightTrigger().onFalse(new finishScore(lift));
+    driverController
+        .rightTrigger()
+        .onFalse(
+            new ConditionalCommand(
+                new InstantCommand(lift::finishScoreCancelled, lift),
+                new finishScore(lift),
+                lift::getCancelScore));
 
     operatorController
         .povDown()
