@@ -325,17 +325,16 @@ public class Lift extends SubsystemBase {
    * scoring
    */
   public void cancelScore() {
-    setCancelScore(true);
+    if (scoringInProgress){
+      setCancelScore(true);
+    }
   }
 
   /** Runs instead of finishScore if cancelScore is true. */
   public void finishScoreCancelled(){
-    if (scoringInProgress){
-      setCancelScore(false);
-      ManualPrepScoreSequence();
-      closeGrabber();
-    }
-    setScoringInProgress(false);
+    setCancelScore(false);
+    ManualPrepScoreSequence();
+    closeGrabber();
   }
 
   /** returns cancelScore (true if scoring action is cancelled) */
