@@ -205,7 +205,7 @@ public class TagLimelight extends SubsystemBase {
 
   /**
    * @return latency - The pipeline’s latency contribution in seconds. Add at least 11ms for image
-   * capture latency.
+   *     capture latency.
    */
   public double getLatency() {
     if (m_simDevice != null) {
@@ -339,7 +339,7 @@ public class TagLimelight extends SubsystemBase {
     m_lastY = result.getY();
 
     return result;
-  }   
+  }
 
   /**
    * Get a 2d translation from the camera to the target, including normalization to handle the
