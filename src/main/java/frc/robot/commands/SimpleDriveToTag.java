@@ -50,9 +50,16 @@ public class SimpleDriveToTag extends CommandBase {
         horizTranslationFromTag = 0;
       }
 
+      double backTranslationFromTag;
+      if (scoreLoc.getScoreHeight() == ScoringLocationUtil.ScoreHeight.LOW){
+        backTranslationFromTag = Cal.DISTANCE_BACK_FROM_TAG_LOW_METERS;
+      } else {
+        backTranslationFromTag = Cal.DISTANCE_BACK_FROM_TAG_MID_HIGH_METERS;
+      }
+
       Translation2d locationToDriveTo =
           new Translation2d(
-              tagPosFromNormalizedRobot.getX() + Cal.DISTANCE_BACK_FROM_TAG_METERS,
+              tagPosFromNormalizedRobot.getX() + backTranslationFromTag,
               tagPosFromNormalizedRobot.getY() + horizTranslationFromTag);
 
       double angleToRotate = -robotPose.getRotation().getDegrees();
