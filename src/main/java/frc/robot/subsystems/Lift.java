@@ -100,6 +100,7 @@ public class Lift extends SubsystemBase {
   private LiftPosition desiredPosition = LiftPosition.STARTING;
   private boolean desiredGrabberClosed = true;
   public ScoringLocationUtil scoreLoc;
+  private boolean scoringInProgress = false;
 
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
@@ -327,10 +328,14 @@ public class Lift extends SubsystemBase {
     setCancelScore(true);
   }
 
+  /** Runs instead of finishScore if cancelScore is true. */
   public void finishScoreCancelled(){
-    setCancelScore(false);
-    ManualPrepScoreSequence();
-    openGrabber();
+    if (scoringInProgress){
+      setCancelScore(false);
+      ManualPrepScoreSequence();
+      closeGrabber();
+    }
+    setScoringInProgress(false);
   }
 
   /** returns cancelScore (true if scoring action is cancelled) */
@@ -343,6 +348,11 @@ public class Lift extends SubsystemBase {
     this.cancelScore = cancelled;
   }
 
+  /** sets scoringInProgress */
+  public void setScoringInProgress(boolean isScoring){
+    scoringInProgress = isScoring;
+  }
+
   public void home() {
     setDesiredPosition(LiftPosition.STARTING);
   }
@@ -352,6 +362,7 @@ public class Lift extends SubsystemBase {
   }
 
   public void startScore() {
+    scoringInProgress = true;
     if (scoreLoc.isCone()) {
       if (scoreLoc.getScoreHeight() == ScoreHeight.HIGH) {
         setDesiredPosition(LiftPosition.PRE_SCORE_HIGH_CONE);

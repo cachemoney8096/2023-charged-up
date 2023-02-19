@@ -12,6 +12,7 @@ public class finishScore extends SequentialCommandGroup {
   public finishScore(Lift lift) {
     addRequirements(lift);
     addCommands(
+        new InstantCommand(() -> lift.setScoringInProgress(false)),
         new InstantCommand(lift::openGrabber, lift),
         new WaitCommand(Cal.Lift.GRABBER_OPEN_TIME_SECONDS),
         new InstantCommand(lift::closeGrabber, lift),
