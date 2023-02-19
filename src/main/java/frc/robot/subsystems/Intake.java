@@ -105,10 +105,9 @@ public class Intake extends SubsystemBase {
   /** Does all the initialization for the spark, return true on success */
   private boolean setUpDeploySpark() {
     int errors = 0;
-    // invert it
-    deployMotor.setInverted(true);
 
     errors += SparkMaxUtils.check(deployMotor.restoreFactoryDefaults());
+    deployMotor.setInverted(true);
     errors +=
         SparkMaxUtils.check(
             SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(

@@ -125,7 +125,8 @@ public class RobotContainer {
     driverController.start().onTrue(new InstantCommand(drive::halfSpeedToggle));
 
     // TODO Maybe: steal
-    driverController.rightBumper().onTrue(new InstantCommand(lift::prepScore, lift));
+    // TODO: implement autoscore command for teleop
+    // driverController.rightBumper().onTrue(new InstantCommand(lift::prepScore, lift));
     driverController
         .leftTrigger()
         .whileTrue(

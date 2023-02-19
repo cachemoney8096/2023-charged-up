@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.drive;
 
+import com.ctre.phoenix.sensors.Pigeon2.AxisDirection;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
@@ -70,7 +71,9 @@ public class DriveSubsystem extends SubsystemBase {
   private boolean halfSpeed = false;
 
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {}
+  public DriveSubsystem() {
+    gyro.configMountPose(AxisDirection.PositiveY, AxisDirection.PositiveZ);
+  }
 
   @Override
   public void periodic() {
