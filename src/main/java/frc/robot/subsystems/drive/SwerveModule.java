@@ -23,16 +23,19 @@ import frc.robot.utils.SparkMaxUtils;
 
 public class SwerveModule implements Sendable {
   private final CANSparkMax drivingSparkMax;
-  private final CANSparkMax turningSparkMax;
+  public final CANSparkMax turningSparkMax;
 
   private final RelativeEncoder drivingEncoder;
-  private final AbsoluteEncoder turningEncoder;
+  public final AbsoluteEncoder turningEncoder;
 
   private final SparkMaxPIDController drivingPIDController;
   private final SparkMaxPIDController turningPIDController;
 
   private double chassisAngularOffsetRadians = 0;
   private SwerveModuleState desiredState = new SwerveModuleState(0.0, new Rotation2d());
+
+    public double desiredVelMps = 0.0;
+    public double desiredPosRad = 0.0;
 
   /**
    * Constructs a SwerveModule and configures the driving and turning motor, encoder, and PID
@@ -61,10 +64,11 @@ public class SwerveModule implements Sendable {
     int errors = 0;
 
     errors += SparkMaxUtils.check(turningSparkMax.restoreFactoryDefaults());
+    turningSparkMax.setInverted(false);
 
     AbsoluteEncoder turningEncoderTmp = turningSparkMax.getAbsoluteEncoder(Type.kDutyCycle);
     SparkMaxPIDController turningPidTmp = turningSparkMax.getPIDController();
-    errors += SparkMaxUtils.check(turningPidTmp.setFeedbackDevice(turningEncoder));
+    errors += SparkMaxUtils.check(turningPidTmp.setFeedbackDevice(turningEncoderTmp));
 
     // Gear ratio 1.0 because the encoder is 1:1 with the module (doesn't involve the actual turning
     // gear ratio)
@@ -117,9 +121,11 @@ public class SwerveModule implements Sendable {
     int errors = 0;
     errors += SparkMaxUtils.check(drivingSparkMax.restoreFactoryDefaults());
 
+    drivingSparkMax.setInverted(true);
+
     RelativeEncoder drivingEncoderTmp = drivingSparkMax.getEncoder();
     SparkMaxPIDController drivingPidTmp = drivingSparkMax.getPIDController();
-    errors += SparkMaxUtils.check(drivingPidTmp.setFeedbackDevice(drivingEncoder));
+    errors += SparkMaxUtils.check(drivingPidTmp.setFeedbackDevice(drivingEncoderTmp));
 
     errors += SparkMaxUtils.check(drivingPidTmp.setP(Cal.SwerveModule.DRIVING_P));
     errors += SparkMaxUtils.check(drivingPidTmp.setI(Cal.SwerveModule.DRIVING_I));
@@ -210,9 +216,14 @@ public class SwerveModule implements Sendable {
         SwerveModuleState.optimize(
             correctedDesiredState, new Rotation2d(turningEncoder.getPosition()));
 
+            desiredVelMps = optimizedDesiredState.speedMetersPerSecond;
+            desiredPosRad = optimizedDesiredState.angle.getRadians();
+
     // Command driving and turning SPARKS MAX towards their respective setpoints.
+    // drivingPIDController.setReference(
+    //     optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
     drivingPIDController.setReference(
-        optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
+        0.0, CANSparkMax.ControlType.kVelocity);
     turningPIDController.setReference(
         optimizedDesiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
   }
@@ -223,6 +234,7 @@ public class SwerveModule implements Sendable {
   }
 
   public void initSendable(SendableBuilder builder) {
+    builder.setActuator(true);
     builder.addDoubleProperty("Driving kP", drivingPIDController::getP, drivingPIDController::setP);
     builder.addDoubleProperty("Driving kI", drivingPIDController::getI, drivingPIDController::setI);
     builder.addDoubleProperty("Driving kD", drivingPIDController::getD, drivingPIDController::setD);

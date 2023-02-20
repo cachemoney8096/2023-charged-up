@@ -13,11 +13,14 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
@@ -49,8 +52,9 @@ public class Intake extends SubsystemBase {
               Cal.Intake.DEPLOY_MAX_VELOCITY_DEG_PER_SECOND,
               Cal.Intake.DEPLOY_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED));
 
-  private Solenoid clamp =
-      new Solenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_CLAMP_FORWARD_CHANNEL);
+  // TODO change to two single solenoids later
+  private DoubleSolenoid clamp =
+      new DoubleSolenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_CLAMP_FORWARD_CHANNEL, 5);
   private CANSparkMax intakeLeft =
       new CANSparkMax(RobotMap.INTAKE_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
   private CANSparkMax intakeRight =
@@ -68,6 +72,10 @@ public class Intake extends SubsystemBase {
   private boolean desireClamped = false;
   private BooleanSupplier clearOfIntake;
 
+  private double intakeDemandA = 0.0;
+  private double intakeDemandB = 0.0;
+  private double intakeDemandC = 0.0;
+
   /** Creates a new Intake. */
   public Intake(BooleanSupplier clearOfIntakeZone) {
     clearOfIntake = clearOfIntakeZone;
@@ -76,7 +84,7 @@ public class Intake extends SubsystemBase {
     SparkMaxUtils.initWithRetry(this::setUpIntakeWheelSparks, Cal.SPARK_INIT_RETRY_ATTEMPTS);
 
     deployMotorController.setTolerance(Cal.Intake.DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG);
-    deployMotorController.enableContinuousInput(0.0, 2 * Math.PI);
+    // deployMotorController.enableContinuousInput(0.0, 360.0);
   }
 
   /** Does all the initialization for the sparks, return true on success */
@@ -107,7 +115,7 @@ public class Intake extends SubsystemBase {
     int errors = 0;
 
     errors += SparkMaxUtils.check(deployMotor.restoreFactoryDefaults());
-    deployMotor.setInverted(true);
+    deployMotor.setInverted(false);
     errors +=
         SparkMaxUtils.check(
             SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(
@@ -143,8 +151,8 @@ public class Intake extends SubsystemBase {
     deployMotorEncoder.setPosition(
         AngleUtil.wrapAngle(
             deployMotorAbsoluteEncoder.getPosition()
-                - (Cal.Intake.ABSOLUTE_ENCODER_START_POS_DEG
-                    - Cal.Intake.STARTING_POSITION_DEGREES)));
+                - Cal.Intake.ABSOLUTE_ENCODER_START_POS_DEG
+                    + Cal.Intake.STARTING_POSITION_DEGREES));
 
     deployMotorController.reset(deployMotorEncoder.getPosition());
   }
@@ -165,10 +173,13 @@ public class Intake extends SubsystemBase {
   /** Sends the deploy motor voltage, needs to be called every cycle */
   private void controlPosition(double positionDeg) {
     deployMotorController.setGoal(positionDeg);
-    double demand = deployMotorController.calculate(deployMotorEncoder.getPosition());
-    demand += Cal.Intake.DEPLOY_FEEDFORWARD.calculate(deployMotorController.getSetpoint().velocity);
-    demand += Cal.Intake.ARBITRARY_FEED_FORWARD_VOLTS * getCosineIntakeAngle();
-    deployMotor.setVoltage(demand);
+    intakeDemandA = deployMotorController.calculate(deployMotorEncoder.getPosition()); 
+    intakeDemandB = Cal.Intake.DEPLOY_FEEDFORWARD.calculate(deployMotorController.getSetpoint().velocity);
+    intakeDemandC = Cal.Intake.ARBITRARY_FEED_FORWARD_VOLTS * getCosineIntakeAngle();
+
+    System.out.println("Start");
+    System.out.println(getCosineIntakeAngle());
+    deployMotor.setVoltage(intakeDemandA + intakeDemandB + intakeDemandC);
   }
 
   /** Deploys the intake out. */
@@ -194,8 +205,8 @@ public class Intake extends SubsystemBase {
 
   /** Returns the cosine of the intake angle in degrees off of the horizontal. */
   private double getCosineIntakeAngle() {
-    return Math.cos(
-        deployMotorEncoder.getPosition() - Constants.Intake.POSITION_WHEN_HORIZONTAL_DEGREES);
+    return Math.cos(Units.degreesToRadians(
+        deployMotorEncoder.getPosition() - Constants.Intake.POSITION_WHEN_HORIZONTAL_DEGREES));
   }
 
   /** If the intake has achieved its desired position, return true */
@@ -209,11 +220,11 @@ public class Intake extends SubsystemBase {
   }
 
   private void clampIntake() {
-    clamp.set(false);
+    clamp.set(Value.kOff);
   }
 
   private void unclampIntake() {
-    clamp.set(true);
+    clamp.set(Value.kForward);
   }
 
   /** Runs the intake wheels inward */
@@ -286,6 +297,11 @@ public class Intake extends SubsystemBase {
           return desireClamped;
         },
         null);
+        
+        builder.addDoubleProperty("intakeDemandA", () -> {return intakeDemandA;}, null);
+        builder.addDoubleProperty("intakeDemandB", () -> {return intakeDemandB;}, null);
+        builder.addDoubleProperty("intakeDemandC", () -> {return intakeDemandC;}, null);
+    
     builder.addBooleanProperty("At Desired Pos", this::atDesiredPosition, null);
     builder.addDoubleProperty("Intake wheel power in [-1,1]", intakeLeft::get, null);
     builder.addStringProperty(

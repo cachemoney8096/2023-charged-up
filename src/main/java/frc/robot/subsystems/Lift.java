@@ -14,6 +14,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -118,13 +119,6 @@ public class Lift extends SubsystemBase {
   /** Creates a new Lift */
   public Lift(ScoringLocationUtil scoreLoc) {
     SparkMaxUtils.initWithRetry(this::initSparks, Cal.SPARK_INIT_RETRY_ATTEMPTS);
-
-    armController.setTolerance(Cal.Lift.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG);
-    armController.enableContinuousInput(0.0, 2 * Math.PI);
-    armController.reset(armEncoder.getPosition());
-
-    elevatorController.setTolerance(Cal.Lift.ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN);
-    elevatorController.reset(elevatorLeftEncoder.getPosition());
 
     // Map of all LiftPosition with according values
     liftPositionMap = new TreeMap<LiftPosition, Pair<Double, Double>>();
@@ -255,19 +249,35 @@ public class Lift extends SubsystemBase {
     armMotor.burnFlash();
   }
 
+  public void setArmPositionGoal(double desiredArmPosDeg) {
+    armController.setGoal(desiredArmPosDeg);
+  }
+
   /** Sends voltage commands to the arm and elevator motors, needs to be called every cycle */
   private void controlPosition(LiftPosition pos) {
     elevatorController.setGoal(liftPositionMap.get(pos).getFirst());
     double elevatorDemandVolts = elevatorController.calculate(elevatorLeftEncoder.getPosition());
     elevatorDemandVolts +=
         Cal.Lift.ELEVATOR_FEEDFORWARD.calculate(elevatorController.getSetpoint().velocity);
-    elevatorLeft.setVoltage(elevatorDemandVolts);
+    // elevatorLeft.setVoltage(elevatorDemandVolts);
+    elevatorLeft.setVoltage(0.0);
 
-    armController.setGoal(liftPositionMap.get(pos).getSecond());
-    double demand = armController.calculate(armEncoder.getPosition());
-    demand += Cal.Lift.ARM_FEEDFORWARD.calculate(armController.getSetpoint().velocity);
-    demand += Cal.Lift.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle();
-    armMotor.setVoltage(demand);
+    double demandA = armController.calculate(armEncoder.getPosition());
+    double demandB = Cal.Lift.ARM_FEEDFORWARD.calculate(armController.getSetpoint().velocity);
+    double demandC = Cal.Lift.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle();
+    // armMotor.setVoltage(0.0);
+    System.out.println("Start");
+    System.out.println(demandA);
+    System.out.println(demandB);
+    System.out.println(demandC);
+    System.out.println("Midpoint");
+    System.out.println(armController.getSetpoint().velocity);
+    System.out.println(liftPositionMap.get(pos).getSecond());
+    System.out.println(armEncoder.getPosition());
+    System.out.println("Another pt");
+    System.out.println(armController.getPositionError());
+    System.out.println(armController.atSetpoint());
+    armMotor.setVoltage(demandA + demandB + demandC);
   }
 
   public void closeGrabber() {
@@ -281,12 +291,14 @@ public class Lift extends SubsystemBase {
   /** Returns true if the game piece sensor sees a game piece */
   public boolean seeGamePiece() {
     // Sensor is false if there's a game piece
-    return !gamePieceSensor.get();
+    // TODO replace once the sensor is on
+    // return !gamePieceSensor.get();
+    return true;
   }
 
   /** Returns the cosine of the arm angle in degrees off of the horizontal. */
   public double getCosineArmAngle() {
-    return Math.cos(armEncoder.getPosition() - Constants.Lift.ARM_POSITION_WHEN_HORIZONTAL_DEGREES);
+    return Math.cos(Units.degreesToRadians(armEncoder.getPosition() - Constants.Lift.ARM_POSITION_WHEN_HORIZONTAL_DEGREES));
   }
 
   public void initialize() {
@@ -303,7 +315,16 @@ public class Lift extends SubsystemBase {
         elevatorDutyCycleEncodersDifferenceDegrees
                 * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE
             - Cal.Lift.ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES);
-  }
+
+            armController.setTolerance(Cal.Lift.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG);
+            // armController.enableContinuousInput(0.0, 360.0);
+            armController.disableContinuousInput();
+            armController.reset(armEncoder.getPosition());
+            armController.setGoal(armEncoder.getPosition());
+
+            elevatorController.setTolerance(Cal.Lift.ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN);
+            elevatorController.reset(elevatorLeftEncoder.getPosition());
+          }
 
   /**
    * if the robot has completed startScore but hasn't started finishScore, then stop the robot from
@@ -417,30 +438,38 @@ public class Lift extends SubsystemBase {
 
     // If the lift is going from below to above or above to below, we have to transit through
     // starting position. Otherwise, we can go directly to the desired position.
-    LiftPositionStartRelative latestPositionStartRelative = getRelativeLiftPosition(latestPosition);
-    LiftPositionStartRelative desiredPositionStartRelative =
-        getRelativeLiftPosition(desiredPosition);
-    if (!seeGamePiece()) {
-      controlPosition(desiredPosition);
-    } else if (desiredPositionStartRelative == LiftPositionStartRelative.BELOW_START
-        && latestPositionStartRelative == LiftPositionStartRelative.ABOVE_START) {
-      controlPosition(LiftPosition.STARTING);
-    } else if (desiredPositionStartRelative == LiftPositionStartRelative.ABOVE_START
-        && latestPositionStartRelative == LiftPositionStartRelative.BELOW_START) {
-      controlPosition(LiftPosition.STARTING);
-    } else {
-      controlPosition(desiredPosition);
-    }
+    // LiftPositionStartRelative latestPositionStartRelative = getRelativeLiftPosition(latestPosition);
+    // LiftPositionStartRelative desiredPositionStartRelative =
+    //     getRelativeLiftPosition(desiredPosition);
+    // if (!seeGamePiece()) {
+    //   controlPosition(desiredPosition);
+    // } else if (desiredPositionStartRelative == LiftPositionStartRelative.BELOW_START
+    //     && latestPositionStartRelative == LiftPositionStartRelative.ABOVE_START) {
+    //   controlPosition(LiftPosition.STARTING);
+    // } else if (desiredPositionStartRelative == LiftPositionStartRelative.ABOVE_START
+    //     && latestPositionStartRelative == LiftPositionStartRelative.BELOW_START) {
+    //   controlPosition(LiftPosition.STARTING);
+    // } else {
+    //   controlPosition(desiredPosition);
+    // }
+    controlPosition(desiredPosition);
 
-    // If the grabber is set to open and it is safe to open, open the grabber (drop). Otherwise,
-    // close it (grab).
-    if (!desiredGrabberClosed
-        && (armEncoder.getPosition() > Cal.Lift.GRABBER_CLOSED_ZONE_TOP_DEGREES
-            || armEncoder.getPosition() < Cal.Lift.GRABBER_CLOSED_ZONE_BOTTOM_DEGREES)) {
-      grabber.set(false); // drop
-    } else {
+    if (desiredGrabberClosed) {
       grabber.set(true); // grab
     }
+    else {
+      grabber.set(false); // drop
+    }
+
+    // // If the grabber is set to open and it is safe to open, open the grabber (drop). Otherwise,
+    // // close it (grab).
+    // if (!desiredGrabberClosed
+    //     && (armEncoder.getPosition() > Cal.Lift.GRABBER_CLOSED_ZONE_TOP_DEGREES
+    //         || armEncoder.getPosition() < Cal.Lift.GRABBER_CLOSED_ZONE_BOTTOM_DEGREES)) {
+    //   grabber.set(false); // drop
+    // } else {
+    //   grabber.set(true); // grab
+    // }
   }
 
   /**

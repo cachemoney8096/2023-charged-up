@@ -60,16 +60,16 @@ public final class Constants {
         WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
 
     public static final double DRIVING_MOTOR_REDUCTION = 4.8;
-    public static final double DRIVE_WHEEL_FREE_SPEED_FUDGE_FACTOR = 0.9;
+    public static final double DRIVE_WHEEL_FREE_SPEED_FUDGE_FACTOR = 1.0;
     public static final double DRIVE_WHEEL_FREE_SPEED_METERS_PER_SECOND =
         DRIVE_WHEEL_FREE_SPEED_FUDGE_FACTOR
             * ((DRIVING_MOTOR_FREE_SPEED_RPS * WHEEL_CIRCUMFERENCE_METERS)
                 / DRIVING_MOTOR_REDUCTION);
 
     public static final double DRIVING_ENCODER_POSITION_FACTOR_METERS =
-        (WHEEL_DIAMETER_METERS * Math.PI) / DRIVING_MOTOR_REDUCTION; // meters
+        WHEEL_CIRCUMFERENCE_METERS / DRIVING_MOTOR_REDUCTION; // meters
     public static final double DRIVING_ENCODER_VELOCITY_FACTOR_METERS_PER_SECOND =
-        ((WHEEL_DIAMETER_METERS * Math.PI) / DRIVING_MOTOR_REDUCTION) / 60.0; // meters per second
+        DRIVING_ENCODER_POSITION_FACTOR_METERS / 60.0; // meters per second
 
     public static final double TURNING_ENCODER_POSITION_PID_MIN_INPUT_RADIANS = 0; // radians
     public static final double TURNING_ENCODER_POSITION_PID_MAX_INPUT_RADIANS =

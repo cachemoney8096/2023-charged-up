@@ -11,19 +11,20 @@ public final class Cal {
 
   public static final class SwerveModule {
     /** Input meters/second, output [-1,1] */
-    public static final double DRIVING_P = 4.0,
+    public static final double DRIVING_P = 0.1,
         DRIVING_I = 0.0,
-        DRIVING_D = 0.05,
-        DRIVING_FF = 1 / Constants.SwerveModule.DRIVE_WHEEL_FREE_SPEED_METERS_PER_SECOND;
+        DRIVING_D = 0.1,
+        DRIVING_FF = 0.95 / Constants.SwerveModule.DRIVE_WHEEL_FREE_SPEED_METERS_PER_SECOND;
+        // DRIVING_FF = 0.0;
 
     public static final double DRIVING_MIN_OUTPUT = -1;
     public static final double DRIVING_MAX_OUTPUT = 1;
 
     /** Input radians, output [-1,1] */
-    public static final double TURNING_P = PLACEHOLDER_DOUBLE,
+    public static final double TURNING_P = 0.8,
         TURNING_I = PLACEHOLDER_DOUBLE,
-        TURNING_D = PLACEHOLDER_DOUBLE,
-        TURNING_FF = 0;
+        TURNING_D = 0.1,
+        TURNING_FF = 0.01;
 
     public static final double TURNING_MIN_OUTPUT = -1;
     public static final double TURNING_MAX_OUTPUT = 1;
@@ -39,7 +40,10 @@ public final class Cal {
      * Angular offset of the modules relative to the zeroing fixture in radians. COmmon to all
      * modules
      */
-    public static final double SWERVE_COMMON_ANGULAR_OFFSET_RAD = PLACEHOLDER_DOUBLE;
+    public static final double SWERVE_FRONT_LEFT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) - 5.2470;
+    public static final double SWERVE_FRONT_RIGHT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) - 5.2901;
+    public static final double SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) - 5.3080;
+    public static final double SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) - 5.3698;
 
     /**
      * Angular offsets of the modules relative to the chassis in radians. The modules form an O when
@@ -47,11 +51,11 @@ public final class Cal {
      */
     public static final double
         FRONT_LEFT_CHASSIS_ANGULAR_OFFSET_RAD =
-            SWERVE_COMMON_ANGULAR_OFFSET_RAD - (3.0 * Math.PI / 4.0),
-        FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET_RAD = SWERVE_COMMON_ANGULAR_OFFSET_RAD - (Math.PI / 4.0),
+            SWERVE_FRONT_LEFT_ANGULAR_OFFSET_RAD - (3.0 * Math.PI / 4.0),
+        FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET_RAD = SWERVE_FRONT_RIGHT_ANGULAR_OFFSET_RAD - (Math.PI / 4.0),
         BACK_LEFT_CHASSIS_ANGULAR_OFFSET_RAD =
-            SWERVE_COMMON_ANGULAR_OFFSET_RAD + (3.0 * Math.PI / 4.0),
-        BACK_RIGHT_CHASSIS_ANGULAR_OFFSET_RAD = SWERVE_COMMON_ANGULAR_OFFSET_RAD + (Math.PI / 4.0);
+            SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD + (3.0 * Math.PI / 4.0),
+        BACK_RIGHT_CHASSIS_ANGULAR_OFFSET_RAD = SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD + (Math.PI / 4.0);
 
     /**
      * Controller on module speed for rotating to target, input degrees [-180,180], output [0,1].
@@ -80,13 +84,13 @@ public final class Cal {
     public static final double EJECTION_POWER = -1.0;
 
     /** Intake positions in degrees */
-    public static final double STARTING_POSITION_DEGREES = 38.0, DEPLOYED_POSITION_DEGREES = 180.0;
+    public static final double STARTING_POSITION_DEGREES = 75.0, DEPLOYED_POSITION_DEGREES = 180.0;
 
     /** Past this position, the intake is free to clamp */
     public static final double CLAMP_POSITION_THRESHOLD_DEGREES = 110.0;
 
     /** Absolute encoder position when the intake is at starting position */
-    public static final double ABSOLUTE_ENCODER_START_POS_DEG = Cal.PLACEHOLDER_DOUBLE;
+    public static final double ABSOLUTE_ENCODER_START_POS_DEG = 25.0;
 
     /** Voltage required to hold the intake in the horizontal position */
     // Stall torque: 3.36 Nm * 75 = 252 Nm
@@ -98,11 +102,12 @@ public final class Cal {
     public static final double
         // angular accel = Torque / Inertia. 3.36 Nm * 75 / (6 * 0.26^2) kg-m^2 * (360 deg / 2pi
         // rad) = 35600 deg/s^2
-        DEPLOY_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = 1600.0,
+        DEPLOY_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = 600.0,
         // 5880 rpm / (60 sec/min) * (360 deg/rev) / 75 = 470.4
-        DEPLOY_MAX_VELOCITY_DEG_PER_SECOND = 400.0,
+        // DEPLOY_MAX_VELOCITY_DEG_PER_SECOND = 400.0,
+        DEPLOY_MAX_VELOCITY_DEG_PER_SECOND = 300.0,
         // Functional not logical
-        DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG = 2.0;
+        DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG = 10.0;
 
     /** Input deg, output Volts */
     public static final double DEPLOY_MOTOR_P = Cal.PLACEHOLDER_DOUBLE,
@@ -140,24 +145,24 @@ public final class Cal {
         ARM_D = Cal.PLACEHOLDER_DOUBLE;
 
     /** Absolute encoder position when the arm is at 0 degrees */
-    public static final double ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG = Cal.PLACEHOLDER_DOUBLE;
+    public static final double ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG = 141.55 + 180.0;
 
     /**
      * Position reading from the absolute encoders when the elevator is at the start (zero) position
      */
-    public static final double ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES = PLACEHOLDER_DOUBLE;
+    public static final double ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES = 5.04;
 
     /** Voltage required to hold the arm in the horizontal position */
     // Stall torque: 3.36 Nm * 75 = 252 Nm
     // Max torque: 3.4 kg * 9.81 (N/kg) * 0.68m = 22.68
     // Ratio: 1.08 V
-    public static final double ARBITRARY_ARM_FEED_FORWARD_VOLTS = 1.0;
+    public static final double ARBITRARY_ARM_FEED_FORWARD_VOLTS = 0.4;
 
     /** Voltage required to hold the elevator */
     // Stall force: 2 * 1.08 Nm * 14.11 / (0.5625 / 39.37) m = 2133 N
     // Max force: 6.4 kg * 9.81 N/kg = 63 N
     // Ratio: 0.32 V
-    public static final double ARBITRARY_ELEVATOR_FEED_FORWARD_VOLTS = 0.3;
+    public static final double ARBITRARY_ELEVATOR_FEED_FORWARD_VOLTS = 0.5;
 
     /** Parameters for arm controller */
     public static final double
@@ -165,9 +170,9 @@ public final class Cal {
         // Stall torque: 3.36 Nm * 75 = 252 Nm
         // Inertia: 3.4 kg * 0.68^2 m^2 = 1.57 kg-m^2
         // Accel = 160.5 rad/s^2 = 9200 deg/s^2
-        ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = 1600.0,
+        ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = 320.0,
         // 5880 rpm / (60 sec/min) / 75 * (360 deg / rev) = 470
-        ARM_MAX_VELOCITY_DEG_PER_SECOND = 400.0,
+        ARM_MAX_VELOCITY_DEG_PER_SECOND = 320.0,
         // functional not logical
         ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG = 1.0;
 
@@ -177,16 +182,15 @@ public final class Cal {
         // Stall force: 2 * 1.08 Nm * 14.11 / (0.5625 / 39.37) m = 2133 N
         // mass: 6.4 kg
         // Accel = 333 m/s^2
-        ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED = 160.0,
+        ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED = 40.0,
         // 11710 rpm / (60 sec/min) * / 14.11 * (pi * 1.125 in) = 48.9 in/s
         ELEVATOR_MAX_VELOCITY_IN_PER_SECOND = 40.0,
         // functional not logical
-        ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN = 0.25;
+        ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN = 1.5;
 
     /** Input deg/s, output volts. From recalc */
     public static final SimpleMotorFeedforward ARM_FEEDFORWARD =
-        new SimpleMotorFeedforward(
-            0.0, 1.46 * (2.0 * Math.PI) / 360.0, 0.08 * (2.0 * Math.PI) / 360.0);
+        new SimpleMotorFeedforward(0.0, 1.46 * (2.0 * Math.PI) / 360.0, 0.08 * (2.0 * Math.PI) / 360.0);
 
     /** Input in/s, output volts. From recalc */
     public static final SimpleMotorFeedforward ELEVATOR_FEEDFORWARD =
@@ -202,10 +206,10 @@ public final class Cal {
                 ));
 
     public static final double ELEVATOR_LOW_POSITION_INCHES = 0.0,
-        ELEVATOR_HIGH_POSITION_INCHES = 20.83;
+        ELEVATOR_HIGH_POSITION_INCHES = 19.5;
 
     /** Sets the min and max positions that the elevator and arm motors will be allowed to reach */
-    public static final float ELEVATOR_POSITIVE_LIMIT_INCHES = 20.83f,
+    public static final float ELEVATOR_POSITIVE_LIMIT_INCHES = 19.5f,
         ELEVATOR_NEGATIVE_LIMIT_INCHES = 0.0f,
         ARM_POSITIVE_LIMIT_DEGREES = 273.0f,
         ARM_NEGATIVE_LIMIT_DEGREES = 74.0f;
@@ -220,7 +224,7 @@ public final class Cal {
      * this position.
      */
     public static final double ELEVATOR_MARGIN_INCHES = 0.5,
-        ARM_MARGIN_DEGREES = 2.0,
+        ARM_MARGIN_DEGREES = 4.0,
         ELEVATOR_START_MARGIN_INCHES = 1.0,
         ARM_START_MARGIN_DEGREES = 8.0;
 
