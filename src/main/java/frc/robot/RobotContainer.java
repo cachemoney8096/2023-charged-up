@@ -164,10 +164,7 @@ public class RobotContainer {
         .onTrue(
             new InstantCommand(
                 () -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH)));
-    operatorController
-        .povRight()
-        .onTrue(
-            new InstantCommand(() -> lights.togglePartyMode()));
+    operatorController.povRight().onTrue(new InstantCommand(() -> lights.togglePartyMode()));
 
     operatorController
         .x()

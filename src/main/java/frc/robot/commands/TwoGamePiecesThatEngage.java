@@ -11,8 +11,8 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Cal;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Lift;
-import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Lift.LiftPosition;
+import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Lights.LightCode;
 import frc.robot.subsystems.TagLimelight;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -69,8 +69,8 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
             intake));
     /**
      * TODO: configure limelight to "take over" driving process after certain point AFTER obtaining
-     * game piece to be more accurate with distance
-     * if limelight fails to find valid target/arpil tag, then turn on NO_TAG light
+     * game piece to be more accurate with distance if limelight fails to find valid target/arpil
+     * tag, then turn on NO_TAG light
      */
 
     /** Initialize sequential commands that run for the "15 second autonomous phase" */
@@ -87,7 +87,12 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         new FollowPathWithEvents(
             drive.followTrajectoryCommand(trajInit, true), trajInit.getMarkers(), eventMap),
         /** TODO: Limelight code goes here */
-        new InstantCommand(()->{if(!tagLimelight.isValidTarget()){lights.toggleCode(LightCode.NO_TAG);}}),
+        new InstantCommand(
+            () -> {
+              if (!tagLimelight.isValidTarget()) {
+                lights.toggleCode(LightCode.NO_TAG);
+              }
+            }),
         new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
         new InstantCommand(lift::startScore, lift),

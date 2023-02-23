@@ -6,8 +6,8 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Cal;
 import frc.robot.subsystems.Lift;
-import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Lift.LiftPosition;
+import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Lights.LightCode;
 
 public class finishScore extends SequentialCommandGroup {
@@ -25,7 +25,6 @@ public class finishScore extends SequentialCommandGroup {
             new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.STARTING)),
             lift.scoreLoc::isScoringHigh),
         new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.STARTING)),
-        new InstantCommand(() -> lights.toggleCode(LightCode.READY_TO_SCORE)))
-        ;
+        new InstantCommand(() -> lights.toggleCode(LightCode.READY_TO_SCORE)));
   }
 }
