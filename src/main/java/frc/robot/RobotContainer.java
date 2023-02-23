@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -29,6 +30,8 @@ import frc.robot.subsystems.Lift.LiftPosition;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.JoystickUtil;
 import frc.robot.utils.ScoringLocationUtil;
+import frc.robot.utils.SendableHelper;
+import edu.wpi.first.wpilibj.PneumaticHub;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -40,7 +43,8 @@ public class RobotContainer {
   private final DriveSubsystem drive = new DriveSubsystem();
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
   private final Lift lift = new Lift(scoreLoc);
-//   private final Intake intake = new Intake(() -> {return true;});
+  private final PneumaticHub pHub = new PneumaticHub();
+  private final Intake intake = new Intake(() -> {return true;});
 //   private final Intake intake = new Intake(lift::clearOfIntakeZone);
 //   private final IntakeLimelight intakeLimelight =
 //       new IntakeLimelight(
@@ -74,6 +78,7 @@ public class RobotContainer {
     // Shuffleboard.getTab("Subsystems").add(tagLimelight.getName(), tagLimelight);
     // Shuffleboard.getTab("Subsystems").add(lights.getName(), lights);
     Shuffleboard.getTab("Subsystems").add(lift.getName(), lift);
+    SmartDashboard.putNumber("Pressure", pHub.getPressure(0));
   }
 
   public void initialize() {
@@ -87,7 +92,7 @@ public class RobotContainer {
     // Encoder offset stuff
     // intake.initialize();
     lift.initialize();
-
+    pHub.enableCompressorAnalog(80, 120);
     burnFlashSparks();
   }
 
@@ -215,13 +220,19 @@ public class RobotContainer {
 
     // Drive controls
 
-    driverController.a().onTrue(new InstantCommand(() -> {
-        lift.setArmPositionGoal(224.0);
-      }, lift));
-      driverController.b().onTrue(new InstantCommand(() -> {
-          lift.setArmPositionGoal(148.0);
-        }, lift));
+    // driverController.a().onTrue(new InstantCommand(() -> {
+    //     lift.setArmPositionGoal(224.0);
+    //   }, lift));
+    //   driverController.b().onTrue(new InstantCommand(() -> {
+    //       lift.setArmPositionGoal(148.0);
+    //     }, lift));
 
+    driverController.a().onTrue(new InstantCommand(() -> {
+      intake.intakeGamePiece();
+    }, intake));
+    driverController.a().onFalse(new InstantCommand(() -> {
+      intake.stopIntakingGamePiece();
+    }, intake));
     drive.setDefaultCommand(
         new RunCommand(
                 () ->

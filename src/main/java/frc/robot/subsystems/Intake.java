@@ -17,6 +17,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
@@ -249,25 +250,25 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (clearOfIntake.getAsBoolean()) {
-      if (desiredDeployed.isPresent()) {
-        if (desiredDeployed.get() == true) {
-          deploy();
-        } else {
-          retract();
-        }
-      }
-    }
+    // if (clearOfIntake.getAsBoolean()) {
+    //   if (desiredDeployed.isPresent()) {
+    //     if (desiredDeployed.get() == true) {
+    //       deploy();
+    //     } else {
+    //       retract();
+    //     }
+    //   }
+    // }
 
-    controlPosition(intakeDesiredPositionDegrees);
+    // controlPosition(intakeDesiredPositionDegrees);
 
-    // Only clamp if it is safe to do so and clamping is desired
-    if (desireClamped
-        && deployMotorEncoder.getPosition() > Cal.Intake.CLAMP_POSITION_THRESHOLD_DEGREES) {
-      clampIntake();
-    } else {
-      unclampIntake();
-    }
+    // // Only clamp if it is safe to do so and clamping is desired
+    // if (desireClamped
+    //     && deployMotorEncoder.getPosition() > Cal.Intake.CLAMP_POSITION_THRESHOLD_DEGREES) {
+    //   clampIntake();
+    // } else {
+    //   unclampIntake();
+    // }
   }
 
   @Override
