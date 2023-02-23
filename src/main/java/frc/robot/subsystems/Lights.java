@@ -11,9 +11,6 @@ public class Lights extends SubsystemBase {
   private TreeMap<LightCode, Double> lightOptionsMap;
   private Spark m_blinkin = new Spark(RobotMap.LED_PWM_PORT);
 
-  /** for example, a spacing value of 1 would mean every LED is on */
-  private int spacing = 1;
-
   /** timer for blinking LED */
   private int blinkingTimer = 0;
   /** When the blinkingTimer reaches 10 (equal to blinkingPeriod), the LED is toggled */
@@ -31,7 +28,6 @@ public class Lights extends SubsystemBase {
     NO_TAG, // Blinking Green
     WORKING, // Solid Red
     READY_TO_SCORE, // Blue
-    ORANGE,
     OFF
   }
 
@@ -58,11 +54,6 @@ public class Lights extends SubsystemBase {
   public void setLight(LightCode light) {
     currentLightStatus = light;
     m_blinkin.set(lightOptionsMap.get(currentLightStatus));
-  }
-
-  /** Sets the spacing between each LED so not all are lit up when applicable */
-  public void setSpacing(int s) {
-    spacing = s;
   }
 
   /** Party mode switches from color to color to create a rainbow of lights */

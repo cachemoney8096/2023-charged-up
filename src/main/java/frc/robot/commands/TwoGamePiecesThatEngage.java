@@ -13,6 +13,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Lift.LiftPosition;
+import frc.robot.subsystems.Lights.LightCode;
 import frc.robot.subsystems.TagLimelight;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.ScoringLocationUtil;
@@ -85,9 +86,8 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
         new FollowPathWithEvents(
             drive.followTrajectoryCommand(trajInit, true), trajInit.getMarkers(), eventMap),
-        /** TODO: Limelight code goes here 
-         * if limelight fails to find valid target/arpil tag, then turn on NO_TAG light
-        */
+        /** TODO: Limelight code goes here */
+        new InstantCommand(()->{if(tagLimelight.getValidTarget() == 0){lights.toggleCode(LightCode.NO_TAG);}}),
         new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
         new InstantCommand(lift::startScore, lift),
