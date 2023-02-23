@@ -23,6 +23,13 @@ public class Lights extends SubsystemBase {
   /** If we are currently blinking, then True would mean the color is currently showing */
   private boolean blinkingColorOn = false;
 
+  /** true if party mode is currently on */
+  private boolean partyMode = false;
+  /** indicates the current color the light is on while in party mode
+   * colors are in order of the rainbow (ex. 0 = red (WORKING))
+   */
+  private int colorIndex = 0;
+
   public enum LightCode {
     CONE, // Solid Yellow
     CUBE, // Solid Purple
@@ -30,6 +37,7 @@ public class Lights extends SubsystemBase {
     NO_TAG, // Blinking Green
     WORKING, // Solid Red
     READY_TO_SCORE, // Blue
+    ORANGE,
     OFF
   }
 
@@ -41,6 +49,7 @@ public class Lights extends SubsystemBase {
     lightOptionsMap.put(LightCode.NO_TAG, new AddressableLEDBuffer(Constants.LED_LENGTH));
     lightOptionsMap.put(LightCode.WORKING, new AddressableLEDBuffer(Constants.LED_LENGTH));
     lightOptionsMap.put(LightCode.READY_TO_SCORE, new AddressableLEDBuffer(Constants.LED_LENGTH));
+    lightOptionsMap.put(LightCode.ORANGE, new AddressableLEDBuffer(Constants.LED_LENGTH));
     lightOptionsMap.put(LightCode.OFF, new AddressableLEDBuffer(Constants.LED_LENGTH));
 
     led.setLength(lightOptionsMap.get(LightCode.OFF).getLength());
@@ -51,6 +60,7 @@ public class Lights extends SubsystemBase {
     setUpBuffer(lightOptionsMap.get(LightCode.NO_TAG), 0, 255, 0);
     setUpBuffer(lightOptionsMap.get(LightCode.WORKING), 255, 0, 0);
     setUpBuffer(lightOptionsMap.get(LightCode.READY_TO_SCORE), 0, 0, 255);
+    setUpBuffer(lightOptionsMap.get(LightCode.ORANGE), 255, 150, 0);
     setUpBuffer(lightOptionsMap.get(LightCode.OFF), 0, 0, 0);
   }
 
@@ -81,6 +91,11 @@ public class Lights extends SubsystemBase {
     spacing = s;
   }
 
+  /** Party mode switches from color to color to create a rainbow of lights */
+  public void togglePartyMode() {
+    this.partyMode = !this.partyMode;
+  }
+
   @Override
   public void periodic() {
     /** NO_TAG is the only LightCode that requires blinking */
@@ -94,6 +109,43 @@ public class Lights extends SubsystemBase {
         blinkingColorOn = !blinkingColorOn;
       }
       blinkingTimer++;
+    }
+
+    /* if party mode should be running, then start a party */
+    else if (partyMode) {
+      if (blinkingTimer >= blinkingPeriod) {
+        switch (colorIndex) {
+          case 0:
+            led.setData(lightOptionsMap.get(LightCode.WORKING));
+            break;
+          case 1:
+            led.setData(lightOptionsMap.get(LightCode.ORANGE));
+            break;
+          case 2:
+            led.setData(lightOptionsMap.get(LightCode.CONE));
+            break;
+          case 3:
+            led.setData(lightOptionsMap.get(LightCode.GAME_OBJECT));
+            break;
+          case 4:
+            led.setData(lightOptionsMap.get(LightCode.READY_TO_SCORE));
+            break;
+          case 5:
+            led.setData(lightOptionsMap.get(LightCode.CUBE));
+            break;
+          default:
+            // case should never be reached
+            led.setData(lightOptionsMap.get(LightCode.OFF));
+        }
+        if (colorIndex == 5) {
+          colorIndex = 0;
+        } else {
+          colorIndex++;
+        }
+        blinkingTimer++;
+      }
+    } else {
+      blinkingTimer = 0;
     }
   }
 }

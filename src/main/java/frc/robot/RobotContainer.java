@@ -77,7 +77,8 @@ public class RobotContainer {
   public void initialize() {
     // autons
     autonChooser.setDefaultOption("Balance", new AutoChargeStationSequence(true, drive));
-    autonChooser.addOption("Score, balance", new AutoScoreAndBalance(true, lift, drive, lights, scoreLoc));
+    autonChooser.addOption(
+        "Score, balance", new AutoScoreAndBalance(true, lift, drive, lights, scoreLoc));
 
     // Put the chooser on the dashboard
     SmartDashboard.putData(autonChooser);
@@ -122,7 +123,9 @@ public class RobotContainer {
     driverController.b().onTrue(new OuttakeSequence(lift));
     driverController.x().onTrue(new InstantCommand(lift::cancelScore, lift));
 
-    driverController.y().onTrue(new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift));
+    driverController
+        .y()
+        .onTrue(new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift));
 
     driverController.back().onTrue(new InstantCommand(lift::home, lift));
     driverController.start().onTrue(new InstantCommand(drive::halfSpeedToggle));
@@ -157,14 +160,14 @@ public class RobotContainer {
         .onTrue(
             new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
     operatorController
-        .povRight()
-        .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
-    operatorController
         .povUp()
         .onTrue(
             new InstantCommand(
                 () -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH)));
+    operatorController
+        .povRight()
+        .onTrue(
+            new InstantCommand(() -> lights.togglePartyMode()));
 
     operatorController
         .x()
