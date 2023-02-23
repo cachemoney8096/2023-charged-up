@@ -87,7 +87,7 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         new FollowPathWithEvents(
             drive.followTrajectoryCommand(trajInit, true), trajInit.getMarkers(), eventMap),
         /** TODO: Limelight code goes here */
-        new InstantCommand(()->{if(tagLimelight.getValidTarget() == 0){lights.toggleCode(LightCode.NO_TAG);}}),
+        new InstantCommand(()->{if(!tagLimelight.isValidTarget()){lights.toggleCode(LightCode.NO_TAG);}}),
         new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
         new InstantCommand(lift::startScore, lift),
