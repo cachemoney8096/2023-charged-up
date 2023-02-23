@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Cal;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Lift;
+import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Lift.LiftPosition;
 import frc.robot.subsystems.TagLimelight;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -46,6 +47,7 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
       Lift lift,
       Intake intake,
       DriveSubsystem drive,
+      Lights lights,
       TagLimelight tagLimelight,
       ScoringLocationUtil scoringLocationUtil) {
     addRequirements(lift, intake, drive, tagLimelight);
@@ -67,27 +69,30 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
     /**
      * TODO: configure limelight to "take over" driving process after certain point AFTER obtaining
      * game piece to be more accurate with distance
+     * if limelight fails to find valid target/arpil tag, then turn on NO_TAG light
      */
 
     /** Initialize sequential commands that run for the "15 second autonomous phase" */
     addCommands(
         new InstantCommand(() -> scoringLocationUtil.setScoreCol(ScoreCol.RIGHT)),
         new InstantCommand(() -> scoringLocationUtil.setScoreHeight(ScoreHeight.HIGH)),
-        new InstantCommand(lift::ManualPrepScoreSequence, lift),
+        new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
         new InstantCommand(lift::startScore, lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
-        new finishScore(lift),
+        new finishScore(lift, lights),
         new InstantCommand(() -> scoringLocationUtil.setScoreCol(ScoreCol.LEFT)),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
         new FollowPathWithEvents(
             drive.followTrajectoryCommand(trajInit, true), trajInit.getMarkers(), eventMap),
-        /** TODO: Limelight code goes here */
-        new InstantCommand(lift::ManualPrepScoreSequence, lift),
+        /** TODO: Limelight code goes here 
+         * if limelight fails to find valid target/arpil tag, then turn on NO_TAG light
+        */
+        new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
         new InstantCommand(lift::startScore, lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
-        new finishScore(lift),
+        new finishScore(lift, lights),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
         drive.followTrajectoryCommand(
             trajCharge, false), // this does not accept the FollowPathWithEvents

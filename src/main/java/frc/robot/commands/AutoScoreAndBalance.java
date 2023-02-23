@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Cal;
 import frc.robot.subsystems.Lift;
+import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Lift.LiftPosition;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.ScoringLocationUtil;
@@ -25,13 +26,14 @@ public class AutoScoreAndBalance extends SequentialCommandGroup {
       boolean isFirstPath,
       Lift lift,
       DriveSubsystem drive,
+      Lights lights,
       ScoringLocationUtil scoringLocationUtil) {
     addCommands(
-        new InstantCommand(lift::ManualPrepScoreSequence, lift),
+        new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
         new InstantCommand(lift::startScore, lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
-        new finishScore(lift),
+        new finishScore(lift, lights),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
         drive.followTrajectoryCommand(traj, isFirstPath),
         new AutoChargeStationBalance(drive));

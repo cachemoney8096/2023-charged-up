@@ -19,10 +19,12 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
+import frc.robot.subsystems.Lights.LightCode;
 import frc.robot.utils.AngleUtil;
 import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
@@ -316,9 +318,9 @@ public class Lift extends SubsystemBase {
   }
 
   /** Runs instead of finishScore if cancelScore is true. */
-  public void finishScoreCancelled() {
+  public void finishScoreCancelled(Lights lights) {
     setCancelScore(false);
-    ManualPrepScoreSequence();
+    ManualPrepScoreSequence(lights);
     closeGrabber();
   }
 
@@ -503,8 +505,14 @@ public class Lift extends SubsystemBase {
    * takes the column and height from ScoringLocationUtil.java and converts that to a LiftPosition
    * then gives the position to the given lift
    */
-  public void ManualPrepScoreSequence() {
+  public void ManualPrepScoreSequence(Lights lights) {
     ScoreHeight height = scoreLoc.getScoreHeight();
+
+    // indicate the robot is currently working on prep score
+    new InstantCommand(
+        () -> {
+          lights.toggleCode(LightCode.WORKING);
+        });
 
     // low for all columns is the same height
     if (height == ScoreHeight.LOW) {
@@ -526,5 +534,11 @@ public class Lift extends SubsystemBase {
         setDesiredPosition(LiftPosition.SCORE_HIGH_CUBE);
       }
     }
+
+    // indicate the robot is now ready to score
+    new InstantCommand(
+        () -> {
+          lights.toggleCode(LightCode.READY_TO_SCORE);
+        });
   }
 }
