@@ -1,20 +1,15 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.RobotMap;
 import java.util.TreeMap;
 
 /** Controls the LEDs that indicate robot status */
 public class Lights extends SubsystemBase {
   private LightCode currentLightStatus = LightCode.OFF;
-  private TreeMap<LightCode, AddressableLEDBuffer> lightOptionsMap;
-  private AddressableLED led = new AddressableLED(RobotMap.LED_PWM_PORT);
-
-  /** for example, a spacing value of 1 would mean every LED is on */
-  private int spacing = 1;
+  private TreeMap<LightCode, Double> lightOptionsMap;
+  private Spark m_blinkin = new Spark(RobotMap.LED_PWM_PORT);
 
   /** timer for blinking LED */
   private int blinkingTimer = 0;
@@ -22,6 +17,9 @@ public class Lights extends SubsystemBase {
   private int blinkingPeriod = 10;
   /** If we are currently blinking, then True would mean the color is currently showing */
   private boolean blinkingColorOn = false;
+
+  /** true if party mode is currently on */
+  private boolean partyMode = false;
 
   public enum LightCode {
     CONE, // Solid Yellow
@@ -34,30 +32,14 @@ public class Lights extends SubsystemBase {
   }
 
   public Lights() {
-    lightOptionsMap = new TreeMap<LightCode, AddressableLEDBuffer>();
-    lightOptionsMap.put(LightCode.CONE, new AddressableLEDBuffer(Constants.LED_LENGTH));
-    lightOptionsMap.put(LightCode.CUBE, new AddressableLEDBuffer(Constants.LED_LENGTH));
-    lightOptionsMap.put(LightCode.GAME_OBJECT, new AddressableLEDBuffer(Constants.LED_LENGTH));
-    lightOptionsMap.put(LightCode.NO_TAG, new AddressableLEDBuffer(Constants.LED_LENGTH));
-    lightOptionsMap.put(LightCode.WORKING, new AddressableLEDBuffer(Constants.LED_LENGTH));
-    lightOptionsMap.put(LightCode.READY_TO_SCORE, new AddressableLEDBuffer(Constants.LED_LENGTH));
-    lightOptionsMap.put(LightCode.OFF, new AddressableLEDBuffer(Constants.LED_LENGTH));
-
-    led.setLength(lightOptionsMap.get(LightCode.OFF).getLength());
-
-    setUpBuffer(lightOptionsMap.get(LightCode.CONE), 255, 255, 0);
-    setUpBuffer(lightOptionsMap.get(LightCode.CUBE), 255, 0, 255);
-    setUpBuffer(lightOptionsMap.get(LightCode.GAME_OBJECT), 0, 255, 0);
-    setUpBuffer(lightOptionsMap.get(LightCode.NO_TAG), 0, 255, 0);
-    setUpBuffer(lightOptionsMap.get(LightCode.WORKING), 255, 0, 0);
-    setUpBuffer(lightOptionsMap.get(LightCode.READY_TO_SCORE), 0, 0, 255);
-    setUpBuffer(lightOptionsMap.get(LightCode.OFF), 0, 0, 0);
-  }
-
-  private void setUpBuffer(AddressableLEDBuffer buffer, int r, int g, int b) {
-    for (var i = 0; i < buffer.getLength(); i += spacing) {
-      buffer.setRGB(i, 255, 0, 0);
-    }
+    lightOptionsMap = new TreeMap<LightCode, Double>();
+    lightOptionsMap.put(LightCode.CONE, 0.69);
+    lightOptionsMap.put(LightCode.CUBE, 0.91);
+    lightOptionsMap.put(LightCode.GAME_OBJECT, 0.71);
+    lightOptionsMap.put(LightCode.NO_TAG, 0.71);
+    lightOptionsMap.put(LightCode.WORKING, 0.61);
+    lightOptionsMap.put(LightCode.READY_TO_SCORE, 0.87);
+    lightOptionsMap.put(LightCode.OFF, 0.99); // 0.99 = black, is this equivalent to OFF?
   }
 
   public void toggleCode(LightCode light) {
@@ -66,19 +48,17 @@ public class Lights extends SubsystemBase {
     } else {
       currentLightStatus = light;
     }
-    led.setData(lightOptionsMap.get(currentLightStatus));
-    led.start();
+    m_blinkin.set(lightOptionsMap.get(currentLightStatus));
   }
 
   public void setLight(LightCode light) {
     currentLightStatus = light;
-    led.setData(lightOptionsMap.get(currentLightStatus));
-    led.start();
+    m_blinkin.set(lightOptionsMap.get(currentLightStatus));
   }
 
-  /** Sets the spacing between each LED so not all are lit up when applicable */
-  public void setSpacing(int s) {
-    spacing = s;
+  /** Party mode switches from color to color to create a rainbow of lights */
+  public void togglePartyMode() {
+    this.partyMode = !this.partyMode;
   }
 
   @Override
@@ -87,13 +67,20 @@ public class Lights extends SubsystemBase {
     if (currentLightStatus == LightCode.NO_TAG) {
       if (blinkingTimer >= blinkingPeriod) {
         if (blinkingColorOn) {
-          led.setData(lightOptionsMap.get(LightCode.OFF));
+          m_blinkin.set(lightOptionsMap.get(LightCode.OFF));
         } else {
-          led.setData(lightOptionsMap.get(LightCode.NO_TAG));
+          m_blinkin.set(lightOptionsMap.get(LightCode.NO_TAG));
         }
         blinkingColorOn = !blinkingColorOn;
       }
       blinkingTimer++;
+    } else {
+      blinkingTimer = 0;
+    }
+
+    /* if party mode should be running, then start a party */
+    if (partyMode) {
+      m_blinkin.set(-0.97);
     }
   }
 }

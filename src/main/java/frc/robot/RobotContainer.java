@@ -24,6 +24,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
 import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lights;
+import frc.robot.subsystems.Lights.LightCode;
 import frc.robot.subsystems.TagLimelight;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.JoystickUtil;
@@ -76,7 +77,8 @@ public class RobotContainer {
   public void initialize() {
     // autons
     autonChooser.setDefaultOption("Balance", new AutoChargeStationSequence(true, drive));
-    autonChooser.addOption("Score, balance", new AutoScoreAndBalance(true, lift, drive, scoreLoc));
+    autonChooser.addOption(
+        "Score, balance", new AutoScoreAndBalance(true, lift, drive, lights, scoreLoc));
 
     // Put the chooser on the dashboard
     SmartDashboard.putData(autonChooser);
@@ -121,7 +123,9 @@ public class RobotContainer {
     driverController.b().onTrue(new OuttakeSequence(lift));
     driverController.x().onTrue(new InstantCommand(lift::cancelScore, lift));
 
-    driverController.y().onTrue(new InstantCommand(lift::ManualPrepScoreSequence, lift));
+    driverController
+        .y()
+        .onTrue(new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift));
 
     driverController.back().onTrue(new InstantCommand(lift::home, lift));
     driverController.start().onTrue(new InstantCommand(drive::halfSpeedToggle));
@@ -132,7 +136,7 @@ public class RobotContainer {
     driverController
         .leftTrigger()
         .whileTrue(
-            new IntakeSequence(intake, lift)
+            new IntakeSequence(intake, lift, lights)
                 .finallyDo(
                     (boolean interrupted) -> {
                       lift.home();
@@ -143,8 +147,8 @@ public class RobotContainer {
         .rightTrigger()
         .onFalse(
             new ConditionalCommand(
-                new InstantCommand(lift::finishScoreCancelled, lift),
-                new finishScore(lift),
+                new InstantCommand(() -> lift.finishScoreCancelled(lights), lift),
+                new finishScore(lift, lights),
                 lift::getCancelScore));
 
     operatorController
@@ -156,14 +160,11 @@ public class RobotContainer {
         .onTrue(
             new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
     operatorController
-        .povRight()
-        .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
-    operatorController
         .povUp()
         .onTrue(
             new InstantCommand(
                 () -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH)));
+    operatorController.povRight().onTrue(new InstantCommand(() -> lights.togglePartyMode()));
 
     operatorController
         .x()
@@ -196,6 +197,21 @@ public class RobotContainer {
                   intake.setDesiredDeployed(false);
                 },
                 intake));
+
+    operatorController
+        .leftBumper()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  lights.toggleCode(LightCode.CONE);
+                }));
+    operatorController
+        .rightBumper()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  lights.toggleCode(LightCode.CUBE);
+                }));
 
     operatorController
         .leftBumper()

@@ -10,11 +10,13 @@ import frc.robot.Cal;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lift.LiftPosition;
+import frc.robot.subsystems.Lights;
+import frc.robot.subsystems.Lights.LightCode;
 
 public class IntakeSequence extends SequentialCommandGroup {
 
-  public IntakeSequence(Intake intake, Lift lift) {
-    addRequirements(intake, lift);
+  public IntakeSequence(Intake intake, Lift lift, Lights lights) {
+    addRequirements(intake, lift, lights);
 
     addCommands(
         // deploy intake for specified amount of time
@@ -45,6 +47,12 @@ public class IntakeSequence extends SequentialCommandGroup {
 
         // stop intake
         new InstantCommand(intake::stopIntakingGamePiece, intake),
+
+        // indicate the robot has obtained a game piece
+        new InstantCommand(
+            () -> {
+              lights.toggleCode(LightCode.GAME_OBJECT);
+            }),
 
         // triggers the grabber to close
         new InstantCommand(lift::closeGrabber, lift),
