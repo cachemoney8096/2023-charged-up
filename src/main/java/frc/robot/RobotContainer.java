@@ -213,12 +213,6 @@ public class RobotContainer {
                   lights.toggleCode(LightCode.CUBE);
                 }));
 
-    operatorController
-        .leftBumper()
-        .onTrue(new InstantCommand(() -> lights.toggleCode(Lights.LightCode.CONE), lights));
-    operatorController
-        .rightBumper()
-        .onTrue(new InstantCommand(() -> lights.toggleCode(Lights.LightCode.CONE), lights));
     operatorController.leftTrigger().onTrue(new InstantCommand(lift::openGrabber, lift));
     operatorController.leftTrigger().onFalse(new InstantCommand(lift::closeGrabber, lift));
     operatorController.rightTrigger().onTrue(new InstantCommand(scoreLoc::toggleMiddleGrid));
