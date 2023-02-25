@@ -44,8 +44,8 @@ public class RobotContainer {
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
   private final Lift lift = new Lift(scoreLoc);
   private final PneumaticHub pHub = new PneumaticHub();
-  private final Intake intake = new Intake(() -> {return true;});
-//   private final Intake intake = new Intake(lift::clearOfIntakeZone);
+  // private final Intake intake = new Intake(() -> {return true;});
+  private final Intake intake = new Intake(lift::clearOfIntakeZone);
 //   private final IntakeLimelight intakeLimelight =
 //       new IntakeLimelight(
 //           Constants.INTAKE_LIMELIGHT_PITCH_DEGREES,
@@ -90,9 +90,9 @@ public class RobotContainer {
     SmartDashboard.putData(autonChooser);
 
     // Encoder offset stuff
-    // intake.initialize();
+    intake.initialize();
     lift.initialize();
-    pHub.enableCompressorAnalog(80, 120);
+    pHub.enableCompressorAnalog(80, 110);
     burnFlashSparks();
   }
 
@@ -110,7 +110,7 @@ public class RobotContainer {
   public void burnFlashSparks() {
     Timer.delay(0.25);
     lift.burnFlashSparks();
-    // intake.burnFlashSparks();
+    intake.burnFlashSparks();
     drive.burnFlashSparks();
     Timer.delay(0.25);
   }
@@ -220,19 +220,21 @@ public class RobotContainer {
 
     // Drive controls
 
-    // driverController.a().onTrue(new InstantCommand(() -> {
-    //     lift.setArmPositionGoal(224.0);
-    //   }, lift));
-    //   driverController.b().onTrue(new InstantCommand(() -> {
-    //       lift.setArmPositionGoal(148.0);
-    //     }, lift));
-
     driverController.a().onTrue(new InstantCommand(() -> {
-      intake.intakeGamePiece();
-    }, intake));
-    driverController.a().onFalse(new InstantCommand(() -> {
-      intake.stopIntakingGamePiece();
-    }, intake));
+        lift.setArmPositionGoal(224.0);
+      }, lift));
+      driverController.b().onTrue(new InstantCommand(() -> {
+          lift.setArmPositionGoal(148.0);
+        }, lift));
+
+    // driverController.a().onTrue(new InstantCommand(() -> {
+    //   intake.setDesiredDeployed(true);
+    //   // intake.intakeGamePiece();
+    // }, intake));
+    // driverController.a().onFalse(new InstantCommand(() -> {
+    //   intake.setDesiredDeployed(false);
+    //   // intake.stopIntakingGamePiece();
+    // }, intake));
     drive.setDefaultCommand(
         new RunCommand(
                 () ->
