@@ -220,10 +220,11 @@ public class SwerveModule implements Sendable {
             desiredPosRad = optimizedDesiredState.angle.getRadians();
 
     // Command driving and turning SPARKS MAX towards their respective setpoints.
-    // drivingPIDController.setReference(
-    //     optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
     drivingPIDController.setReference(
-        0.0, CANSparkMax.ControlType.kVelocity);
+        optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
+    // This turns off the drive
+    // drivingPIDController.setReference( 
+    //     0.0, CANSparkMax.ControlType.kVelocity);
     turningPIDController.setReference(
         optimizedDesiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
   }

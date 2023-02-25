@@ -127,7 +127,7 @@ public final class Constants {
         ELEVATOR_MOTOR_ENCODER_IN_PER_REV / 60.0;
 
     /** Gear ratio for the arm motor */
-    public static final double ARM_MOTOR_GEAR_RATIO = 75.0;
+    public static final double ARM_MOTOR_GEAR_RATIO = 108.0;
 
     /** When are is at this position, the arm is horizontal and pointing up */
     // TODO adjust based on arm CoM instead of arm angle

@@ -80,8 +80,8 @@ public final class Cal {
   }
 
   public static final class Intake {
-    public static final double INTAKING_POWER = 1.0;
-    public static final double EJECTION_POWER = -1.0;
+    public static final double INTAKING_POWER = 1;
+    public static final double EJECTION_POWER = -1;
 
     /** Intake positions in degrees */
     public static final double STARTING_POSITION_DEGREES = 75.0, DEPLOYED_POSITION_DEGREES = 180.0;
@@ -110,9 +110,9 @@ public final class Cal {
         DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG = 10.0;
 
     /** Input deg, output Volts */
-    public static final double DEPLOY_MOTOR_P = Cal.PLACEHOLDER_DOUBLE,
+    public static final double DEPLOY_MOTOR_P = 0.05,
         DEPLOY_MOTOR_I = 0.0,
-        DEPLOY_MOTOR_D = Cal.PLACEHOLDER_DOUBLE;
+        DEPLOY_MOTOR_D = 0.0;
 
     /** Input deg/s, output volts. From recalc */
     public static final SimpleMotorFeedforward DEPLOY_FEEDFORWARD =

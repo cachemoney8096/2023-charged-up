@@ -54,8 +54,10 @@ public class Intake extends SubsystemBase {
               Cal.Intake.DEPLOY_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED));
 
   // TODO change to two single solenoids later
-  private DoubleSolenoid clamp =
-      new DoubleSolenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_CLAMP_FORWARD_CHANNEL, 5);
+  private Solenoid clampLeft =
+      new Solenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_CLAMP_FORWARD_CHANNEL);
+  private Solenoid clampRight =
+      new Solenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_CLAMP_FOLLOW_CHANNEL);   
   private CANSparkMax intakeLeft =
       new CANSparkMax(RobotMap.INTAKE_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
   private CANSparkMax intakeRight =
@@ -221,11 +223,15 @@ public class Intake extends SubsystemBase {
   }
 
   private void clampIntake() {
-    clamp.set(Value.kOff);
+    clampLeft.set(true);
+    clampRight.set(true);
+    // clamp3.set(true); //delete this
   }
 
   private void unclampIntake() {
-    clamp.set(Value.kForward);
+    clampLeft.set(false);
+    clampRight.set(false);
+    // clamp3.set(true);   //delete this 
   }
 
   /** Runs the intake wheels inward */
@@ -250,25 +256,29 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // if (clearOfIntake.getAsBoolean()) {
-    //   if (desiredDeployed.isPresent()) {
-    //     if (desiredDeployed.get() == true) {
-    //       deploy();
-    //     } else {
-    //       retract();
-    //     }
-    //   }
-    // }
+    System.out.println(deployMotorAbsoluteEncoder.getPosition());
+    System.out.println(deployMotorEncoder.getPosition());
+    if (clearOfIntake.getAsBoolean()) {
+      if (desiredDeployed.isPresent()) {
+        if (desiredDeployed.get() == true) {
+          deploy();
+        } else {
+          retract();
+        }
+      }
+    }
 
     // controlPosition(intakeDesiredPositionDegrees);
 
-    // // Only clamp if it is safe to do so and clamping is desired
-    // if (desireClamped
-    //     && deployMotorEncoder.getPosition() > Cal.Intake.CLAMP_POSITION_THRESHOLD_DEGREES) {
-    //   clampIntake();
-    // } else {
-    //   unclampIntake();
-    // }
+    // Only clamp if it is safe to do so and clamping is desired
+    if (desireClamped
+        && deployMotorAbsoluteEncoder.getPosition() > Cal.Intake.CLAMP_POSITION_THRESHOLD_DEGREES) {
+      clampIntake();
+      // System.out.println("Clamping");
+    } else {
+      unclampIntake();
+      // System.out.println("Unclamping");
+    }
   }
 
   @Override

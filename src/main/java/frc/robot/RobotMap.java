@@ -30,6 +30,7 @@ public final class RobotMap {
 
   /** Intake clamp pneumatic channels */
   public static final int INTAKE_CLAMP_FORWARD_CHANNEL = 0;
+  public static final int INTAKE_CLAMP_FOLLOW_CHANNEL = 1;
 
   /** Lift grabbing pneumatic channels */
   public static final int LIFT_GRABBING_CHANNEL = 2;
