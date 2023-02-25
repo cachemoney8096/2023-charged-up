@@ -73,7 +73,7 @@ public class RobotContainer {
     configureBindings();
 
     Shuffleboard.getTab("Subsystems").add(drive.getName(), drive);
-    // Shuffleboard.getTab("Subsystems").add(intake.getName(), intake);
+    Shuffleboard.getTab("Subsystems").add(intake.getName(), intake);
     // Shuffleboard.getTab("Subsystems").add(intakeLimelight.getName(), intakeLimelight);
     // Shuffleboard.getTab("Subsystems").add(tagLimelight.getName(), tagLimelight);
     // Shuffleboard.getTab("Subsystems").add(lights.getName(), lights);
@@ -220,18 +220,28 @@ public class RobotContainer {
 
     // Drive controls
 
-    driverController.a().onTrue(new InstantCommand(() -> {
-        lift.setArmPositionGoal(224.0);
-      }, lift));
-      driverController.b().onTrue(new InstantCommand(() -> {
-          lift.setArmPositionGoal(148.0);
+    // driverController.a().onTrue(new InstantCommand(() -> {
+    //     lift.setArmPositionGoal(224.0);
+    //   }, lift));
+    //   driverController.b().onTrue(new InstantCommand(() -> {
+    //       lift.setArmPositionGoal(148.0);
+    //     }, lift));
+        driverController.x().onTrue(new InstantCommand(() -> {
+          lift.setArmPositionGoal(180.0);
         }, lift));
+      
+    // driverController.a().onTrue(new InstantCommand(() -> {
+    //     lift.setElevatorPositionGoal(1.0);
+    //   }, lift));
+    //   driverController.b().onTrue(new InstantCommand(() -> {
+    //       lift.setElevatorPositionGoal(18.5);
+    //     }, lift));
 
     // driverController.a().onTrue(new InstantCommand(() -> {
     //   intake.setDesiredDeployed(true);
     //   // intake.intakeGamePiece();
     // }, intake));
-    // driverController.a().onFalse(new InstantCommand(() -> {
+    // driverController.b().onTrue(new InstantCommand(() -> {
     //   intake.setDesiredDeployed(false);
     //   // intake.stopIntakingGamePiece();
     // }, intake));
@@ -243,7 +253,7 @@ public class RobotContainer {
                         MathUtil.applyDeadband(-driverController.getRightX(), 0.1),
                         JoystickUtil.squareAxis(
                             MathUtil.applyDeadband(-driverController.getLeftX(), 0.1)),
-                        driverController.getHID().getLeftBumper(),
+                        !driverController.getHID().getLeftBumper(),
                         driverController.getHID().getPOV()),
                 drive)
             .withName("Manual Drive"));

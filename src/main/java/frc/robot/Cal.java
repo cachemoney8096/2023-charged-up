@@ -90,7 +90,7 @@ public final class Cal {
     public static final double CLAMP_POSITION_THRESHOLD_DEGREES = 110.0;
 
     /** Absolute encoder position when the intake is at starting position */
-    public static final double ABSOLUTE_ENCODER_START_POS_DEG = 25.0;
+    public static final double ABSOLUTE_ENCODER_START_POS_DEG = 43.0;
 
     /** Voltage required to hold the intake in the horizontal position */
     // Stall torque: 3.36 Nm * 75 = 252 Nm
@@ -110,7 +110,7 @@ public final class Cal {
         DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG = 10.0;
 
     /** Input deg, output Volts */
-    public static final double DEPLOY_MOTOR_P = 0.05,
+    public static final double DEPLOY_MOTOR_P = 0.7,
         DEPLOY_MOTOR_I = 0.0,
         DEPLOY_MOTOR_D = 0.0;
 
@@ -135,12 +135,12 @@ public final class Cal {
 
   public static final class Lift {
     /** Input in, output Volts */
-    public static final double ELEVATOR_P = Cal.PLACEHOLDER_DOUBLE,
+    public static final double ELEVATOR_P = 3.0,
         ELEVATOR_I = 0.0,
-        ELEVATOR_D = Cal.PLACEHOLDER_DOUBLE;
+        ELEVATOR_D = 0.3;
 
     /** Input deg, output Volts */
-    public static final double ARM_P = Cal.PLACEHOLDER_DOUBLE,
+    public static final double ARM_P = 0.1,
         ARM_I = 0.0,
         ARM_D = Cal.PLACEHOLDER_DOUBLE;
 
@@ -182,15 +182,15 @@ public final class Cal {
         // Stall force: 2 * 1.08 Nm * 14.11 / (0.5625 / 39.37) m = 2133 N
         // mass: 6.4 kg
         // Accel = 333 m/s^2
-        ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED = 40.0,
+        ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED = 240.0,
         // 11710 rpm / (60 sec/min) * / 14.11 * (pi * 1.125 in) = 48.9 in/s
-        ELEVATOR_MAX_VELOCITY_IN_PER_SECOND = 40.0,
+        ELEVATOR_MAX_VELOCITY_IN_PER_SECOND = 50.0,
         // functional not logical
         ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN = 1.5;
 
     /** Input deg/s, output volts. From recalc */
     public static final SimpleMotorFeedforward ARM_FEEDFORWARD =
-        new SimpleMotorFeedforward(0.0, 1.46 * (2.0 * Math.PI) / 360.0, 0.08 * (2.0 * Math.PI) / 360.0);
+        new SimpleMotorFeedforward(0.0, 3 * (2.0 * Math.PI) / 360.0, 0.08 * (2.0 * Math.PI) / 360.0);
 
     /** Input in/s, output volts. From recalc */
     public static final SimpleMotorFeedforward ELEVATOR_FEEDFORWARD =

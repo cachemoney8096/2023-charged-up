@@ -180,8 +180,8 @@ public class Intake extends SubsystemBase {
     intakeDemandB = Cal.Intake.DEPLOY_FEEDFORWARD.calculate(deployMotorController.getSetpoint().velocity);
     intakeDemandC = Cal.Intake.ARBITRARY_FEED_FORWARD_VOLTS * getCosineIntakeAngle();
 
-    System.out.println("Start");
-    System.out.println(getCosineIntakeAngle());
+    // System.out.println("Start");
+    // System.out.println(getCosineIntakeAngle());
     deployMotor.setVoltage(intakeDemandA + intakeDemandB + intakeDemandC);
   }
 
@@ -198,7 +198,7 @@ public class Intake extends SubsystemBase {
     desireClamped = false;
 
     // Set the desired intake position
-    intakeDesiredPositionDegrees = Cal.Intake.STARTING_POSITION_DEGREES;
+    intakeDesiredPositionDegrees = 65;//Cal.Intake.STARTING_POSITION_DEGREES;
   }
 
   /*Setter for whether intake is desired deploy is true retract is false */
@@ -256,8 +256,8 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    System.out.println(deployMotorAbsoluteEncoder.getPosition());
-    System.out.println(deployMotorEncoder.getPosition());
+    // System.out.println(deployMotorAbsoluteEncoder.getPosition());
+    // System.out.println(deployMotorEncoder.getPosition());
     if (clearOfIntake.getAsBoolean()) {
       if (desiredDeployed.isPresent()) {
         if (desiredDeployed.get() == true) {
@@ -268,7 +268,7 @@ public class Intake extends SubsystemBase {
       }
     }
 
-    // controlPosition(intakeDesiredPositionDegrees);
+    controlPosition(intakeDesiredPositionDegrees);
 
     // Only clamp if it is safe to do so and clamping is desired
     if (desireClamped

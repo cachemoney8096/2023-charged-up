@@ -101,7 +101,13 @@ public class Lift extends SubsystemBase {
   private LiftPosition desiredPosition = LiftPosition.STARTING;
   private boolean desiredGrabberClosed = true;
   public ScoringLocationUtil scoreLoc;
-  private boolean scoringInProgress = false;
+  private boolean scoringInProgress = false; 
+  private double elevatorDemandVolts;
+  private double armGoal;
+
+  private double demandA;
+  private double demandB;
+  private double demandC;
 
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
@@ -253,30 +259,33 @@ public class Lift extends SubsystemBase {
     armController.setGoal(desiredArmPosDeg);
   }
 
+  public void setElevatorPositionGoal (double desiredElevatorPosIn) {
+    elevatorController.setGoal(desiredElevatorPosIn);
+  }
+
   /** Sends voltage commands to the arm and elevator motors, needs to be called every cycle */
   private void controlPosition(LiftPosition pos) {
-    elevatorController.setGoal(liftPositionMap.get(pos).getFirst());
-    double elevatorDemandVolts = elevatorController.calculate(elevatorLeftEncoder.getPosition());
+    elevatorDemandVolts = elevatorController.calculate(elevatorLeftEncoder.getPosition());
     elevatorDemandVolts +=
         Cal.Lift.ELEVATOR_FEEDFORWARD.calculate(elevatorController.getSetpoint().velocity);
-    // elevatorLeft.setVoltage(elevatorDemandVolts);
-    elevatorLeft.setVoltage(0.0);
+    elevatorLeft.setVoltage(elevatorDemandVolts);
+    // elevatorLeft.setVoltage(0.0);
 
-    double demandA = armController.calculate(armEncoder.getPosition());
-    double demandB = Cal.Lift.ARM_FEEDFORWARD.calculate(armController.getSetpoint().velocity);
-    double demandC = Cal.Lift.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle();
+    demandA = armController.calculate(armEncoder.getPosition());
+    demandB = Cal.Lift.ARM_FEEDFORWARD.calculate(armController.getSetpoint().velocity);
+    demandC = Cal.Lift.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle();
     // armMotor.setVoltage(0.0);
-    System.out.println("Start");
-    System.out.println(demandA);
-    System.out.println(demandB);
-    System.out.println(demandC);
-    System.out.println("Midpoint");
-    System.out.println(armController.getSetpoint().velocity);
-    System.out.println(liftPositionMap.get(pos).getSecond());
-    System.out.println(armEncoder.getPosition());
-    System.out.println("Another pt");
-    System.out.println(armController.getPositionError());
-    System.out.println(armController.atSetpoint());
+    // System.out.println("Start");
+    // System.out.println(demandA);
+    // System.out.println(demandB);
+    // System.out.println(demandC);
+    // System.out.println("Midpoint");
+    // System.out.println(armController.getSetpoint().velocity);
+    // System.out.println(liftPositionMap.get(pos).getSecond());
+    // System.out.println(armEncoder.getPosition());
+    // System.out.println("Another pt");
+    // System.out.println(armController.getPositionError());
+    // System.out.println(armController.atSetpoint());
     armMotor.setVoltage(demandA + demandB + demandC);
   }
 
@@ -310,18 +319,19 @@ public class Lift extends SubsystemBase {
     // Set elevator encoder position from absolute encoders
     double elevatorDutyCycleEncodersDifferenceDegrees =
         AngleUtil.wrapAngle(
-            elevatorRightAbsEncoder.getPosition() - elevatorLeftEncoder.getPosition());
-    elevatorLeftEncoder.setPosition(
-        elevatorDutyCycleEncodersDifferenceDegrees
-                * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE
-            - Cal.Lift.ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES);
+            elevatorRightAbsEncoder.getPosition() - elevatorLeftEncoder.getPosition() * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_DEGREES_PER_INCH);
+    // elevatorLeftEncoder.setPosition(
+    //     elevatorDutyCycleEncodersDifferenceDegrees
+    //             * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE
+    //         - Cal.Lift.ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES);
+            elevatorLeftEncoder.setPosition(-0.25);
 
             armController.setTolerance(Cal.Lift.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG);
             // armController.enableContinuousInput(0.0, 360.0);
             armController.disableContinuousInput();
             armController.reset(armEncoder.getPosition());
             armController.setGoal(armEncoder.getPosition());
-
+            armGoal = armController.getGoal().position;
             elevatorController.setTolerance(Cal.Lift.ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN);
             elevatorController.reset(elevatorLeftEncoder.getPosition());
           }
@@ -375,6 +385,9 @@ public class Lift extends SubsystemBase {
 
   /** Sets the desired position, which the lift may not go to directly. */
   public void setDesiredPosition(LiftPosition pos) {
+    if (desiredPosition != pos){
+      elevatorController.setGoal(liftPositionMap.get(pos).getFirst());
+    }
     desiredPosition = pos;
   }
 
@@ -496,9 +509,9 @@ public class Lift extends SubsystemBase {
         elevatorLeftEncoder::setPosition);
     builder.addDoubleProperty("Elevator Vel (in)", elevatorLeftEncoder::getVelocity, null);
     builder.addDoubleProperty(
-        "Elevator Left Abs Pos (in)", elevatorLeftAbsEncoder::getPosition, null);
+        "Elevator Left Abs Pos (deg)", elevatorLeftAbsEncoder::getPosition, null);
     builder.addDoubleProperty(
-        "Elevator Right Abs Pos (in)", elevatorRightAbsEncoder::getPosition, null);
+        "Elevator Right Abs Pos (deg)", elevatorRightAbsEncoder::getPosition, null);
     builder.addBooleanProperty("Clear of intake", this::clearOfIntakeZone, null);
     builder.addDoubleProperty(
         "Arm Abs Position (deg)", armAbsoluteEncoder::getPosition, armEncoder::setPosition);
@@ -526,6 +539,11 @@ public class Lift extends SubsystemBase {
         null);
     builder.addDoubleProperty("Elevator output", elevatorLeft::get, null);
     builder.addDoubleProperty("Arm output", armMotor::get, null);
+    builder.addDoubleProperty("Elevator voltage", () -> {return elevatorDemandVolts;}, null);
+    builder.addDoubleProperty("demandA", () -> {return demandA;}, null);
+    builder.addDoubleProperty("demandB", () -> {return demandB;}, null);
+    builder.addDoubleProperty("demandC", () -> {return demandC;}, null);
+    builder.addDoubleProperty("Arm goal", () -> {return armGoal;}, null);
   }
 
   /**
