@@ -86,7 +86,9 @@ public final class Cal {
     public static final double EJECTION_POWER = -1.0;
 
     /** Intake positions in degrees */
-    public static final double STARTING_POSITION_DEGREES = 75.0, DEPLOYED_POSITION_DEGREES = 180.0;
+    public static final double STARTING_POSITION_DEGREES = 75.0,
+        DEPLOYED_POSITION_DEGREES = 180.0,
+        RETRACTED_POSITION_DEGREES = 65.0;
 
     /** Past this position, the intake is free to clamp */
     public static final double CLAMP_POSITION_THRESHOLD_DEGREES = 110.0;
