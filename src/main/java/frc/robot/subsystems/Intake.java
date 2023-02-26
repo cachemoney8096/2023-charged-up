@@ -49,8 +49,10 @@ public class Intake extends SubsystemBase {
               Cal.Intake.DEPLOY_MAX_VELOCITY_DEG_PER_SECOND,
               Cal.Intake.DEPLOY_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED));
 
-  private Solenoid clamp =
-      new Solenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_CLAMP_FORWARD_CHANNEL);
+  private Solenoid clampLeft =
+      new Solenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_CLAMP_LEFT_CHANNEL);
+  private Solenoid clampRight =
+      new Solenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_CLAMP_RIGHT_CHANNEL);
   private CANSparkMax intakeLeft =
       new CANSparkMax(RobotMap.INTAKE_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
   private CANSparkMax intakeRight =
@@ -209,11 +211,13 @@ public class Intake extends SubsystemBase {
   }
 
   private void clampIntake() {
-    clamp.set(false);
+    clampLeft.set(true);
+    clampRight.set(true);
   }
 
   private void unclampIntake() {
-    clamp.set(true);
+    clampLeft.set(false);
+    clampRight.set(false);
   }
 
   /** Runs the intake wheels inward */

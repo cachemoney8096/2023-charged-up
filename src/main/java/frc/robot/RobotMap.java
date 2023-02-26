@@ -4,7 +4,7 @@ package frc.robot;
 public final class RobotMap {
   public static final int DRIVER_CONTROLLER_PORT = 0, OPERATOR_CONTROLLER_PORT = 1;
 
-  public static final int PIGEON_CAN_ID = 1;
+  public static final int PIGEON_CAN_ID = 30;
 
   /** Driving SPARK MAX CAN IDs */
   public static final int FRONT_LEFT_DRIVING_CAN_ID = 11,
@@ -29,13 +29,13 @@ public final class RobotMap {
       ELEVATOR_MOTOR_RIGHT_CAN_ID = 39;
 
   /** Intake clamp pneumatic channels */
-  public static final int INTAKE_CLAMP_FORWARD_CHANNEL = 0;
+  public static final int INTAKE_CLAMP_LEFT_CHANNEL = 0, INTAKE_CLAMP_RIGHT_CHANNEL = 1;
 
   /** Lift grabbing pneumatic channels */
-  public static final int LIFT_GRABBING_CHANNEL = 1;
+  public static final int LIFT_GRABBING_CHANNEL = 2;
 
   /** Sensor DIO */
-  public static final int LIFT_GAME_PIECE_DIO = 0, INTAKE_GAME_PIECE_DIO = 1;
+  public static final int LIFT_GAME_PIECE_DIO = 9, INTAKE_GAME_PIECE_DIO = 8;
 
   /** PWM Port for LEDs */
   public static final int LED_PWM_PORT = 0;
