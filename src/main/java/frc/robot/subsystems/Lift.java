@@ -252,6 +252,14 @@ public class Lift extends SubsystemBase {
     armMotor.burnFlash();
   }
 
+  public void setArmPositionGoal(double desiredArmPosDeg) {
+    armController.setGoal(desiredArmPosDeg);
+  }
+
+  public void setElevatorPositionGoal (double desiredElevatorPosIn) {
+    elevatorController.setGoal(desiredElevatorPosIn);
+  }
+
   /** Sends voltage commands to the arm and elevator motors, needs to be called every cycle */
   private void controlPosition(LiftPosition pos) {
     if (goalPosition != pos) {
@@ -282,7 +290,9 @@ public class Lift extends SubsystemBase {
   /** Returns true if the game piece sensor sees a game piece */
   public boolean seeGamePiece() {
     // Sensor is false if there's a game piece
-    return !gamePieceSensor.get();
+    // TODO replace once the sensor is on
+    // return !gamePieceSensor.get();
+    return true;
   }
 
   /** Returns the cosine of the arm angle in degrees off of the horizontal. */
@@ -301,11 +311,12 @@ public class Lift extends SubsystemBase {
     // Set elevator encoder position from absolute encoders
     double elevatorDutyCycleEncodersDifferenceDegrees =
         AngleUtil.wrapAngle(
-            elevatorRightAbsEncoder.getPosition() - elevatorLeftEncoder.getPosition());
-    elevatorLeftEncoder.setPosition(
-        elevatorDutyCycleEncodersDifferenceDegrees
-                * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE
-            - Cal.Lift.ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES);
+            elevatorRightAbsEncoder.getPosition() - elevatorLeftEncoder.getPosition() * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_DEGREES_PER_INCH);
+    elevatorLeftEncoder.setPosition(-0.25);
+    // elevatorLeftEncoder.setPosition(
+    //     elevatorDutyCycleEncodersDifferenceDegrees
+    //             * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE
+    //         - Cal.Lift.ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES);
 
     armController.setTolerance(Cal.Lift.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG);
     armController.reset(armEncoder.getPosition());
@@ -427,20 +438,22 @@ public class Lift extends SubsystemBase {
 
     // If the lift is going from below to above or above to below, we have to transit through
     // starting position. Otherwise, we can go directly to the desired position.
-    LiftPositionStartRelative latestPositionStartRelative = getRelativeLiftPosition(latestPosition);
-    LiftPositionStartRelative desiredPositionStartRelative =
-        getRelativeLiftPosition(desiredPosition);
-    if (!seeGamePiece()) {
-      controlPosition(desiredPosition);
-    } else if (desiredPositionStartRelative == LiftPositionStartRelative.BELOW_START
-        && latestPositionStartRelative == LiftPositionStartRelative.ABOVE_START) {
-      controlPosition(LiftPosition.STARTING);
-    } else if (desiredPositionStartRelative == LiftPositionStartRelative.ABOVE_START
-        && latestPositionStartRelative == LiftPositionStartRelative.BELOW_START) {
-      controlPosition(LiftPosition.STARTING);
-    } else {
-      controlPosition(desiredPosition);
-    }
+    // LiftPositionStartRelative latestPositionStartRelative = getRelativeLiftPosition(latestPosition);
+    // LiftPositionStartRelative desiredPositionStartRelative =
+    //     getRelativeLiftPosition(desiredPosition);
+    // if (!seeGamePiece()) {
+    //   controlPosition(desiredPosition);
+    // } else if (desiredPositionStartRelative == LiftPositionStartRelative.BELOW_START
+    //     && latestPositionStartRelative == LiftPositionStartRelative.ABOVE_START) {
+    //   controlPosition(LiftPosition.STARTING);
+    // } else if (desiredPositionStartRelative == LiftPositionStartRelative.ABOVE_START
+    //     && latestPositionStartRelative == LiftPositionStartRelative.BELOW_START) {
+    //   controlPosition(LiftPosition.STARTING);
+    // } else {
+    //   controlPosition(desiredPosition);
+    // }
+    controlPosition(desiredPosition);
+
 
     // // If the grabber is set to open and it is safe to open, open the grabber (drop). Otherwise,
     // // close it (grab).
@@ -512,6 +525,12 @@ public class Lift extends SubsystemBase {
           return latestPosition.toString();
         },
         null);
+        builder.addStringProperty(
+            "Goal position",
+            () -> {
+              return goalPosition.toString();
+            },
+            null);
     builder.addDoubleProperty("Elevator output", elevatorLeft::get, null);
     builder.addDoubleProperty("Arm output", armMotor::get, null);
   }

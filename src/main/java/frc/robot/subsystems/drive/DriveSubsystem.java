@@ -17,6 +17,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -24,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
+import frc.robot.utils.SendableHelper;
 
 public class DriveSubsystem extends SubsystemBase {
   private double targetHeadingDegrees;
@@ -311,6 +313,54 @@ public class DriveSubsystem extends SubsystemBase {
     addChild("Front Left", frontLeft);
     addChild("Rear Right", rearRight);
     addChild("Rear Left", rearLeft);
+    builder.addDoubleProperty(
+      "Rear Right Module Position", 
+      () -> {
+        return rearRight.getPosition().angle.getRadians();
+      }, 
+      null);
+    builder.addDoubleProperty(
+      "Front Left Module Position", 
+      () -> {
+        return frontLeft.getPosition().angle.getRadians();
+      }, 
+      null);
+    builder.addDoubleProperty(
+      "Front Right Module Position", 
+      () -> {
+        return frontRight.getPosition().angle.getRadians();
+      }, 
+      null);
+      builder.addDoubleProperty(
+        "Front Right Rel Encoder Position", 
+        () -> {
+          return frontRight.turningSparkMax.getEncoder().getPosition();
+        }, 
+      null);
+      builder.addDoubleProperty(
+        "Front Right Desired Module Position", 
+        () -> {
+          return frontRight.desiredPosRad;
+        }, 
+        null);
+      builder.addDoubleProperty(
+        "Front Right Vel (mps)", 
+        () -> {
+          return frontRight.getState().speedMetersPerSecond;
+        }, 
+        null);
+        builder.addDoubleProperty(
+          "Front Right Desired Vel (mps)", 
+          () -> {
+            return frontRight.desiredVelMps;
+          }, 
+          null);
+    builder.addDoubleProperty(
+      "Rear Left Module Position", 
+      () -> {
+        return rearLeft.getPosition().angle.getRadians();
+      }, 
+      null);
     builder.addBooleanProperty(
         "Half speed?",
         () -> {

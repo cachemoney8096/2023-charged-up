@@ -5,7 +5,6 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -27,9 +26,12 @@ import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Lights.LightCode;
 import frc.robot.subsystems.TagLimelight;
+import frc.robot.subsystems.Lift.LiftPosition;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.JoystickUtil;
 import frc.robot.utils.ScoringLocationUtil;
+import frc.robot.utils.SendableHelper;
+import edu.wpi.first.wpilibj.PneumaticHub;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -41,6 +43,8 @@ public class RobotContainer {
   private final DriveSubsystem drive = new DriveSubsystem();
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
   private final Lift lift = new Lift(scoreLoc);
+  private final PneumaticHub pHub = new PneumaticHub();
+  // private final Intake intake = new Intake(() -> {return true;});
   private final Intake intake = new Intake(lift::clearOfIntakeZone);
   private final IntakeLimelight intakeLimelight =
       new IntakeLimelight(
@@ -53,7 +57,6 @@ public class RobotContainer {
           Constants.TAG_LIMELIGHT_HEIGHT_METERS,
           Constants.TAG_TARGET_HEIGHT_METERS);
   private final Lights lights = new Lights();
-  private final PneumaticHub pneumaticHub = new PneumaticHub();
 
   // A chooser for autonomous commands
   private SendableChooser<Command> autonChooser = new SendableChooser<>();
@@ -71,16 +74,18 @@ public class RobotContainer {
 
     Shuffleboard.getTab("Subsystems").add(drive.getName(), drive);
     Shuffleboard.getTab("Subsystems").add(intake.getName(), intake);
-    Shuffleboard.getTab("Subsystems").add(intakeLimelight.getName(), intakeLimelight);
-    Shuffleboard.getTab("Subsystems").add(tagLimelight.getName(), tagLimelight);
-    Shuffleboard.getTab("Subsystems").add(lights.getName(), lights);
+    // Shuffleboard.getTab("Subsystems").add(intakeLimelight.getName(), intakeLimelight);
+    // Shuffleboard.getTab("Subsystems").add(tagLimelight.getName(), tagLimelight);
+    // Shuffleboard.getTab("Subsystems").add(lights.getName(), lights);
+    Shuffleboard.getTab("Subsystems").add(lift.getName(), lift);
+    SmartDashboard.putNumber("Pressure", pHub.getPressure(0));
   }
 
   public void initialize() {
     // autons
     autonChooser.setDefaultOption("Balance", new AutoChargeStationSequence(true, drive));
-    autonChooser.addOption(
-        "Score, balance", new AutoScoreAndBalance(true, lift, drive, lights, scoreLoc));
+    // autonChooser.addOption(
+    //     "Score, balance", new AutoScoreAndBalance(true, lift, drive, lights, scoreLoc));
 
     // Put the chooser on the dashboard
     SmartDashboard.putData(autonChooser);
@@ -88,8 +93,6 @@ public class RobotContainer {
     // Encoder offset stuff
     intake.initialize();
     lift.initialize();
-
-    pneumaticHub.enableCompressorAnalog(80, 110);
 
     burnFlashSparks();
   }
@@ -123,127 +126,142 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    driverController.a().onTrue(new InstantCommand(drive::toggleSkids));
-    driverController.b().onTrue(new OuttakeSequence(lift));
-    driverController.x().onTrue(new InstantCommand(lift::cancelScore, lift));
+    // driverController.a().onTrue(new InstantCommand(drive::toggleSkids));
+    // driverController.b().onTrue(new OuttakeSequence(lift));
+    // driverController.x().onTrue(new InstantCommand(lift::cancelScore, lift));
 
-    driverController
-        .y()
-        .onTrue(new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift));
+    // driverController.y().onTrue(new InstantCommand(lift::ManualPrepScoreSequence, lift));
 
-    driverController.back().onTrue(new InstantCommand(lift::home, lift));
-    driverController.start().onTrue(new InstantCommand(drive::halfSpeedToggle));
+    // driverController.back().onTrue(new InstantCommand(lift::home, lift));
+    // driverController.start().onTrue(new InstantCommand(drive::halfSpeedToggle));
 
     // TODO Maybe: steal
     // TODO: implement autoscore command for teleop
-    // driverController.rightBumper().onTrue(new InstantCommand(lift::prepScore, lift));
-    driverController
-        .leftTrigger()
-        .whileTrue(
-            new IntakeSequence(intake, lift, lights)
-                .finallyDo(
-                    (boolean interrupted) -> {
-                      lift.home();
-                      lift.closeGrabber();
-                    }));
-    driverController.rightTrigger().onTrue(new InstantCommand(lift::startScore, lift));
-    driverController
-        .rightTrigger()
-        .onFalse(
-            new ConditionalCommand(
-                new InstantCommand(() -> lift.finishScoreCancelled(lights), lift),
-                new finishScore(lift, lights),
-                lift::getCancelScore));
+    // // driverController.rightBumper().onTrue(new InstantCommand(lift::prepScore, lift));
+    // driverController
+    //     .leftTrigger()
+    //     .whileTrue(
+    //         new IntakeSequence(intake, lift, lights)
+    //             .finallyDo(
+    //                 (boolean interrupted) -> {
+    //                   lift.home();
+    //                   lift.closeGrabber();
+    //                 }));
+    // driverController.rightTrigger().onTrue(new InstantCommand(lift::startScore, lift));
+    // driverController
+    //     .rightTrigger()
+    //     .onFalse(
+    //         new ConditionalCommand(
+    //             new InstantCommand(() -> { lift.finishScoreCancelled(lights);}, lift),
+    //             new finishScore(lift, lights),
+    //             lift::getCancelScore));
 
-    operatorController
-        .povDown()
-        .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.LOW)));
-    operatorController
-        .povLeft()
-        .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
-    operatorController
-        .povUp()
-        .onTrue(
-            new InstantCommand(
-                () -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH)));
-    operatorController.povRight().onTrue(new InstantCommand(() -> lights.togglePartyMode()));
+    // operatorController
+    //     .povDown()
+    //     .onTrue(
+    //         new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.LOW)));
+    // operatorController
+    //     .povRight()
+    //     .onTrue(
+    //         new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
+    // operatorController
+    //     .povUp()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH)));
+    // operatorController.povRight().onTrue(new InstantCommand(() -> lights.togglePartyMode()));
 
-    operatorController
-        .x()
-        .onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.LEFT)));
-    operatorController
-        .a()
-        .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER)));
-    operatorController
-        .y()
-        .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER)));
-    operatorController
-        .b()
-        .onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.RIGHT)));
+    // operatorController
+    //     .x()
+    //     .onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.LEFT)));
+    // operatorController
+    //     .a()
+    //     .onTrue(
+    //         new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER)));
+    // operatorController
+    //     .y()
+    //     .onTrue(
+    //         new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER)));
+    // operatorController
+    //     .b()
+    //     .onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.RIGHT)));
 
-    operatorController
-        .start()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  intake.setDesiredDeployed(true);
-                },
-                intake));
-    operatorController
-        .back()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  intake.setDesiredDeployed(false);
-                },
-                intake));
+    // operatorController
+    //     .start()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               intake.setDesiredDeployed(true);
+    //             },
+    //             intake));
+    // operatorController
+    //     .back()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               intake.setDesiredDeployed(false);
+    //             },
+    //             intake));
 
-    operatorController
-        .leftBumper()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  lights.toggleCode(LightCode.CONE);
-                }));
-    operatorController
-        .rightBumper()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  lights.toggleCode(LightCode.CUBE);
-                }));
-
-    operatorController.leftTrigger().onTrue(new InstantCommand(lift::openGrabber, lift));
-    operatorController.leftTrigger().onFalse(new InstantCommand(lift::closeGrabber, lift));
-    operatorController.rightTrigger().onTrue(new InstantCommand(scoreLoc::toggleMiddleGrid));
-    operatorController.rightTrigger().onFalse(new InstantCommand(scoreLoc::toggleMiddleGrid));
+    // operatorController
+    //     .leftBumper()
+    //     .onTrue(new InstantCommand(() -> lights.toggleCode(Lights.LightCode.CONE), lights));
+    // operatorController
+    //     .rightBumper()
+    //     .onTrue(new InstantCommand(() -> lights.toggleCode(Lights.LightCode.CONE), lights));
+    // operatorController.leftTrigger().onTrue(new InstantCommand(lift::openGrabber, lift));
+    // operatorController.leftTrigger().onFalse(new InstantCommand(lift::closeGrabber, lift));
+    // operatorController.rightTrigger().onTrue(new InstantCommand(scoreLoc::toggleMiddleGrid));
+    // operatorController.rightTrigger().onFalse(new InstantCommand(scoreLoc::toggleMiddleGrid));
 
     // TODO add manual arm and elevator control
 
     // Drive controls
+
+    // driverController.a().onTrue(new InstantCommand(() -> {
+    //     lift.setArmPositionGoal(224.0);
+    //   }, lift));
+    //   driverController.b().onTrue(new InstantCommand(() -> {
+    //       lift.setArmPositionGoal(148.0);
+    //     }, lift));
+        driverController.x().onTrue(new InstantCommand(() -> {
+          lift.setArmPositionGoal(180.0);
+        }, lift));
+      
+    // driverController.a().onTrue(new InstantCommand(() -> {
+    //     lift.setElevatorPositionGoal(1.0);
+    //   }, lift));
+    //   driverController.b().onTrue(new InstantCommand(() -> {
+    //       lift.setElevatorPositionGoal(18.5);
+    //     }, lift));
+
+    // driverController.a().onTrue(new InstantCommand(() -> {
+    //   intake.setDesiredDeployed(true);
+    //   // intake.intakeGamePiece();
+    // }, intake));
+    // driverController.b().onTrue(new InstantCommand(() -> {
+    //   intake.setDesiredDeployed(false);
+    //   // intake.stopIntakingGamePiece();
+    // }, intake));
     drive.setDefaultCommand(
         new RunCommand(
                 () ->
                     drive.rotateOrKeepHeading(
-                        MathUtil.applyDeadband(-driverController.getLeftY(), 0.1),
-                        MathUtil.applyDeadband(-driverController.getLeftX(), 0.1),
+                        MathUtil.applyDeadband(-driverController.getRightY(), 0.1),
+                        MathUtil.applyDeadband(-driverController.getRightX(), 0.1),
                         JoystickUtil.squareAxis(
-                            MathUtil.applyDeadband(-driverController.getRightX(), 0.1)),
-                        driverController.getHID().getLeftBumper(),
+                            MathUtil.applyDeadband(-driverController.getLeftX(), 0.1)),
+                        !driverController.getHID().getLeftBumper(),
                         driverController.getHID().getPOV()),
                 drive)
             .withName("Manual Drive"));
 
-    intake.setDefaultCommand(
-        new InstantCommand(
-            () -> {
-              intake.setDesiredDeployed(false);
-            },
-            intake));
+    // intake.setDefaultCommand(
+    //     new InstantCommand(
+    //         () -> {
+    //           intake.setDesiredDeployed(false);
+    //         },
+    //         intake));
   }
 
   public Command getAutonomousCommand() {
