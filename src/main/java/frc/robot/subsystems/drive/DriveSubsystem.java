@@ -168,10 +168,11 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Sets the wheels into an X formation to prevent movement. */
   public void setX() {
-    frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-    frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-    rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-    rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+    // TMP: setX is actually set forward for pathplanner tuning
+    frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+    frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+    rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+    rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
   }
 
   /**
@@ -271,6 +272,14 @@ public class DriveSubsystem extends SubsystemBase {
     return gyro;
   }
 
+
+  public void setModuleDrivePidf(double kP, double kI, double kD, double kF) {
+    frontLeft.setPIDF(kP, kI, kD, kF);
+    frontRight.setPIDF(kP, kI, kD, kF);
+    rearLeft.setPIDF(kP, kI, kD, kF);
+    rearRight.setPIDF(kP, kI, kD, kF);
+  }
+
   /** Taken from Github */
   public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
     return new SequentialCommandGroup(
@@ -294,10 +303,11 @@ public class DriveSubsystem extends SubsystemBase {
                 .PATH_THETA_CONTROLLER, // Rotation controller. Tune these values for your robot.
             // Leaving them 0 will only use feedforwards.
             this::setModuleStates, // Module states consumer
-            true, // Should the path be automatically mirrored depending on alliance color.
+            false, // Should the path be automatically mirrored depending on alliance color.
             // Optional, defaults to true
             this // Requires this drive subsystem
-            ));
+            ),
+            new InstantCommand(() -> {targetHeadingDegrees = getPose().getRotation().getDegrees();}));
   }
 
   public void toggleSkids() {
@@ -321,21 +331,21 @@ public class DriveSubsystem extends SubsystemBase {
     addChild("Rear Right", rearRight);
     addChild("Rear Left", rearLeft);
     builder.addDoubleProperty(
-      "Rear Right Module Position", 
+      "Rear Right Module Position (deg)", 
       () -> {
-        return rearRight.getPosition().angle.getRadians();
+        return rearRight.getPosition().angle.getDegrees();
       }, 
       null);
     builder.addDoubleProperty(
-      "Front Left Module Position", 
+      "Front Left Module Position (deg)", 
       () -> {
-        return frontLeft.getPosition().angle.getRadians();
+        return frontLeft.getPosition().angle.getDegrees();
       }, 
       null);
     builder.addDoubleProperty(
-      "Front Right Module Position", 
+      "Front Right Module Position (deg)", 
       () -> {
-        return frontRight.getPosition().angle.getRadians();
+        return frontRight.getPosition().angle.getDegrees();
       }, 
       null);
       builder.addDoubleProperty(
@@ -363,9 +373,9 @@ public class DriveSubsystem extends SubsystemBase {
           }, 
           null);
     builder.addDoubleProperty(
-      "Rear Left Module Position", 
+      "Rear Left Module Position (deg)", 
       () -> {
-        return rearLeft.getPosition().angle.getRadians();
+        return rearLeft.getPosition().angle.getDegrees();
       }, 
       null);
     builder.addBooleanProperty(
@@ -399,5 +409,6 @@ public class DriveSubsystem extends SubsystemBase {
           return getPose().getRotation().getDegrees();
         },
         null);
+    builder.addDoubleProperty("Pitch", gyro::getPitch, null);
   }
 }

@@ -173,6 +173,14 @@ public class SwerveModule implements Sendable {
     turningSparkMax.burnFlash();
   }
 
+  public void setPIDF(double kP, double kI, double kD, double kF) {
+    double errors = 0;
+    errors += SparkMaxUtils.check(drivingPIDController.setP(kP));
+    errors += SparkMaxUtils.check(drivingPIDController.setI(kI));
+    errors += SparkMaxUtils.check(drivingPIDController.setD(kD));
+    errors += SparkMaxUtils.check(drivingPIDController.setFF(kF));
+  }
+
   /**
    * Returns the current state of the module.
    *

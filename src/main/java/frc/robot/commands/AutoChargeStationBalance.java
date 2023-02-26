@@ -3,6 +3,7 @@ package frc.robot.commands;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Cal.AutoBalance;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -33,19 +34,25 @@ public class AutoChargeStationBalance extends CommandBase {
     double pitchDeg = gyro.getPitch();
 
     /** Velocity is [-1,1] */
-    double normVelocityFromAngleDeg =
+    double normVelocity =
         pitchDeg * AutoBalance.CHARGE_STATION_PITCH_DEGREES_TO_NORM_VELOCITY;
 
-    double deadbandedNormVelocityFromAngleDeg =
+        SmartDashboard.putNumber("Pitch fro gyro", pitchDeg);
+        SmartDashboard.putNumber("Drive speed before deadband", normVelocity);
+
+    double deadbandedNormVelocity =
         MathUtil.applyDeadband(
-            normVelocityFromAngleDeg, AutoBalance.CHARGE_STATION_DEADBAND_NORM_VELOCITY);
+            normVelocity, AutoBalance.CHARGE_STATION_DEADBAND_NORM_VELOCITY);
 
     /** Time remaining in current match period (auto or teleop) in seconds */
     double matchTime = DriverStation.getMatchTime();
 
+    SmartDashboard.putNumber("Drive speed", matchTime > 1.0 ? deadbandedNormVelocity : 0.0);
+    SmartDashboard.putNumber("Match time", matchTime);
+
     // stop driving (and thus set x) if there is less than one second left in auton
     drive.drive(
-        matchTime > 1 ? deadbandedNormVelocityFromAngleDeg : 0,
+        matchTime > 1.0 ? deadbandedNormVelocity : 0.0,
         NOT_MOVING_IN_Y,
         NOT_ROTATING,
         ROBOT_RELATIVE);

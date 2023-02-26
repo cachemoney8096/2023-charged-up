@@ -56,7 +56,7 @@ public final class Constants {
 
     /** Calculations required for driving motor conversion factors and feed forward */
     public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotor.FREE_SPEED_RPM / 60,
-        WHEEL_DIAMETER_METERS = Units.inchesToMeters(3),
+        WHEEL_DIAMETER_METERS = Units.inchesToMeters(3) * 0.979,
         WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
 
     public static final double DRIVING_MOTOR_REDUCTION = 4.8;

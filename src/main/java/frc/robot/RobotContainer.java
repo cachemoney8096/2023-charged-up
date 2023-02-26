@@ -5,33 +5,24 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoChargeStationSequence;
-import frc.robot.commands.AutoScoreAndBalance;
-import frc.robot.commands.IntakeSequence;
-import frc.robot.commands.OuttakeSequence;
-import frc.robot.commands.finishScore;
+import frc.robot.commands.SimpleChargeStationSequence;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
-import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lights;
-import frc.robot.subsystems.Lights.LightCode;
 import frc.robot.subsystems.TagLimelight;
-import frc.robot.subsystems.Lift.LiftPosition;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.JoystickUtil;
 import frc.robot.utils.ScoringLocationUtil;
-import frc.robot.utils.SendableHelper;
-import edu.wpi.first.wpilibj.PneumaticHub;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -42,10 +33,14 @@ import edu.wpi.first.wpilibj.PneumaticHub;
 public class RobotContainer {
   private final DriveSubsystem drive = new DriveSubsystem();
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
-  private final Lift lift = new Lift(scoreLoc);
+  // private final Lift lift = new Lift(scoreLoc);
   private final PneumaticHub pHub = new PneumaticHub();
-  // private final Intake intake = new Intake(() -> {return true;});
-  private final Intake intake = new Intake(lift::clearOfIntakeZone);
+  private final Intake intake =
+      new Intake(
+          () -> {
+            return true;
+          });
+  // private final Intake intake = new Intake(lift::clearOfIntakeZone);
   private final IntakeLimelight intakeLimelight =
       new IntakeLimelight(
           Constants.INTAKE_LIMELIGHT_PITCH_DEGREES,
@@ -77,13 +72,15 @@ public class RobotContainer {
     // Shuffleboard.getTab("Subsystems").add(intakeLimelight.getName(), intakeLimelight);
     // Shuffleboard.getTab("Subsystems").add(tagLimelight.getName(), tagLimelight);
     // Shuffleboard.getTab("Subsystems").add(lights.getName(), lights);
-    Shuffleboard.getTab("Subsystems").add(lift.getName(), lift);
+    // Shuffleboard.getTab("Subsystems").add(lift.getName(), lift);
     SmartDashboard.putNumber("Pressure", pHub.getPressure(0));
   }
 
   public void initialize() {
     // autons
-    autonChooser.setDefaultOption("Balance", new AutoChargeStationSequence(true, drive));
+
+    autonChooser.setDefaultOption(
+        "Simple Balance Sequence", new AutoChargeStationSequence(true, drive));
     // autonChooser.addOption(
     //     "Score, balance", new AutoScoreAndBalance(true, lift, drive, lights, scoreLoc));
 
@@ -92,7 +89,7 @@ public class RobotContainer {
 
     // Encoder offset stuff
     intake.initialize();
-    lift.initialize();
+    // lift.initialize();
 
     burnFlashSparks();
   }
@@ -110,7 +107,7 @@ public class RobotContainer {
    */
   public void burnFlashSparks() {
     Timer.delay(0.25);
-    lift.burnFlashSparks();
+    // lift.burnFlashSparks();
     intake.burnFlashSparks();
     drive.burnFlashSparks();
     Timer.delay(0.25);
@@ -159,11 +156,13 @@ public class RobotContainer {
     // operatorController
     //     .povDown()
     //     .onTrue(
-    //         new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.LOW)));
+    //         new InstantCommand(() ->
+    // scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.LOW)));
     // operatorController
     //     .povRight()
     //     .onTrue(
-    //         new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
+    //         new InstantCommand(() ->
+    // scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
     // operatorController
     //     .povUp()
     //     .onTrue(
@@ -173,7 +172,8 @@ public class RobotContainer {
 
     // operatorController
     //     .x()
-    //     .onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.LEFT)));
+    //     .onTrue(new InstantCommand(() ->
+    // scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.LEFT)));
     // operatorController
     //     .a()
     //     .onTrue(
@@ -184,7 +184,8 @@ public class RobotContainer {
     //         new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER)));
     // operatorController
     //     .b()
-    //     .onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.RIGHT)));
+    //     .onTrue(new InstantCommand(() ->
+    // scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.RIGHT)));
 
     // operatorController
     //     .start()
@@ -224,10 +225,10 @@ public class RobotContainer {
     //   driverController.b().onTrue(new InstantCommand(() -> {
     //       lift.setArmPositionGoal(148.0);
     //     }, lift));
-        driverController.x().onTrue(new InstantCommand(() -> {
-          lift.setArmPositionGoal(180.0);
-        }, lift));
-      
+    // driverController.x().onTrue(new InstantCommand(() -> {
+    //   lift.setArmPositionGoal(180.0);
+    // }, lift));
+
     // driverController.a().onTrue(new InstantCommand(() -> {
     //     lift.setElevatorPositionGoal(1.0);
     //   }, lift));
