@@ -72,6 +72,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    gyro.configFactoryDefault();
+    gyro.reset();
     gyro.configMountPose(AxisDirection.PositiveY, AxisDirection.PositiveZ);
   }
 
@@ -307,7 +309,7 @@ public class DriveSubsystem extends SubsystemBase {
     addChild("Rotate to target controller", Cal.SwerveSubsystem.ROTATE_TO_TARGET_PID_CONTROLLER);
     addChild("Front Right", frontRight);
     addChild("Front Left", frontLeft);
-    addChild("Back Right", rearLeft);
+    addChild("Rear Right", rearRight);
     addChild("Rear Left", rearLeft);
     builder.addBooleanProperty(
         "Half speed?",
