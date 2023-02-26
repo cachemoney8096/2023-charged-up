@@ -13,6 +13,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -66,6 +67,7 @@ public class Intake extends SubsystemBase {
 
   // Members
   private double intakeDesiredPositionDegrees = Cal.Intake.STARTING_POSITION_DEGREES;
+  private double intakeMostRecentGoalDegrees = Cal.Intake.STARTING_POSITION_DEGREES;
   private Optional<Boolean> desiredDeployed = Optional.empty();
   private boolean desireClamped = false;
   private BooleanSupplier clearOfIntake;
@@ -78,7 +80,6 @@ public class Intake extends SubsystemBase {
     SparkMaxUtils.initWithRetry(this::setUpIntakeWheelSparks, Cal.SPARK_INIT_RETRY_ATTEMPTS);
 
     deployMotorController.setTolerance(Cal.Intake.DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG);
-    deployMotorController.enableContinuousInput(0.0, 2 * Math.PI);
   }
 
   /** Does all the initialization for the sparks, return true on success */
@@ -109,7 +110,7 @@ public class Intake extends SubsystemBase {
     int errors = 0;
 
     errors += SparkMaxUtils.check(deployMotor.restoreFactoryDefaults());
-    deployMotor.setInverted(true);
+    deployMotor.setInverted(false);
     errors +=
         SparkMaxUtils.check(
             SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(
@@ -145,8 +146,8 @@ public class Intake extends SubsystemBase {
     deployMotorEncoder.setPosition(
         AngleUtil.wrapAngle(
             deployMotorAbsoluteEncoder.getPosition()
-                - (Cal.Intake.ABSOLUTE_ENCODER_START_POS_DEG
-                    - Cal.Intake.STARTING_POSITION_DEGREES)));
+                - Cal.Intake.ABSOLUTE_ENCODER_START_POS_DEG
+                + Cal.Intake.STARTING_POSITION_DEGREES));
 
     deployMotorController.reset(deployMotorEncoder.getPosition());
   }
@@ -166,11 +167,15 @@ public class Intake extends SubsystemBase {
 
   /** Sends the deploy motor voltage, needs to be called every cycle */
   private void controlPosition(double positionDeg) {
-    deployMotorController.setGoal(positionDeg);
-    double demand = deployMotorController.calculate(deployMotorEncoder.getPosition());
-    demand += Cal.Intake.DEPLOY_FEEDFORWARD.calculate(deployMotorController.getSetpoint().velocity);
-    demand += Cal.Intake.ARBITRARY_FEED_FORWARD_VOLTS * getCosineIntakeAngle();
-    deployMotor.setVoltage(demand);
+    if (positionDeg != intakeMostRecentGoalDegrees) {
+      deployMotorController.setGoal(positionDeg);
+      intakeMostRecentGoalDegrees = positionDeg;
+    }
+    double demandVolts = deployMotorController.calculate(deployMotorEncoder.getPosition());
+    demandVolts +=
+        Cal.Intake.DEPLOY_FEEDFORWARD.calculate(deployMotorController.getSetpoint().velocity);
+    demandVolts += Cal.Intake.ARBITRARY_FEED_FORWARD_VOLTS * getCosineIntakeAngle();
+    deployMotor.setVoltage(demandVolts);
   }
 
   /** Deploys the intake out. */
@@ -186,7 +191,7 @@ public class Intake extends SubsystemBase {
     desireClamped = false;
 
     // Set the desired intake position
-    intakeDesiredPositionDegrees = Cal.Intake.STARTING_POSITION_DEGREES;
+    intakeDesiredPositionDegrees = Cal.Intake.RETRACTED_POSITION_DEGREES;
   }
 
   /*Setter for whether intake is desired deploy is true retract is false */
@@ -197,7 +202,8 @@ public class Intake extends SubsystemBase {
   /** Returns the cosine of the intake angle in degrees off of the horizontal. */
   private double getCosineIntakeAngle() {
     return Math.cos(
-        deployMotorEncoder.getPosition() - Constants.Intake.POSITION_WHEN_HORIZONTAL_DEGREES);
+        Units.degreesToRadians(
+            deployMotorEncoder.getPosition() - Constants.Intake.POSITION_WHEN_HORIZONTAL_DEGREES));
   }
 
   /** If the intake has achieved its desired position, return true */
@@ -256,7 +262,7 @@ public class Intake extends SubsystemBase {
 
     // Only clamp if it is safe to do so and clamping is desired
     if (desireClamped
-        && deployMotorEncoder.getPosition() > Cal.Intake.CLAMP_POSITION_THRESHOLD_DEGREES) {
+        && deployMotorAbsoluteEncoder.getPosition() > Cal.Intake.CLAMP_POSITION_THRESHOLD_DEGREES) {
       clampIntake();
     } else {
       unclampIntake();
