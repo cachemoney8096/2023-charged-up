@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -52,6 +53,7 @@ public class RobotContainer {
           Constants.TAG_LIMELIGHT_HEIGHT_METERS,
           Constants.TAG_TARGET_HEIGHT_METERS);
   private final Lights lights = new Lights();
+  private final PneumaticHub pneumaticHub = new PneumaticHub();
 
   // A chooser for autonomous commands
   private SendableChooser<Command> autonChooser = new SendableChooser<>();
@@ -86,6 +88,8 @@ public class RobotContainer {
     // Encoder offset stuff
     intake.initialize();
     lift.initialize();
+
+    pneumaticHub.enableCompressorAnalog(80, 110);
 
     burnFlashSparks();
   }
