@@ -14,6 +14,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -100,6 +101,7 @@ public class Lift extends SubsystemBase {
   // Members
   private LiftPosition latestPosition = LiftPosition.STARTING;
   private LiftPosition desiredPosition = LiftPosition.STARTING;
+  private LiftPosition goalPosition = LiftPosition.STARTING;
   private boolean desiredGrabberClosed = true;
   public ScoringLocationUtil scoreLoc;
   private boolean scoringInProgress = false;
@@ -120,13 +122,6 @@ public class Lift extends SubsystemBase {
   /** Creates a new Lift */
   public Lift(ScoringLocationUtil scoreLoc) {
     SparkMaxUtils.initWithRetry(this::initSparks, Cal.SPARK_INIT_RETRY_ATTEMPTS);
-
-    armController.setTolerance(Cal.Lift.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG);
-    armController.enableContinuousInput(0.0, 2 * Math.PI);
-    armController.reset(armEncoder.getPosition());
-
-    elevatorController.setTolerance(Cal.Lift.ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN);
-    elevatorController.reset(elevatorLeftEncoder.getPosition());
 
     // Map of all LiftPosition with according values
     liftPositionMap = new TreeMap<LiftPosition, Pair<Double, Double>>();
@@ -259,17 +254,21 @@ public class Lift extends SubsystemBase {
 
   /** Sends voltage commands to the arm and elevator motors, needs to be called every cycle */
   private void controlPosition(LiftPosition pos) {
-    elevatorController.setGoal(liftPositionMap.get(pos).getFirst());
+    if (goalPosition != pos) {
+      goalPosition = pos;
+      elevatorController.setGoal(liftPositionMap.get(pos).getFirst());
+      armController.setGoal(liftPositionMap.get(pos).getSecond());
+    }
+
     double elevatorDemandVolts = elevatorController.calculate(elevatorLeftEncoder.getPosition());
     elevatorDemandVolts +=
         Cal.Lift.ELEVATOR_FEEDFORWARD.calculate(elevatorController.getSetpoint().velocity);
     elevatorLeft.setVoltage(elevatorDemandVolts);
 
-    armController.setGoal(liftPositionMap.get(pos).getSecond());
-    double demand = armController.calculate(armEncoder.getPosition());
-    demand += Cal.Lift.ARM_FEEDFORWARD.calculate(armController.getSetpoint().velocity);
-    demand += Cal.Lift.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle();
-    armMotor.setVoltage(demand);
+    double armDemandVolts = armController.calculate(armEncoder.getPosition());
+    armDemandVolts += Cal.Lift.ARM_FEEDFORWARD.calculate(armController.getSetpoint().velocity);
+    armDemandVolts += Cal.Lift.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle();
+    armMotor.setVoltage(armDemandVolts);
   }
 
   public void closeGrabber() {
@@ -288,7 +287,9 @@ public class Lift extends SubsystemBase {
 
   /** Returns the cosine of the arm angle in degrees off of the horizontal. */
   public double getCosineArmAngle() {
-    return Math.cos(armEncoder.getPosition() - Constants.Lift.ARM_POSITION_WHEN_HORIZONTAL_DEGREES);
+    return Math.cos(
+        Units.degreesToRadians(
+            armEncoder.getPosition() - Constants.Lift.ARM_POSITION_WHEN_HORIZONTAL_DEGREES));
   }
 
   public void initialize() {
@@ -305,6 +306,13 @@ public class Lift extends SubsystemBase {
         elevatorDutyCycleEncodersDifferenceDegrees
                 * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE
             - Cal.Lift.ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES);
+
+    armController.setTolerance(Cal.Lift.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG);
+    armController.reset(armEncoder.getPosition());
+    armController.setGoal(armEncoder.getPosition());
+    elevatorController.setTolerance(Cal.Lift.ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN);
+    elevatorController.reset(elevatorLeftEncoder.getPosition());
+    elevatorController.setGoal(elevatorLeftEncoder.getPosition());
   }
 
   /**
@@ -434,14 +442,21 @@ public class Lift extends SubsystemBase {
       controlPosition(desiredPosition);
     }
 
-    // If the grabber is set to open and it is safe to open, open the grabber (drop). Otherwise,
-    // close it (grab).
-    if (!desiredGrabberClosed
-        && (armEncoder.getPosition() > Cal.Lift.GRABBER_CLOSED_ZONE_TOP_DEGREES
-            || armEncoder.getPosition() < Cal.Lift.GRABBER_CLOSED_ZONE_BOTTOM_DEGREES)) {
-      grabber.set(false); // drop
-    } else {
+    // // If the grabber is set to open and it is safe to open, open the grabber (drop). Otherwise,
+    // // close it (grab).
+    // if (!desiredGrabberClosed
+    //     && (armEncoder.getPosition() > Cal.Lift.GRABBER_CLOSED_ZONE_TOP_DEGREES
+    //         || armEncoder.getPosition() < Cal.Lift.GRABBER_CLOSED_ZONE_BOTTOM_DEGREES)) {
+    //   grabber.set(false); // drop
+    // } else {
+    //   grabber.set(true); // grab
+    // }
+    // TODO do we need a grabber zone?
+
+    if (desiredGrabberClosed) {
       grabber.set(true); // grab
+    } else {
+      grabber.set(false); // drop
     }
   }
 
