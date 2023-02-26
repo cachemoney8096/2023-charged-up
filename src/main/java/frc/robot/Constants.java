@@ -60,16 +60,16 @@ public final class Constants {
         WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
 
     public static final double DRIVING_MOTOR_REDUCTION = 4.8;
-    public static final double DRIVE_WHEEL_FREE_SPEED_FUDGE_FACTOR = 0.9;
+    public static final double DRIVE_WHEEL_FREE_SPEED_FUDGE_FACTOR = 1.0;
     public static final double DRIVE_WHEEL_FREE_SPEED_METERS_PER_SECOND =
         DRIVE_WHEEL_FREE_SPEED_FUDGE_FACTOR
             * ((DRIVING_MOTOR_FREE_SPEED_RPS * WHEEL_CIRCUMFERENCE_METERS)
                 / DRIVING_MOTOR_REDUCTION);
 
     public static final double DRIVING_ENCODER_POSITION_FACTOR_METERS =
-        (WHEEL_DIAMETER_METERS * Math.PI) / DRIVING_MOTOR_REDUCTION; // meters
+        WHEEL_CIRCUMFERENCE_METERS / DRIVING_MOTOR_REDUCTION; // meters
     public static final double DRIVING_ENCODER_VELOCITY_FACTOR_METERS_PER_SECOND =
-        ((WHEEL_DIAMETER_METERS * Math.PI) / DRIVING_MOTOR_REDUCTION) / 60.0; // meters per second
+        DRIVING_ENCODER_POSITION_FACTOR_METERS / 60.0; // meters per second
 
     public static final double TURNING_ENCODER_POSITION_PID_MIN_INPUT_RADIANS = 0; // radians
     public static final double TURNING_ENCODER_POSITION_PID_MAX_INPUT_RADIANS =
@@ -112,7 +112,7 @@ public final class Constants {
   }
 
   public static final class Lift {
-    public static final double ELEVATOR_WINCH_CIRCUMFERENCE_INCHES = Math.PI * 1.125;
+    public static final double ELEVATOR_WINCH_CIRCUMFERENCE_INCHES = Math.PI * (1.125 + .125);
 
     public static final double ELEVATOR_MOTOR_GEAR_RATIO = 14.11;
 
@@ -127,7 +127,7 @@ public final class Constants {
         ELEVATOR_MOTOR_ENCODER_IN_PER_REV / 60.0;
 
     /** Gear ratio for the arm motor */
-    public static final double ARM_MOTOR_GEAR_RATIO = 75.0;
+    public static final double ARM_MOTOR_GEAR_RATIO = 108.0;
 
     /** When are is at this position, the arm is horizontal and pointing up */
     // TODO adjust based on arm CoM instead of arm angle
@@ -136,6 +136,10 @@ public final class Constants {
     /** Scalar for the difference in the elevator's absolute encoders in inches per degree */
     public static final double ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE =
         ELEVATOR_WINCH_CIRCUMFERENCE_INCHES * (26.0 / (28.0 - 26.0)) / REVOLUTIONS_TO_DEGREES;
+
+    /** Scalar for the difference in the elevator's absolute encoders in degrees per inch */
+    public static final double ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_DEGREES_PER_INCH =
+        1.0 / ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE;
   }
 
   public static final class Intake {
