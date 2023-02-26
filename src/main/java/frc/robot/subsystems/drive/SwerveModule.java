@@ -61,10 +61,11 @@ public class SwerveModule implements Sendable {
     int errors = 0;
 
     errors += SparkMaxUtils.check(turningSparkMax.restoreFactoryDefaults());
+    turningSparkMax.setInverted(false);
 
     AbsoluteEncoder turningEncoderTmp = turningSparkMax.getAbsoluteEncoder(Type.kDutyCycle);
     SparkMaxPIDController turningPidTmp = turningSparkMax.getPIDController();
-    errors += SparkMaxUtils.check(turningPidTmp.setFeedbackDevice(turningEncoder));
+    errors += SparkMaxUtils.check(turningPidTmp.setFeedbackDevice(turningEncoderTmp));
 
     // Gear ratio 1.0 because the encoder is 1:1 with the module (doesn't involve the actual turning
     // gear ratio)
@@ -117,9 +118,11 @@ public class SwerveModule implements Sendable {
     int errors = 0;
     errors += SparkMaxUtils.check(drivingSparkMax.restoreFactoryDefaults());
 
+    drivingSparkMax.setInverted(true);
+
     RelativeEncoder drivingEncoderTmp = drivingSparkMax.getEncoder();
     SparkMaxPIDController drivingPidTmp = drivingSparkMax.getPIDController();
-    errors += SparkMaxUtils.check(drivingPidTmp.setFeedbackDevice(drivingEncoder));
+    errors += SparkMaxUtils.check(drivingPidTmp.setFeedbackDevice(drivingEncoderTmp));
 
     errors += SparkMaxUtils.check(drivingPidTmp.setP(Cal.SwerveModule.DRIVING_P));
     errors += SparkMaxUtils.check(drivingPidTmp.setI(Cal.SwerveModule.DRIVING_I));
