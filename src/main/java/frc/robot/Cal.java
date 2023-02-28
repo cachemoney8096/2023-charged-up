@@ -23,7 +23,7 @@ public final class Cal {
     public static final double TURNING_P = 0.8,
         TURNING_I = PLACEHOLDER_DOUBLE,
         TURNING_D = 0.1,
-        TURNING_FF = 0.01;
+        TURNING_FF = 0.00;
 
     public static final double TURNING_MIN_OUTPUT = -1;
     public static final double TURNING_MAX_OUTPUT = 1;
@@ -32,18 +32,18 @@ public final class Cal {
   public static final class SwerveSubsystem {
 
     /** For the purposes of trajectory constraints */
-    public static final double MAX_LINEAR_SPEED_METERS_PER_SEC = 4.0,
+    public static final double MAX_LINEAR_SPEED_METERS_PER_SEC = 3.0,
         MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ = 3.0;
 
     /**
      * Angular offset of the modules relative to the zeroing fixture in radians. Ideally should be
      * relative to the ficture but they are actually slightly different.
      */
-    public static final double SWERVE_FRONT_LEFT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) - 5.2470;
+    public static final double SWERVE_FRONT_LEFT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 1.036;
 
-    public static final double SWERVE_FRONT_RIGHT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) - 5.2901;
-    public static final double SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) - 5.3080;
-    public static final double SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) - 5.3698;
+    public static final double SWERVE_FRONT_RIGHT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 1.005;
+    public static final double SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 0.987;
+    public static final double SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 0.9075;
 
     /**
      * Angular offsets of the modules relative to the chassis in radians. The modules form an O when
@@ -69,8 +69,8 @@ public final class Cal {
     public static final double ROTATE_TO_TARGET_FF = 0.1; // From 2022
 
     /** Auton path finding controllers */
-    public static final PIDController PATH_X_CONTROLLER = new PIDController(0.100506, 0.0, 0.0),
-        PATH_Y_CONTROLLER = new PIDController(0.1, 0.0, 0.0);
+    public static final PIDController PATH_X_CONTROLLER = new PIDController(9.0, 0.0, 0.0),
+        PATH_Y_CONTROLLER = new PIDController(9.0, 0.0, 0.0);
 
     /** High profile constraints = pure P controller */
     public static final PIDController PATH_THETA_CONTROLLER = new PIDController(9.0, 0.0, 0.80);
@@ -250,7 +250,7 @@ public final class Cal {
 
   public static final class AutoBalance {
     /** Max speed to go on charge station in meters per second */
-    public static final double MAX_CHARGE_STATION_CLIMB_SPEED_MPS = 0.5;
+    public static final double MAX_CHARGE_STATION_CLIMB_SPEED_MPS = 1.0;
 
     /** Max speed to go on charge station in [-1,1] */
     public static final double MAX_CHARGE_STATION_CLIMB_NORM_SPEED =
@@ -261,7 +261,7 @@ public final class Cal {
      * balancing on the charge station
      */
     public static final double CHARGE_STATION_PITCH_DEGREES_TO_NORM_VELOCITY =
-        -1 * Constants.MAX_PITCH_DEGREES / MAX_CHARGE_STATION_CLIMB_NORM_SPEED;
+        -1 * MAX_CHARGE_STATION_CLIMB_NORM_SPEED / Constants.MAX_PITCH_DEGREES;
 
     /**
      * Maximum speed to deadband at (that is to say, it won't auto-balance if the velocity is <=

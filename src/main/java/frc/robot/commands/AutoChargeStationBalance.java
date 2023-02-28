@@ -33,19 +33,19 @@ public class AutoChargeStationBalance extends CommandBase {
     double pitchDeg = gyro.getPitch();
 
     /** Velocity is [-1,1] */
-    double normVelocityFromAngleDeg =
+    double normVelocity =
         pitchDeg * AutoBalance.CHARGE_STATION_PITCH_DEGREES_TO_NORM_VELOCITY;
 
-    double deadbandedNormVelocityFromAngleDeg =
+    double deadbandedNormVelocity =
         MathUtil.applyDeadband(
-            normVelocityFromAngleDeg, AutoBalance.CHARGE_STATION_DEADBAND_NORM_VELOCITY);
+            normVelocity, AutoBalance.CHARGE_STATION_DEADBAND_NORM_VELOCITY);
 
     /** Time remaining in current match period (auto or teleop) in seconds */
     double matchTime = DriverStation.getMatchTime();
 
     // stop driving (and thus set x) if there is less than one second left in auton
     drive.drive(
-        matchTime > 1 ? deadbandedNormVelocityFromAngleDeg : 0,
+        matchTime > 1.0 ? deadbandedNormVelocity : 0.0,
         NOT_MOVING_IN_Y,
         NOT_ROTATING,
         ROBOT_RELATIVE);

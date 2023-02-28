@@ -4,28 +4,21 @@
 
 package frc.robot.commands;
 
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Cal;
 import frc.robot.subsystems.drive.DriveSubsystem;
 
 /** Drives onto the charge station and balances */
 public class AutoChargeStationSequence extends SequentialCommandGroup {
-  private PathPlannerTrajectory traj =
-      PathPlanner.loadPath(
-          "EngageOnlyTraj",
-          new PathConstraints(
-              Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
-              Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
+
+  private static final double NORM_SPEED_UP_CHARGE_STATION = 0.3;
+  private static final double DISTANCE_UP_CHARGE_STATION_METERS = 2.21;
 
   public AutoChargeStationSequence(boolean isFirstPath, DriveSubsystem drive) {
     addCommands(
-        drive.followTrajectoryCommand(traj, isFirstPath), new AutoChargeStationBalance(drive));
-  }
-
-  public PathPlannerTrajectory getTrajectory() {
-    return this.traj;
+      new RunCommand(() -> {drive.drive(NORM_SPEED_UP_CHARGE_STATION, 0, 0, false);}, drive).until(
+        () -> {return drive.getPose().getX() >DISTANCE_UP_CHARGE_STATION_METERS; }
+      )
+    );
   }
 }
