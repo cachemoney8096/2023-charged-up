@@ -74,7 +74,7 @@ public class SimpleDriveToTag extends CommandBase {
                   locationToDriveTo,
                   Rotation2d.fromDegrees(180),
                   Rotation2d.fromDegrees(angleToRotate)));
-      drive.followTrajectoryCommand(robotToTag, false);
+      drive.followTrajectoryCommand(robotToTag, false).schedule();
     }
   }
 }

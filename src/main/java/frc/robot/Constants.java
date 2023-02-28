@@ -45,7 +45,7 @@ public final class Constants {
   /** Height of the vision targets above the carpet */
   public static final double INTAKE_TARGET_HEIGHT_METERS = PLACEHOLDER_DOUBLE;
 
-  public static final double TAG_TARGET_HEIGHT_METERS = PLACEHOLDER_DOUBLE;
+  public static final double TAG_TARGET_HEIGHT_METERS = Units.inchesToMeters(17.875);
 
   public static final class SwerveModule {
     /**

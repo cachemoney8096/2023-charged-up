@@ -35,11 +35,11 @@ public class RobotContainer {
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
   // private final Lift lift = new Lift(scoreLoc);
   private final PneumaticHub pHub = new PneumaticHub();
-  private final Intake intake =
-      new Intake(
-          () -> {
-            return true;
-          });
+  // private final Intake intake =
+  //     new Intake(
+  //         () -> {
+  //           return true;
+  //         });
   // private final Intake intake = new Intake(lift::clearOfIntakeZone);
   private final IntakeLimelight intakeLimelight =
       new IntakeLimelight(
@@ -68,9 +68,9 @@ public class RobotContainer {
     configureBindings();
 
     Shuffleboard.getTab("Subsystems").add(drive.getName(), drive);
-    Shuffleboard.getTab("Subsystems").add(intake.getName(), intake);
+    // Shuffleboard.getTab("Subsystems").add(intake.getName(), intake);
     // Shuffleboard.getTab("Subsystems").add(intakeLimelight.getName(), intakeLimelight);
-    // Shuffleboard.getTab("Subsystems").add(tagLimelight.getName(), tagLimelight);
+    Shuffleboard.getTab("Subsystems").add(tagLimelight.getName(), tagLimelight);
     // Shuffleboard.getTab("Subsystems").add(lights.getName(), lights);
     // Shuffleboard.getTab("Subsystems").add(lift.getName(), lift);
     SmartDashboard.putNumber("Pressure", pHub.getPressure(0));
@@ -88,7 +88,7 @@ public class RobotContainer {
     SmartDashboard.putData(autonChooser);
 
     // Encoder offset stuff
-    intake.initialize();
+    // intake.initialize();
     // lift.initialize();
 
     burnFlashSparks();
@@ -108,7 +108,7 @@ public class RobotContainer {
   public void burnFlashSparks() {
     Timer.delay(0.25);
     // lift.burnFlashSparks();
-    intake.burnFlashSparks();
+    // intake.burnFlashSparks();
     drive.burnFlashSparks();
     Timer.delay(0.25);
   }
