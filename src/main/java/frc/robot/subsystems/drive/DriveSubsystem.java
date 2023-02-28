@@ -132,6 +132,14 @@ public class DriveSubsystem extends SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+    // x, y, and rot are all being deadbanded from 0.1 to 0.0, so checking if
+    // they're equal to 0
+    // does account for controller deadzones.
+    if (xSpeed == 0 && ySpeed == 0 && rot == 0) {
+      setX();
+      return;
+    }
+
     // Adjust input based on max speed
     xSpeed *= Constants.SwerveDrive.MAX_SPEED_METERS_PER_SECOND;
     ySpeed *= Constants.SwerveDrive.MAX_SPEED_METERS_PER_SECOND;
@@ -226,6 +234,10 @@ public class DriveSubsystem extends SubsystemBase {
         Cal.SwerveSubsystem.ROTATE_TO_TARGET_PID_CONTROLLER.calculate(offsetHeadingDegrees, 0.0)
             + Math.signum(offsetHeadingDegrees) * Cal.SwerveSubsystem.ROTATE_TO_TARGET_FF;
 
+    if (Math.abs(desiredRotation) < Cal.SwerveSubsystem.ROTATION_DEADBAND_THRESHOLD) {
+      desiredRotation = 0;
+    }
+
     drive(x, y, desiredRotation, fieldRelative);
   }
 
@@ -241,13 +253,8 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void rotateOrKeepHeading(
       double x, double y, double rot, boolean fieldRelative, int povAngleDeg) {
-    // x, y, and rot are all being deadbanded from 0.1 to 0.0, so checking if
-    // they're equal to 0
-    // does account for controller deadzones.
-    if (x == 0 && y == 0 && rot == 0 && povAngleDeg == -1) {
-      setX();
-    } else if (povAngleDeg != -1) {
-      // targetHeadingDegrees is counterclockwise so need to flip povAngle
+    if (povAngleDeg != -1) {
+      // targetHeadingDegrees is counterclockwise so need to reflect povAngle
       targetHeadingDegrees = 360 - povAngleDeg;
       keepHeading(x, y, fieldRelative);
     } else if (rot == 0) {

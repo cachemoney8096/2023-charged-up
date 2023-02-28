@@ -75,6 +75,9 @@ public final class Cal {
     /** High profile constraints = pure P controller */
     public static final PIDController PATH_THETA_CONTROLLER = new PIDController(9.0, 0.0, 0.80);
 
+    /** If the desired chassi rotation is below this value in [0,1], it is ignored */
+    public static final double ROTATION_DEADBAND_THRESHOLD = 0.1;
+
     /** Current limits for swerveSubsystem sparksmax in amps */
     public static final int DRIVE_CURRENT_LIMIT_AMPS = 50;
 
