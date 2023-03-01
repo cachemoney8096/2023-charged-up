@@ -84,7 +84,7 @@ public class Lift extends SubsystemBase {
               Cal.Lift.ARM_MAX_VELOCITY_DEG_PER_SECOND,
               Cal.Lift.ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED));
 
-  private CANSparkMax armMotor = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
+  // private CANSparkMax armMotor = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
   private Solenoid grabber =
       new Solenoid(PneumaticsModuleType.REVPH, RobotMap.LIFT_GRABBING_CHANNEL);
 
@@ -94,8 +94,8 @@ public class Lift extends SubsystemBase {
       elevatorLeft.getAbsoluteEncoder(Type.kDutyCycle);
   private final AbsoluteEncoder elevatorRightAbsEncoder =
       elevatorRight.getAbsoluteEncoder(Type.kDutyCycle);
-  private final RelativeEncoder armEncoder = armMotor.getEncoder();
-  private final AbsoluteEncoder armAbsoluteEncoder = armMotor.getAbsoluteEncoder(Type.kDutyCycle);
+  // private final RelativeEncoder armEncoder = armMotor.getEncoder();
+  // private final AbsoluteEncoder armAbsoluteEncoder = armMotor.getAbsoluteEncoder(Type.kDutyCycle);
   private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
 
   // Members
@@ -170,14 +170,14 @@ public class Lift extends SubsystemBase {
 
     errors += SparkMaxUtils.check(elevatorLeft.restoreFactoryDefaults());
     errors += SparkMaxUtils.check(elevatorRight.restoreFactoryDefaults());
-    errors += SparkMaxUtils.check(armMotor.restoreFactoryDefaults());
+    // errors += SparkMaxUtils.check(armMotor.restoreFactoryDefaults());
 
     errors += SparkMaxUtils.check(elevatorRight.follow(elevatorLeft, true));
 
     // inverting stuff
-    errors += SparkMaxUtils.check(armAbsoluteEncoder.setInverted(true));
+    // errors += SparkMaxUtils.check(armAbsoluteEncoder.setInverted(true));
     errors += SparkMaxUtils.check(elevatorLeftAbsEncoder.setInverted(false));
-    armMotor.setInverted(false);
+    // armMotor.setInverted(false);
 
     // Get positions and degrees of elevator through encoder in inches
     errors +=
@@ -196,13 +196,13 @@ public class Lift extends SubsystemBase {
             elevatorLeftEncoder.setVelocityConversionFactor(
                 Constants.Lift.ELEVATOR_MOTOR_ENCODER_IPS_PER_RPM));
 
-    errors +=
-        SparkMaxUtils.check(
-            SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(
-                armEncoder, Constants.Lift.ARM_MOTOR_GEAR_RATIO));
-    errors +=
-        SparkMaxUtils.check(
-            SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(armAbsoluteEncoder, 1.0));
+    // errors +=
+    //     SparkMaxUtils.check(
+    //         SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(
+    //             armEncoder, Constants.Lift.ARM_MOTOR_GEAR_RATIO));
+    // errors +=
+    //     SparkMaxUtils.check(
+            // SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(armAbsoluteEncoder, 1.0));
 
     errors +=
         SparkMaxUtils.check(
@@ -215,20 +215,19 @@ public class Lift extends SubsystemBase {
                 SoftLimitDirection.kReverse, Cal.Lift.ELEVATOR_NEGATIVE_LIMIT_INCHES));
     errors += SparkMaxUtils.check(elevatorLeft.enableSoftLimit(SoftLimitDirection.kReverse, true));
 
-    errors +=
-        SparkMaxUtils.check(
-            armMotor.setSoftLimit(
-                SoftLimitDirection.kForward, Cal.Lift.ARM_POSITIVE_LIMIT_DEGREES));
-    errors += SparkMaxUtils.check(armMotor.enableSoftLimit(SoftLimitDirection.kForward, true));
-    errors +=
-        SparkMaxUtils.check(
-            armMotor.setSoftLimit(
-                SoftLimitDirection.kReverse, Cal.Lift.ARM_NEGATIVE_LIMIT_DEGREES));
-    errors += SparkMaxUtils.check(armMotor.enableSoftLimit(SoftLimitDirection.kReverse, true));
+    // errors +=
+        // SparkMaxUtils.check(
+            // armMotor.setSoftLimit(
+                // SoftLimitDirection.kForward, Cal.Lift.ARM_POSITIVE_LIMIT_DEGREES));
+    // errors += SparkMaxUtils.check(armMotor.enableSoftLimit(SoftLimitDirection.kForward, true));
+    // errors +=
+    //     SparkMaxUtils.check(
+            // armMotor.setSoftLimit(
+                // SoftLimitDirection.kReverse, Cal.Lift.ARM_NEGATIVE_LIMIT_DEGREES));
+    // errors += SparkMaxUtils.check(armMotor.enableSoftLimit(SoftLimitDirection.kReverse, true));
 
-    errors += SparkMaxUtils.check(armMotor.setIdleMode(IdleMode.kBrake));
-    errors += SparkMaxUtils.check(elevatorLeft.setIdleMode(IdleMode.kBrake));
-    errors += SparkMaxUtils.check(elevatorRight.setIdleMode(IdleMode.kBrake));
+    // errors += SparkMaxUtils.check(armMotor.setIdleMode(IdleMode.kBrake));
+    // errors ?+= SparkMaxUtils.check(elevatorRight.setIdleMode(IdleMode.kBrake));
 
     errors +=
         SparkMaxUtils.check(
@@ -236,7 +235,7 @@ public class Lift extends SubsystemBase {
     errors +=
         SparkMaxUtils.check(
             elevatorRight.setSmartCurrentLimit(Cal.Lift.ELEVATOR_CURRENT_LIMIT_AMPS));
-    errors += SparkMaxUtils.check(armMotor.setSmartCurrentLimit(Cal.Lift.ARM_CURRENT_LIMIT_AMPS));
+    // errors += SparkMaxUtils.check(armMotor.setSmartCurrentLimit(Cal.Lift.ARM_CURRENT_LIMIT_AMPS));
 
     return errors == 0;
   }
@@ -249,7 +248,7 @@ public class Lift extends SubsystemBase {
     Timer.delay(0.005);
     elevatorLeft.burnFlash();
     Timer.delay(0.005);
-    armMotor.burnFlash();
+    // armMotor.burnFlash();
   }
 
   public void setArmPositionGoal(double desiredArmPosDeg) {
@@ -273,10 +272,10 @@ public class Lift extends SubsystemBase {
         Cal.Lift.ELEVATOR_FEEDFORWARD.calculate(elevatorController.getSetpoint().velocity);
     elevatorLeft.setVoltage(elevatorDemandVolts);
 
-    double armDemandVolts = armController.calculate(armEncoder.getPosition());
-    armDemandVolts += Cal.Lift.ARM_FEEDFORWARD.calculate(armController.getSetpoint().velocity);
-    armDemandVolts += Cal.Lift.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle();
-    armMotor.setVoltage(armDemandVolts);
+    // double armDemandVolts = armController.calculate(armEncoder.getPosition());
+    // armDemandVolts += Cal.Lift.ARM_FEEDFORWARD.calculate(armController.getSetpoint().velocity);
+    // armDemandVolts += Cal.Lift.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle();
+    // armMotor.setVoltage(armDemandVolts);
   }
 
   public void closeGrabber() {
@@ -296,31 +295,31 @@ public class Lift extends SubsystemBase {
   }
 
   /** Returns the cosine of the arm angle in degrees off of the horizontal. */
-  public double getCosineArmAngle() {
-    return Math.cos(
-        Units.degreesToRadians(
-            armEncoder.getPosition() - Constants.Lift.ARM_POSITION_WHEN_HORIZONTAL_DEGREES));
-  }
+  // public double getCosineArmAngle() {
+  //   return Math.cos(
+  //       Units.degreesToRadians(
+  //           armEncoder.getPosition() - Constants.Lift.ARM_POSITION_WHEN_HORIZONTAL_DEGREES));
+  // }
 
   public void initialize() {
     // Set arm encoder position from absolute
-    armEncoder.setPosition(
-        AngleUtil.wrapAngle(
-            armAbsoluteEncoder.getPosition() - Cal.Lift.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG));
+    // armEncoder.setPosition(
+    //     AngleUtil.wrapAngle(
+    //         // armAbsoluteEncoder.getPosition() - Cal.Lift.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG));
 
-    // Set elevator encoder position from absolute encoders
+    // // Set elevator encoder position from absolute encoders
     double elevatorDutyCycleEncodersDifferenceDegrees =
         AngleUtil.wrapAngle(
             (elevatorRightAbsEncoder.getPosition() - elevatorLeftAbsEncoder.getPosition()) * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_DEGREES_PER_INCH);
-    // elevatorLeftEncoder.setPosition(-0.25);
+    // // elevatorLeftEncoder.setPosition(-0.25);
     elevatorLeftEncoder.setPosition(
         elevatorDutyCycleEncodersDifferenceDegrees
                 * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE
             - Cal.Lift.ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES);
 
-    armController.setTolerance(Cal.Lift.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG);
-    armController.reset(armEncoder.getPosition());
-    armController.setGoal(armEncoder.getPosition());
+    // armController.setTolerance(Cal.Lift.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG);
+    // armController.reset(armEncoder.getPosition());
+    // armController.setGoal(armEncoder.getPosition());
     elevatorController.setTolerance(Cal.Lift.ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN);
     elevatorController.reset(elevatorLeftEncoder.getPosition());
     elevatorController.setGoal(elevatorLeftEncoder.getPosition());
@@ -391,10 +390,10 @@ public class Lift extends SubsystemBase {
     double elevatorPositionToCheckInches = liftPositionMap.get(positionToCheck).getFirst();
     double armPositionToCheckDegrees = liftPositionMap.get(positionToCheck).getSecond();
     double elevatorPositionInches = elevatorLeftEncoder.getPosition();
-    double armPositionDegrees = armEncoder.getPosition();
-    if (Math.abs(armPositionDegrees - armPositionToCheckDegrees) > armMarginDegrees) {
-      return false;
-    }
+    // double armPositionDegrees = armEncoder.getPosition();
+    // if (Math.abs(armPositionDegrees - armPositionToCheckDegrees) > armMarginDegrees) {
+    //   return false;
+    // }
 
     if (Math.abs(elevatorPositionInches - elevatorPositionToCheckInches) > elevatorMarginInches) {
       return false;
@@ -477,9 +476,9 @@ public class Lift extends SubsystemBase {
    * Returns true if the lift is clear of the zone where the intake moves, so that the intake can
    * move as soon as the lift is clear of that zone
    */
-  public boolean clearOfIntakeZone() {
-    return armEncoder.getPosition() > Cal.Lift.ARM_INTAKE_ZONE_THRESHOLD_DEGREES;
-  }
+  // public boolean clearOfIntakeZone() {
+  //   return armEncoder.getPosition() > Cal.Lift.ARM_INTAKE_ZONE_THRESHOLD_DEGREES;
+  // }
 
   @Override
   public void simulationPeriodic() {
@@ -500,12 +499,12 @@ public class Lift extends SubsystemBase {
         "Elevator Left Abs Pos (in)", elevatorLeftAbsEncoder::getPosition, null);
     builder.addDoubleProperty(
         "Elevator Right Abs Pos (in)", elevatorRightAbsEncoder::getPosition, null);
-    builder.addBooleanProperty("Clear of intake", this::clearOfIntakeZone, null);
-    builder.addDoubleProperty(
-        "Arm Abs Position (deg)", armAbsoluteEncoder::getPosition, armEncoder::setPosition);
-    builder.addDoubleProperty(
-        "Arm Position (deg)", armEncoder::getPosition, armEncoder::setPosition);
-    builder.addDoubleProperty("Arm Vel (deg/s)", armEncoder::getVelocity, null);
+    // builder.addBooleanProperty("Clear of intake", this::clearOfIntakeZone, null);
+    // builder.addDoubleProperty(
+        // "Arm Abs Position (deg)", armAbsoluteEncoder::getPosition, armEncoder::setPosition);
+    // builder.addDoubleProperty(
+    //     "Arm Position (deg)", armEncoder::getPosition, armEncoder::setPosition);
+    // builder.addDoubleProperty("Arm Vel (deg/s)", armEncoder::getVelocity, null);
     builder.addBooleanProperty("See Game Piece", this::seeGamePiece, null);
     builder.addBooleanProperty(
         "At desired position",
@@ -532,7 +531,7 @@ public class Lift extends SubsystemBase {
             },
             null);
     builder.addDoubleProperty("Elevator output", elevatorLeft::get, null);
-    builder.addDoubleProperty("Arm output", armMotor::get, null);
+    // builder.addDoubleProperty("Arm output", armMotor::get, null);
   }
 
   /**
