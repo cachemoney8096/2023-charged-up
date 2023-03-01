@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -18,6 +19,7 @@ import frc.robot.commands.AutoChargeStationSequence;
 import frc.robot.commands.SimpleChargeStationSequence;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
+import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.TagLimelight;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -33,7 +35,7 @@ import frc.robot.utils.ScoringLocationUtil;
 public class RobotContainer {
   private final DriveSubsystem drive = new DriveSubsystem();
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
-  // private final Lift lift = new Lift(scoreLoc);
+  private final Lift lift = new Lift(scoreLoc);
   private final PneumaticHub pHub = new PneumaticHub();
   private final Intake intake =
       new Intake(
@@ -72,7 +74,7 @@ public class RobotContainer {
     // Shuffleboard.getTab("Subsystems").add(intakeLimelight.getName(), intakeLimelight);
     // Shuffleboard.getTab("Subsystems").add(tagLimelight.getName(), tagLimelight);
     // Shuffleboard.getTab("Subsystems").add(lights.getName(), lights);
-    // Shuffleboard.getTab("Subsystems").add(lift.getName(), lift);
+    Shuffleboard.getTab("Subsystems").add(lift.getName(), lift);
     SmartDashboard.putNumber("Pressure", pHub.getPressure(0));
   }
 
@@ -89,7 +91,7 @@ public class RobotContainer {
 
     // Encoder offset stuff
     intake.initialize();
-    // lift.initialize();
+    lift.initialize();
 
     burnFlashSparks();
   }
@@ -187,22 +189,22 @@ public class RobotContainer {
     //     .onTrue(new InstantCommand(() ->
     // scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.RIGHT)));
 
-    // operatorController
-    //     .start()
-    //     .onTrue(
-    //         new InstantCommand(
-    //             () -> {
-    //               intake.setDesiredDeployed(true);
-    //             },
-    //             intake));
-    // operatorController
-    //     .back()
-    //     .onTrue(
-    //         new InstantCommand(
-    //             () -> {
-    //               intake.setDesiredDeployed(false);
-    //             },
-    //             intake));
+    driverController
+        .b()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  intake.setDesiredDeployed(true);
+                },
+                intake));
+    driverController
+        .a()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  intake.setDesiredDeployed(false);
+                },
+                intake));
 
     // operatorController
     //     .leftBumper()
@@ -219,12 +221,12 @@ public class RobotContainer {
 
     // Drive controls
 
-    // driverController.a().onTrue(new InstantCommand(() -> {
-    //     lift.setArmPositionGoal(224.0);
-    //   }, lift));
-    //   driverController.b().onTrue(new InstantCommand(() -> {
-    //       lift.setArmPositionGoal(148.0);
-    //     }, lift));
+    driverController.x().onTrue(new InstantCommand(() -> {
+        lift.setElevatorPositionGoal(1.0);
+      }, lift));
+      driverController.y().onTrue(new InstantCommand(() -> {
+          lift.setElevatorPositionGoal(18.5);
+        }, lift));
     // driverController.x().onTrue(new InstantCommand(() -> {
     //   lift.setArmPositionGoal(180.0);
     // }, lift));
