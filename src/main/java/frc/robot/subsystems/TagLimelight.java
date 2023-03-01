@@ -6,8 +6,11 @@ import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -15,6 +18,8 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utils.ScoringLocationUtil;
+import frc.robot.utils.ScoringLocationUtil.ScoreCol;
 
 /** Limelight to read april tags */
 public class TagLimelight extends SubsystemBase {
@@ -139,6 +144,37 @@ public class TagLimelight extends SubsystemBase {
 
     SmartDashboard.putString("LED Mode", ledMode.name());
     SmartDashboard.putString("Cam Mode", camMode.name());
+  }
+
+  public Transform2d getBotFromTarget() {
+    double[] botposeTargetSpaceArray =
+        table.getEntry("t6r_ts").getDoubleArray(new double[] {0, 0, 0, 0, 0, 0});
+    /**
+     * Target space:
+     * 3d Cartesian Coordinate System with (0,0,0) at the center of the target.
+     * <p>X+ → Pointing to the right of the target (If you are looking at the target)
+     * <p>Y+ → Pointing downward
+     * <p>Z+ → Pointing out of the target (orthogonal to target’s plane).
+     */
+
+    /**
+     * We convert to 2d target space:
+     * X+ -> Out of the target
+     * Y+ -> Pointing to the right of the target (If you are looking at the target)
+     * This means positive yaw is based on Z+ being up
+     */
+    Translation2d translation =
+        new Translation2d(
+          botposeTargetSpaceArray[2],
+          botposeTargetSpaceArray[0]);
+    Rotation2d rot = Rotation2d.fromDegrees(-botposeTargetSpaceArray[4]);
+    return new Transform2d(translation, rot);
+  }
+
+  public Transform2d getRobotToScoringLocation(ScoringLocationUtil scoreLoc) {
+    Transform2d botFromTarget = getBotFromTarget();
+    Transform2d scoringLocationFromTag = scoreLoc.scoringLocationFromTag();
+    return botFromTarget.inverse().plus(scoringLocationFromTag);
   }
 
   /**
