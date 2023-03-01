@@ -101,7 +101,7 @@ public final class Cal {
     public static final double CLAMP_POSITION_THRESHOLD_DEGREES = 110.0;
 
     /** Absolute encoder position when the intake is at starting position */
-    public static final double ABSOLUTE_ENCODER_START_POS_DEG = 43.0;
+    public static final double ABSOLUTE_ENCODER_START_POS_DEG = 283.0;
 
     /** Voltage required to hold the intake in the horizontal position */
     // Stall torque: 3.36 Nm * 75 = 252 Nm
@@ -154,7 +154,7 @@ public final class Cal {
     /**
      * Position reading from the absolute encoders when the elevator is at the start (zero) position
      */
-    public static final double ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES = 0.7;
+    public static final double ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES = 2.2;
 
     /** Voltage required to hold the arm in the horizontal position */
     // Stall torque: 3.36 Nm * 75 = 252 Nm
