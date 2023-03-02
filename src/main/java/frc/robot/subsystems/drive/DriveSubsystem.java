@@ -241,6 +241,18 @@ public class DriveSubsystem extends SubsystemBase {
     drive(x, y, desiredRotation, fieldRelative);
   }
 
+  public int convertCardinalDirections(int povAngleDeg) {
+    // change d-pad values for left and right to 45 degree angles
+    if (povAngleDeg == 270) {
+      povAngleDeg += 45;
+    } else if (povAngleDeg == 90) {
+      povAngleDeg -= 45;
+    }
+    // targetHeadingDegrees is counterclockwise so need to flip povAngle
+    povAngleDeg = 360 - povAngleDeg;
+    return povAngleDeg;
+  }
+
   /**
    * Determines whether to rotate according to input or to run the keep heading code, by checking if
    * the (already deadbanded) rotation input is equal to 0.
@@ -254,8 +266,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void rotateOrKeepHeading(
       double x, double y, double rot, boolean fieldRelative, int povAngleDeg) {
     if (povAngleDeg != -1) {
-      // targetHeadingDegrees is counterclockwise so need to reflect povAngle
-      targetHeadingDegrees = 360 - povAngleDeg;
+      targetHeadingDegrees = convertCardinalDirections(povAngleDeg);
       keepHeading(x, y, fieldRelative);
     } else if (rot == 0) {
       keepHeading(x, y, fieldRelative);
