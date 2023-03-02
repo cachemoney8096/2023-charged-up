@@ -6,11 +6,16 @@ package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix.sensors.Pigeon2.AxisDirection;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -363,6 +368,17 @@ public class DriveSubsystem extends SubsystemBase {
             this // Requires this drive subsystem
             ),
             new InstantCommand(() -> {targetHeadingDegrees = getPose().getRotation().getDegrees();}));
+  }
+
+  public Command transformToPath(Transform2d transform){
+    PathPlannerTrajectory path =
+    PathPlanner.generatePath(
+        new PathConstraints(
+            Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
+            Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ),
+        new PathPoint(new Translation2d(0, 0), new Rotation2d(0)),
+        new PathPoint(transform.getTranslation(), new Rotation2d(0), transform.getRotation()));
+    return followTrajectoryCommand(path, false);
   }
 
   public void toggleSkids() {
