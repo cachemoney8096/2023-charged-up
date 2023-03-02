@@ -23,6 +23,7 @@ import frc.robot.subsystems.IntakeLimelight;
 import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.TagLimelight;
+import frc.robot.subsystems.TagLimelightV2;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.JoystickUtil;
 import frc.robot.utils.ScoringLocationUtil;
@@ -49,11 +50,12 @@ public class RobotContainer {
           Constants.INTAKE_LIMELIGHT_PITCH_DEGREES,
           Constants.INTAKE_LIMELIGHT_HEIGHT_METERS,
           Constants.INTAKE_TARGET_HEIGHT_METERS);
-  private final TagLimelight tagLimelight =
-      new TagLimelight(
-          Constants.TAG_LIMELIGHT_PITCH_DEGREES,
-          Constants.TAG_LIMELIGHT_HEIGHT_METERS,
-          Constants.TAG_TARGET_HEIGHT_METERS);
+  // private final TagLimelight tagLimelight =
+  //     new TagLimelight(
+  //         Constants.TAG_LIMELIGHT_PITCH_DEGREES,
+  //         Constants.TAG_LIMELIGHT_HEIGHT_METERS,
+  //         Constants.TAG_TARGET_HEIGHT_METERS);
+  private final TagLimelightV2 tagLimelight = new TagLimelightV2(scoreLoc);
   private final Lights lights = new Lights();
 
   // A chooser for autonomous commands
@@ -225,7 +227,7 @@ public class RobotContainer {
     driverController.leftTrigger().onTrue(new InstantCommand(intake::intakeGamePiece, intake));
     driverController.leftTrigger().onFalse(new InstantCommand(intake::stopIntakingGamePiece, intake));
 
-    driverController.rightTrigger().whileTrue(new DriveToTagSimple(scoreLoc, drive));
+    driverController.rightTrigger().whileTrue(new DriveToTagSimple(tagLimelight, scoreLoc, drive));
 
     driverController.x().onTrue(new InstantCommand(() -> {
         lift.setElevatorPositionGoal(1.0);
