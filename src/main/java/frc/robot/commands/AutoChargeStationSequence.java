@@ -16,9 +16,14 @@ public class AutoChargeStationSequence extends SequentialCommandGroup {
 
   public AutoChargeStationSequence(boolean isFirstPath, DriveSubsystem drive) {
     addCommands(
-      new RunCommand(() -> {drive.drive(NORM_SPEED_UP_CHARGE_STATION, 0, 0, false);}, drive).until(
-        () -> {return drive.getPose().getX() >DISTANCE_UP_CHARGE_STATION_METERS; }
-      )
-    );
+        new RunCommand(
+                () -> {
+                  drive.drive(NORM_SPEED_UP_CHARGE_STATION, 0, 0, false);
+                },
+                drive)
+            .until(
+                () -> {
+                  return drive.getPose().getX() > DISTANCE_UP_CHARGE_STATION_METERS;
+                }));
   }
 }

@@ -289,7 +289,10 @@ public class DriveSubsystem extends SubsystemBase {
             // Optional, defaults to true
             this // Requires this drive subsystem
             ),
-            new InstantCommand(() -> {targetHeadingDegrees = getPose().getRotation().getDegrees();}));
+        new InstantCommand(
+            () -> {
+              targetHeadingDegrees = getPose().getRotation().getDegrees();
+            }));
   }
 
   public void toggleSkids() {
