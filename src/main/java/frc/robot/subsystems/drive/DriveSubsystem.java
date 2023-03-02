@@ -306,7 +306,11 @@ public class DriveSubsystem extends SubsystemBase {
             true, // Should the path be automatically mirrored depending on alliance color.
             // Optional, defaults to true
             this // Requires this drive subsystem
-            ));
+            ),
+        new InstantCommand(
+            () -> {
+              targetHeadingDegrees = getPose().getRotation().getDegrees();
+            }));
   }
 
   public void toggleSkids() {
