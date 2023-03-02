@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoChargeStationSequence;
+import frc.robot.commands.DriveToTagSimple;
 import frc.robot.commands.SimpleChargeStationSequence;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
@@ -220,6 +221,11 @@ public class RobotContainer {
     // TODO add manual arm and elevator control
 
     // Drive controls
+
+    driverController.leftTrigger().onTrue(new InstantCommand(intake::intakeGamePiece, intake));
+    driverController.leftTrigger().onFalse(new InstantCommand(intake::stopIntakingGamePiece, intake));
+
+    driverController.rightTrigger().whileTrue(new DriveToTagSimple(scoreLoc, drive));
 
     driverController.x().onTrue(new InstantCommand(() -> {
         lift.setElevatorPositionGoal(1.0);
