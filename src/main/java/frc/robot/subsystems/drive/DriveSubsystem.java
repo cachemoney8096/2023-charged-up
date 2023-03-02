@@ -265,8 +265,10 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void rotateOrKeepHeading(
       double x, double y, double rot, boolean fieldRelative, int povAngleDeg) {
+    // x, y, and rot are all being deadbanded from 0.1 to 0.0, so checking if
+    // they're equal to 0
+    // does account for controller deadzones.
     if (povAngleDeg != -1) {
-      // targetHeadingDegrees is counterclockwise so need to reflect povAngle
       targetHeadingDegrees = convertCardinalDirections(povAngleDeg);
       keepHeading(x, y, fieldRelative);
     } else if (rot == 0) {
