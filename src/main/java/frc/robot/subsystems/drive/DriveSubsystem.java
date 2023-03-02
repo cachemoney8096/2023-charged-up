@@ -5,9 +5,6 @@
 package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix.sensors.Pigeon2.AxisDirection;
-
-import java.util.function.BooleanSupplier;
-
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
@@ -21,13 +18,10 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
@@ -276,7 +270,7 @@ public class DriveSubsystem extends SubsystemBase {
     frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
     frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
     rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
-    rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0))); 
+    rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
   }
 
   public WPI_Pigeon2 getGyro() {
@@ -286,7 +280,12 @@ public class DriveSubsystem extends SubsystemBase {
   /** Taken from Github */
   public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
     return new SequentialCommandGroup(
-      new ConditionalCommand(new RunCommand(() -> setForward()).withTimeout(0.1), new InstantCommand(), () -> {return isFirstPath;}),
+        new RunCommand(() -> setForward())
+            .withTimeout(0.1)
+            .unless(
+                () -> {
+                  return !isFirstPath;
+                }),
         new InstantCommand(
             () -> {
               // Reset odometry for the first path you run during auto
