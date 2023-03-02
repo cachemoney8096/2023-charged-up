@@ -286,8 +286,7 @@ public class DriveSubsystem extends SubsystemBase {
   /** Taken from Github */
   public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
     return new SequentialCommandGroup(
-      new ConditionalCommand(new RunCommand(() -> setForward())
-      .andThen(new WaitCommand(0.1)), new InstantCommand(), () -> {return isFirstPath;}),
+      new ConditionalCommand(new RunCommand(() -> setForward()).withTimeout(0.1), new InstantCommand(), () -> {return isFirstPath;}),
         new InstantCommand(
             () -> {
               // Reset odometry for the first path you run during auto
