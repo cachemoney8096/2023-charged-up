@@ -75,7 +75,7 @@ public class RobotContainer {
     Shuffleboard.getTab("Subsystems").add(drive.getName(), drive);
     Shuffleboard.getTab("Subsystems").add(intake.getName(), intake);
     // Shuffleboard.getTab("Subsystems").add(intakeLimelight.getName(), intakeLimelight);
-    // Shuffleboard.getTab("Subsystems").add(tagLimelight.getName(), tagLimelight);
+    Shuffleboard.getTab("Subsystems").add(tagLimelight.getName(), tagLimelight);
     // Shuffleboard.getTab("Subsystems").add(lights.getName(), lights);
     Shuffleboard.getTab("Subsystems").add(lift.getName(), lift);
     SmartDashboard.putNumber("Pressure", pHub.getPressure(0));
@@ -227,7 +227,7 @@ public class RobotContainer {
     driverController.leftTrigger().onTrue(new InstantCommand(intake::intakeGamePiece, intake));
     driverController.leftTrigger().onFalse(new InstantCommand(intake::stopIntakingGamePiece, intake));
 
-    driverController.rightTrigger().whileTrue(new DriveToTagSimple(tagLimelight, scoreLoc, drive));
+    driverController.rightTrigger().whileTrue(new DriveToTagSimple(tagLimelight, drive));
 
     driverController.x().onTrue(new InstantCommand(() -> {
         lift.setElevatorPositionGoal(1.0);

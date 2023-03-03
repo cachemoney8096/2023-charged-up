@@ -2,8 +2,6 @@ package frc.robot.subsystems;
 
 import java.util.Optional;
 
-import javax.xml.crypto.dsig.Transform;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -12,7 +10,6 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.LimelightHelpers;
 import frc.robot.utils.ScoringLocationUtil;
-import frc.robot.utils.LimelightHelpers.LimelightResults;
 import frc.robot.utils.LimelightHelpers.LimelightTarget_Fiducial;
 
 public class TagLimelightV2 extends SubsystemBase {
@@ -22,6 +19,8 @@ public class TagLimelightV2 extends SubsystemBase {
 
   public TagLimelightV2(ScoringLocationUtil scoringLocUtil) {
     scoreLoc = scoringLocUtil;
+
+    LimelightHelpers.setLEDMode_ForceOff("");
   }
 
   private static Transform2d getBotFromTarget(Pose3d botPoseTargetSpace) {
@@ -66,7 +65,7 @@ public class TagLimelightV2 extends SubsystemBase {
       if (!validScoringTag(target.fiducialID)) {
         continue;
       }
-      double targetDistance = target.getRobotPose_TargetSpace2D().getTranslation().getNorm();
+      double targetDistance = target.getTargetPose_RobotSpace().getTranslation().getNorm();
       if (targetDistance < minDistMeters) {
         minDistMeters = targetDistance;
         bestTag = tagIndex;
@@ -75,28 +74,27 @@ public class TagLimelightV2 extends SubsystemBase {
     return bestTag;
   }
 
-  private Transform2d getRobotToScoringLocation(Pose3d botPoseTargetSpace) {
-    Transform2d botFromTarget = getBotFromTarget(botPoseTargetSpace);
+  private Transform2d getRobotToScoringLocation(Pose3d targetPoseRobotSpace) {
+    Transform2d targetFromBot = getBotFromTarget(targetPoseRobotSpace);
         Transform2d scoringLocationFromTag = scoreLoc.scoringLocationFromTag();
-    return botFromTarget.inverse().plus(scoringLocationFromTag);
+    return targetFromBot.plus(scoringLocationFromTag);
   }
 
   public Optional<Transform2d> getRobotToScoringLocation() {
     return robotToScoringLocation;
   }
 
+  public Optional<Transform2d> checkForTag() {
+    if (!LimelightHelpers.getTV("")) {
+      robotToScoringLocation = Optional.empty();
+      return Optional.empty();
+    }
+    robotToScoringLocation = Optional.of(getRobotToScoringLocation(LimelightHelpers.getTargetPose3d_RobotSpace("")));
+    return robotToScoringLocation;
+  }
+
   @Override
   public void periodic() {
-    LimelightResults results = LimelightHelpers.getLatestResults("");
-    LimelightTarget_Fiducial[] targets = results.targetingResults.targets_Fiducials;
-    int numAprilTags = targets.length;
-    if (numAprilTags < 2) {
-      robotToScoringLocation = Optional.empty();
-      return;
-    }
-    int bestTagIndex = chooseTag(targets);
-    LimelightTarget_Fiducial bestTarget = targets[bestTagIndex];
-    robotToScoringLocation = Optional.of(getRobotToScoringLocation(bestTarget.getRobotPose_TargetSpace()));
   }
 
   @Override

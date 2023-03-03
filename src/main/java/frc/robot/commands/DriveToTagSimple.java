@@ -17,15 +17,13 @@ import frc.robot.utils.LimelightHelpers.LimelightTarget_Fiducial;
 
 public class DriveToTagSimple extends CommandBase {
 
-  private ScoringLocationUtil scoreLoc;
   private DriveSubsystem drive;
   private TagLimelightV2 tagLimelight;
   private boolean targetLocked = false;
-  private Command followTrajectoryCommand;
+  private Command followTrajectoryCommand = null;
 
-  public DriveToTagSimple(TagLimelightV2 limelight, ScoringLocationUtil scoreLocationUtil, DriveSubsystem driveSubsystem) {
+  public DriveToTagSimple(TagLimelightV2 limelight, DriveSubsystem driveSubsystem) {
     // Note: does not require the drive subsystem itself! It will schedule a command that will do the driving.
-    scoreLoc = scoreLocationUtil;
     drive = driveSubsystem;
     tagLimelight = limelight;
   }
@@ -37,7 +35,7 @@ public class DriveToTagSimple extends CommandBase {
   @Override
   public void execute() {
     if (!targetLocked) {
-      Optional<Transform2d> robotToScoringLocation = tagLimelight.getRobotToScoringLocation();
+      Optional<Transform2d> robotToScoringLocation = tagLimelight.checkForTag();
       if (!robotToScoringLocation.isPresent()) {
         return;
       }
@@ -56,6 +54,9 @@ public class DriveToTagSimple extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return targetLocked;
+    if (followTrajectoryCommand == null) {
+      return false;
+    }
+    return followTrajectoryCommand.isFinished();
   }
 }

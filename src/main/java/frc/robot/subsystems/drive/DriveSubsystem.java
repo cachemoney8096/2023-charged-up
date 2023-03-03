@@ -88,7 +88,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {
+  public void periodic() {    
     // Update the odometry in the periodic block
     odometry.update(
         Rotation2d.fromDegrees(gyro.getYaw()),
@@ -337,12 +337,12 @@ public class DriveSubsystem extends SubsystemBase {
   /** Taken from Github */
   public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
     return new SequentialCommandGroup(
-        new RunCommand(() -> setForward())
-            .withTimeout(0.1)
-            .unless(
-                () -> {
-                  return !isFirstPath;
-                }),
+        // new RunCommand(() -> setForward())
+        //     .withTimeout(0.1)
+        //     .unless(
+        //         () -> {
+        //           return !isFirstPath;
+        //         }),
         new InstantCommand(
             () -> {
               // Reset odometry for the first path you run during auto
@@ -367,17 +367,22 @@ public class DriveSubsystem extends SubsystemBase {
             // Optional, defaults to true
             this // Requires this drive subsystem
             ),
-            new InstantCommand(() -> {targetHeadingDegrees = getPose().getRotation().getDegrees();}));
+            new InstantCommand(() -> {targetHeadingDegrees = getPose().getRotation().getDegrees();})).withName("Follow trajectory");
   }
 
   public Command transformToPath(Transform2d transform){
+    Transform2d flipTransform = new Transform2d(
+      new Translation2d(
+        -transform.getX(),
+        -transform.getY()),
+        transform.getRotation().unaryMinus());
     PathPlannerTrajectory path =
     PathPlanner.generatePath(
         new PathConstraints(
             Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
             Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ),
         new PathPoint(new Translation2d(0, 0), new Rotation2d(0)),
-        new PathPoint(transform.getTranslation(), new Rotation2d(0), transform.getRotation()));
+        new PathPoint(flipTransform.getTranslation(), new Rotation2d(0), flipTransform.getRotation()));
     return followTrajectoryCommand(path, false);
   }
 
