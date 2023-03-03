@@ -309,12 +309,12 @@ public class Lift extends SubsystemBase {
 
     // // Set elevator encoder position from absolute encoders
     double elevatorDutyCycleEncodersDifferenceDegrees =
-        AngleUtil.wrapAngle(
-            (elevatorRightAbsEncoder.getPosition() - elevatorLeftAbsEncoder.getPosition()) * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_DEGREES_PER_INCH);
+        AngleUtil.wrapAngleAroundZero(
+            (elevatorLeftAbsEncoder.getPosition() - elevatorRightAbsEncoder.getPosition()));
     // // elevatorLeftEncoder.setPosition(-0.25);
     elevatorLeftEncoder.setPosition(
-        elevatorDutyCycleEncodersDifferenceDegrees
-                * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE
+        (elevatorDutyCycleEncodersDifferenceDegrees
+                * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE)
             - Cal.Lift.ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES);
 
     // armController.setTolerance(Cal.Lift.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG);
