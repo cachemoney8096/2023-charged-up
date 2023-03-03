@@ -371,18 +371,22 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public Command transformToPath(Transform2d transform){
+    // Transform is to get the limelight to the correct location, not to get the robot
+    // Here we correct for that
     Transform2d flipTransform = new Transform2d(
       new Translation2d(
         -transform.getX(),
         -transform.getY()),
-        transform.getRotation().unaryMinus());
+        transform.getRotation());
     PathPlannerTrajectory path =
     PathPlanner.generatePath(
         new PathConstraints(
             Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
             Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ),
         new PathPoint(new Translation2d(0, 0), new Rotation2d(0)),
-        new PathPoint(flipTransform.getTranslation(), new Rotation2d(0), flipTransform.getRotation()));
+        // new PathPoint(flipTransform.getTranslation(), new Rotation2d(0), flipTransform.getRotation()));
+        // We know the robot needs to be at zero relative to start of match so let's just use that
+        new PathPoint(flipTransform.getTranslation(), new Rotation2d(0), getPose().getRotation().unaryMinus()));
     return followTrajectoryCommand(path, false);
   }
 
