@@ -22,9 +22,8 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
-  private ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
-  private Lift lift = new Lift(scoreLoc);
-  private Intake intake = new Intake(lift::clearOfIntakeZone);
+  private Lift lift;
+  private Intake intake;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -37,6 +36,9 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
 
     m_robotContainer.initialize();
+
+    lift = m_robotContainer.lift;
+    intake = m_robotContainer.intake;
   }
 
   /**

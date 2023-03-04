@@ -40,8 +40,8 @@ import frc.robot.utils.ScoringLocationUtil;
 public class RobotContainer {
   private final DriveSubsystem drive = new DriveSubsystem();
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
-  private final Lift lift = new Lift(scoreLoc);
-  private final Intake intake = new Intake(lift::clearOfIntakeZone);
+  public final Lift lift = new Lift(scoreLoc);
+  public final Intake intake = new Intake(lift::clearOfIntakeZone);
   private final IntakeLimelight intakeLimelight =
       new IntakeLimelight(
           Constants.INTAKE_LIMELIGHT_PITCH_DEGREES,
