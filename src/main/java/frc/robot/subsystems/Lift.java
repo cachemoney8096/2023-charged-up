@@ -495,12 +495,23 @@ public class Lift extends SubsystemBase {
         "Elevator Position (in)",
         elevatorLeftEncoder::getPosition,
         elevatorLeftEncoder::setPosition);
-    builder.addDoubleProperty("Elevator Vel (in)", elevatorLeftEncoder::getVelocity, null);
+    builder.addDoubleProperty("Elevator Vel (in/s)", elevatorLeftEncoder::getVelocity, null);
     builder.addDoubleProperty(
-        "Elevator Left Abs Pos (in)", elevatorLeftAbsEncoder::getPosition, null);
+        "Elevator Left Abs Pos (deg)", elevatorLeftAbsEncoder::getPosition, null);
     builder.addDoubleProperty(
-        "Elevator Right Abs Pos (in)", elevatorRightAbsEncoder::getPosition, null);
-    builder.addBooleanProperty("Clear of intake", this::clearOfIntakeZone, null);
+        "Elevator Right Abs Pos (deg)", elevatorRightAbsEncoder::getPosition, null);
+    builder.addDoubleProperty("Elevator Pos per abs (in)", () -> {
+
+    // Set elevator encoder position from absolute encoders
+    double elevatorDutyCycleEncodersDifferenceDegrees =
+        AngleUtil.wrapAngleAroundZero(
+            (elevatorLeftAbsEncoder.getPosition() - elevatorRightAbsEncoder.getPosition()));
+            return (elevatorDutyCycleEncodersDifferenceDegrees
+            * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE)
+        - Cal.Lift.ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES;
+
+    }, null);
+        builder.addBooleanProperty("Clear of intake", this::clearOfIntakeZone, null);
     builder.addDoubleProperty(
         "Arm Abs Position (deg)", armAbsoluteEncoder::getPosition, armEncoder::setPosition);
     builder.addDoubleProperty(

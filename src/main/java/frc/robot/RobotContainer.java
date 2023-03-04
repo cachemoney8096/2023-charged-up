@@ -39,12 +39,12 @@ public class RobotContainer {
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
   private final Lift lift = new Lift(scoreLoc);
   private final PneumaticHub pHub = new PneumaticHub();
-  private final Intake intake =
-      new Intake(
-          () -> {
-            return true;
-          });
-  // private final Intake intake = new Intake(lift::clearOfIntakeZone);
+  // private final Intake intake =
+  //     new Intake(
+  //         () -> {
+  //           return true;
+  //         });
+  private final Intake intake = new Intake(lift::clearOfIntakeZone);
   private final IntakeLimelight intakeLimelight =
       new IntakeLimelight(
           Constants.INTAKE_LIMELIGHT_PITCH_DEGREES,
