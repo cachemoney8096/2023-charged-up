@@ -143,6 +143,10 @@ public class Intake extends SubsystemBase {
   }
 
   public void initialize() {
+    rezeroIntake();
+  }
+
+  public void rezeroIntake() {
     deployMotorEncoder.setPosition(
         AngleUtil.wrapAngle(
             deployMotorAbsoluteEncoder.getPosition()
@@ -268,6 +272,7 @@ public class Intake extends SubsystemBase {
       unclampIntake();
     }
   }
+
 
   @Override
   public void simulationPeriodic() {

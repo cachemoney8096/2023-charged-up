@@ -293,6 +293,10 @@ public class Lift extends SubsystemBase {
   }
 
   public void initialize() {
+    rezeroLift();
+  }
+
+  public void rezeroLift() {
     // Set arm encoder position from absolute
     armEncoder.setPosition(
         AngleUtil.wrapAngle(
