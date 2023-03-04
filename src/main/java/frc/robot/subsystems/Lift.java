@@ -467,9 +467,9 @@ public class Lift extends SubsystemBase {
     // TODO do we need a grabber zone?
 
     if (desiredGrabberClosed) {
-      grabber.set(true); // grab
+      grabber.set(false); // grab
     } else {
-      grabber.set(false); // drop
+      grabber.set(true); // drop
     }
   }
 
