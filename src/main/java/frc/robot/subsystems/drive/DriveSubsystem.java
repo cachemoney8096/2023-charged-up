@@ -5,6 +5,9 @@
 package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix.sensors.Pigeon2.AxisDirection;
+
+import javax.xml.crypto.dsig.Transform;
+
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -272,7 +275,7 @@ public class DriveSubsystem extends SubsystemBase {
         Cal.SwerveSubsystem.ROTATE_TO_TARGET_PID_CONTROLLER.calculate(offsetHeadingDegrees, 0.0)
             + Math.signum(offsetHeadingDegrees) * Cal.SwerveSubsystem.ROTATE_TO_TARGET_FF;
 
-    if (Math.abs(desiredRotation) < 0.1) {
+    if (Math.abs(desiredRotation) < 0.07) {
       desiredRotation = 0;
     }
 
@@ -376,17 +379,27 @@ public class DriveSubsystem extends SubsystemBase {
     Transform2d flipTransform = new Transform2d(
       new Translation2d(
         -transform.getX(),
-        -transform.getY()),
+        transform.getY()),
         transform.getRotation());
+        System.out.println("Transform:");
+        System.out.println(flipTransform.getX());
+        System.out.println(flipTransform.getY());
+    // Transform2d driveTransform = new Transform2d(new Translation2d(1, 0), Rotation2d.fromDegrees(0));
+    Pose2d curPose = getPose();
+    Transform2d curPoseTransform = new Transform2d(curPose.getTranslation(), curPose.getRotation());
+    Transform2d finalTransform = curPoseTransform.plus(flipTransform);
+    Rotation2d startHeading = flipTransform.getTranslation().getAngle().plus(curPose.getRotation());
+    Rotation2d finalHeading = startHeading.plus(Rotation2d.fromDegrees(180));
     PathPlannerTrajectory path =
     PathPlanner.generatePath(
         new PathConstraints(
-            Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
-            Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ),
-        new PathPoint(new Translation2d(0, 0), new Rotation2d(0)),
+            1.0,
+            1.0),
+        new PathPoint(curPose.getTranslation(), startHeading, curPose.getRotation()),
         // new PathPoint(flipTransform.getTranslation(), new Rotation2d(0), flipTransform.getRotation()));
         // We know the robot needs to be at zero relative to start of match so let's just use that
-        new PathPoint(flipTransform.getTranslation(), new Rotation2d(0), getPose().getRotation().unaryMinus()));
+        new PathPoint(finalTransform.getTranslation(), finalHeading, Rotation2d.fromDegrees(0)));
+        // new PathPoint(flipTransform.getTranslation(), new Rotation2d(0), getPose().getRotation().unaryMinus()));
     return followTrajectoryCommand(path, false);
   }
 

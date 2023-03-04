@@ -11,13 +11,17 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoChargeStationSequence;
 import frc.robot.commands.DriveToTagSimple;
+import frc.robot.commands.IntakeSequence;
+import frc.robot.commands.OuttakeSequence;
 import frc.robot.commands.SimpleChargeStationSequence;
+import frc.robot.commands.finishScore;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
 import frc.robot.subsystems.Lift;
@@ -38,7 +42,7 @@ public class RobotContainer {
   private final DriveSubsystem drive = new DriveSubsystem();
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
   private final Lift lift = new Lift(scoreLoc);
-  private final PneumaticHub pHub = new PneumaticHub();
+  public final PneumaticHub pneumaticHub = new PneumaticHub();
   // private final Intake intake =
   //     new Intake(
   //         () -> {
@@ -78,7 +82,11 @@ public class RobotContainer {
     Shuffleboard.getTab("Subsystems").add(tagLimelight.getName(), tagLimelight);
     // Shuffleboard.getTab("Subsystems").add(lights.getName(), lights);
     Shuffleboard.getTab("Subsystems").add(lift.getName(), lift);
-    SmartDashboard.putNumber("Pressure", pHub.getPressure(0));
+  }
+
+  public void rezero() {
+    intake.initialize();
+    lift.initialize();
   }
 
   public void initialize() {
@@ -93,8 +101,7 @@ public class RobotContainer {
     SmartDashboard.putData(autonChooser);
 
     // Encoder offset stuff
-    intake.initialize();
-    lift.initialize();
+    rezero();
 
     burnFlashSparks();
   }
@@ -129,85 +136,90 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // driverController.a().onTrue(new InstantCommand(drive::toggleSkids));
-    // driverController.b().onTrue(new OuttakeSequence(lift));
-    // driverController.x().onTrue(new InstantCommand(lift::cancelScore, lift));
+    driverController.b().whileTrue(new OuttakeSequence(lift).finallyDo(
+                      (boolean interrupted) -> {
+                        lift.home();
+                        lift.closeGrabber();
+                      }));
+    driverController.x().onTrue(new InstantCommand(lift::cancelScore, lift));
 
-    // driverController.y().onTrue(new InstantCommand(lift::ManualPrepScoreSequence, lift));
+    driverController.rightBumper().onTrue(new InstantCommand(() -> {lift.ManualPrepScoreSequence(lights);}, lift));
 
-    // driverController.back().onTrue(new InstantCommand(lift::home, lift));
-    // driverController.start().onTrue(new InstantCommand(drive::halfSpeedToggle));
+    driverController.back().onTrue(new InstantCommand(lift::home, lift));
+    driverController.start().onTrue(new InstantCommand(drive::halfSpeedToggle));
 
     // TODO Maybe: steal
     // TODO: implement autoscore command for teleop
     // // driverController.rightBumper().onTrue(new InstantCommand(lift::prepScore, lift));
-    // driverController
-    //     .leftTrigger()
-    //     .whileTrue(
-    //         new IntakeSequence(intake, lift, lights)
-    //             .finallyDo(
-    //                 (boolean interrupted) -> {
-    //                   lift.home();
-    //                   lift.closeGrabber();
-    //                 }));
-    // driverController.rightTrigger().onTrue(new InstantCommand(lift::startScore, lift));
-    // driverController
-    //     .rightTrigger()
-    //     .onFalse(
-    //         new ConditionalCommand(
-    //             new InstantCommand(() -> { lift.finishScoreCancelled(lights);}, lift),
-    //             new finishScore(lift, lights),
-    //             lift::getCancelScore));
+    driverController
+        .leftTrigger()
+        .whileTrue(
+            new IntakeSequence(intake, lift, lights)
+                .finallyDo(
+                    (boolean interrupted) -> {
+                      lift.home();
+                      lift.closeGrabber();
+                      intake.stopIntakingGamePiece();
+                    }));
+    driverController.rightTrigger().onTrue(new InstantCommand(lift::startScore, lift));
+    driverController
+        .rightTrigger()
+        .onFalse(
+            new ConditionalCommand(
+                new InstantCommand(() -> { lift.finishScoreCancelled(lights);}, lift),
+                new finishScore(lift, lights),
+                lift::getCancelScore));
 
     // operatorController
     //     .povDown()
     //     .onTrue(
     //         new InstantCommand(() ->
     // scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.LOW)));
-    // operatorController
-    //     .povRight()
-    //     .onTrue(
-    //         new InstantCommand(() ->
-    // scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
-    // operatorController
-    //     .povUp()
-    //     .onTrue(
-    //         new InstantCommand(
-    //             () -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH)));
+    operatorController
+        .povRight()
+        .onTrue(
+            new InstantCommand(() ->
+    scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
+    operatorController
+        .povUp()
+        .onTrue(
+            new InstantCommand(
+                () -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH)));
     // operatorController.povRight().onTrue(new InstantCommand(() -> lights.togglePartyMode()));
 
-    // operatorController
-    //     .x()
-    //     .onTrue(new InstantCommand(() ->
-    // scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.LEFT)));
-    // operatorController
-    //     .a()
-    //     .onTrue(
-    //         new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER)));
-    // operatorController
-    //     .y()
-    //     .onTrue(
-    //         new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER)));
-    // operatorController
-    //     .b()
-    //     .onTrue(new InstantCommand(() ->
-    // scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.RIGHT)));
-
-    driverController
-        .b()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  intake.setDesiredDeployed(true);
-                },
-                intake));
-    driverController
+    operatorController
+        .x()
+        .onTrue(new InstantCommand(() ->
+    scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.LEFT)));
+    operatorController
         .a()
         .onTrue(
-            new InstantCommand(
-                () -> {
-                  intake.setDesiredDeployed(false);
-                },
-                intake));
+            new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER)));
+    operatorController
+        .y()
+        .onTrue(
+            new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER)));
+    operatorController
+        .b()
+        .onTrue(new InstantCommand(() ->
+    scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.RIGHT)));
+
+    // driverController
+    //     .b()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               intake.setDesiredDeployed(true);
+    //             },
+    //             intake));
+    // driverController
+    //     .a()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               intake.setDesiredDeployed(false);
+    //             },
+    //             intake));
 
     // operatorController
     //     .leftBumper()
@@ -224,17 +236,22 @@ public class RobotContainer {
 
     // Drive controls
 
-    driverController.leftTrigger().onTrue(new InstantCommand(intake::intakeGamePiece, intake));
-    driverController.leftTrigger().onFalse(new InstantCommand(intake::stopIntakingGamePiece, intake));
+    // driverController.leftTrigger().onTrue(new InstantCommand(intake::intakeGamePiece, intake));
+    // driverController.leftTrigger().onFalse(new InstantCommand(intake::stopIntakingGamePiece, intake));
 
-    driverController.rightTrigger().whileTrue(new DriveToTagSimple(tagLimelight, drive));
+    driverController.start().whileTrue(new DriveToTagSimple(tagLimelight, drive));
 
-    driverController.x().onTrue(new InstantCommand(() -> {
-        lift.setElevatorPositionGoal(1.0);
-      }, lift));
-      driverController.y().onTrue(new InstantCommand(() -> {
-          lift.setElevatorPositionGoal(18.5);
-        }, lift));
+    // driverController.x().onTrue(new InstantCommand(() -> {
+    //     lift.setArmPositionGoal(135);
+    //   }, lift));
+      // driverController.y().onTrue(new InstantCommand(() -> {
+      //     lift.setArmPositionGoal(180);
+      //   }, lift));
+        driverController.y().onTrue(new InstantCommand(lift::home, lift));
+      
+        // driverController.a().onTrue(new InstantCommand(() -> {
+        //   lift.setArmPositionGoal(90);
+        // }, lift));
     // driverController.x().onTrue(new InstantCommand(() -> {
     //   lift.setArmPositionGoal(180.0);
     // }, lift));
@@ -261,18 +278,18 @@ public class RobotContainer {
                         MathUtil.applyDeadband(-driverController.getRightY(), 0.1),
                         MathUtil.applyDeadband(-driverController.getRightX(), 0.1),
                         JoystickUtil.squareAxis(
-                            MathUtil.applyDeadband(-driverController.getLeftX(), 0.1)),
+                            MathUtil.applyDeadband(-driverController.getLeftX(), 0.07)),
                         !driverController.getHID().getLeftBumper(),
                         driverController.getHID().getPOV()),
                 drive)
             .withName("Manual Drive"));
 
-    // intake.setDefaultCommand(
-    //     new InstantCommand(
-    //         () -> {
-    //           intake.setDesiredDeployed(false);
-    //         },
-    //         intake));
+    intake.setDefaultCommand(
+        new InstantCommand(
+            () -> {
+              intake.setDesiredDeployed(false);
+            },
+            intake));
   }
 
   public Command getAutonomousCommand() {

@@ -264,7 +264,7 @@ public class Intake extends SubsystemBase {
 
     // Only clamp if it is safe to do so and clamping is desired
     if (desireClamped
-        && deployMotorAbsoluteEncoder.getPosition() > Cal.Intake.CLAMP_POSITION_THRESHOLD_DEGREES) {
+        && deployMotorEncoder.getPosition() > Cal.Intake.CLAMP_POSITION_THRESHOLD_DEGREES) {
       clampIntake();
     } else {
       unclampIntake();

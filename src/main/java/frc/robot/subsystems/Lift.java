@@ -105,6 +105,7 @@ public class Lift extends SubsystemBase {
   private boolean desiredGrabberClosed = true;
   public ScoringLocationUtil scoreLoc;
   private boolean scoringInProgress = false;
+  private double elevatorOutputVolts;
 
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
@@ -127,7 +128,7 @@ public class Lift extends SubsystemBase {
     liftPositionMap = new TreeMap<LiftPosition, Pair<Double, Double>>();
     liftPositionMap.put(
         LiftPosition.GRAB_FROM_INTAKE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 77.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 78.0));
     liftPositionMap.put(
         LiftPosition.SHELF, new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 196.0));
     liftPositionMap.put(
@@ -135,25 +136,25 @@ public class Lift extends SubsystemBase {
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 265.0));
     liftPositionMap.put(
         LiftPosition.SCORE_MID_CUBE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 224.0));
-    liftPositionMap.put(
-        LiftPosition.SCORE_MID_CONE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 224.0));
-    liftPositionMap.put(
-        LiftPosition.SCORE_HIGH_CUBE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 224.0));
-    liftPositionMap.put(
-        LiftPosition.SCORE_HIGH_CONE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 224.0));
-    liftPositionMap.put(
-        LiftPosition.PRE_SCORE_MID_CONE,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 216.0));
     liftPositionMap.put(
-        LiftPosition.PRE_SCORE_HIGH_CONE,
+        LiftPosition.SCORE_MID_CONE,
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 206.0));
+    liftPositionMap.put(
+        LiftPosition.SCORE_HIGH_CUBE,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 216.0));
     liftPositionMap.put(
+        LiftPosition.SCORE_HIGH_CONE,
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 206.0));
+    liftPositionMap.put(
+        LiftPosition.PRE_SCORE_MID_CONE,
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 196.0));
+    liftPositionMap.put(
+        LiftPosition.PRE_SCORE_HIGH_CONE,
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 196.0));
+    liftPositionMap.put(
         LiftPosition.POST_SCORE_HIGH,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 210.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 180.0));
     liftPositionMap.put(
         LiftPosition.OUTTAKING,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 196.0));
@@ -272,6 +273,7 @@ public class Lift extends SubsystemBase {
     elevatorDemandVolts +=
         Cal.Lift.ELEVATOR_FEEDFORWARD.calculate(elevatorController.getSetpoint().velocity);
     elevatorLeft.setVoltage(elevatorDemandVolts);
+    elevatorOutputVolts = elevatorDemandVolts;
 
     double armDemandVolts = armController.calculate(armEncoder.getPosition());
     armDemandVolts += Cal.Lift.ARM_FEEDFORWARD.calculate(armController.getSetpoint().velocity);
@@ -542,8 +544,11 @@ public class Lift extends SubsystemBase {
               return goalPosition.toString();
             },
             null);
-    builder.addDoubleProperty("Elevator output", elevatorLeft::get, null);
+    builder.addDoubleProperty("Elevator output", () -> {return elevatorOutputVolts;}, null);
     builder.addDoubleProperty("Arm output", armMotor::get, null);
+    builder.addStringProperty("Score Loc Height", () -> {return scoreLoc.getScoreHeight().toString();}, null);
+    builder.addBooleanProperty("Score Loc Cone", () -> {return scoreLoc.isCone();}, null);
+    builder.addStringProperty("Score Loc Col", () -> {return scoreLoc.getScoreCol().toString();}, null);
   }
 
   /**
@@ -557,7 +562,7 @@ public class Lift extends SubsystemBase {
     new InstantCommand(
         () -> {
           lights.toggleCode(LightCode.WORKING);
-        });
+        }).schedule();
 
     // low for all columns is the same height
     if (height == ScoreHeight.LOW) {
@@ -568,7 +573,7 @@ public class Lift extends SubsystemBase {
       if (height == ScoreHeight.MID) {
         setDesiredPosition(LiftPosition.PRE_SCORE_MID_CONE);
       } else {
-        setDesiredPosition(LiftPosition.PRE_SCORE_MID_CONE);
+        setDesiredPosition(LiftPosition.PRE_SCORE_HIGH_CONE);
       }
     }
     // middle columns are for cubes

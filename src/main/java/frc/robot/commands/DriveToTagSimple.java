@@ -37,7 +37,7 @@ public class DriveToTagSimple extends CommandBase {
     if (!targetLocked) {
       Optional<Transform2d> robotToScoringLocation = tagLimelight.checkForTag();
       if (!robotToScoringLocation.isPresent()) {
-        return;
+        robotToScoringLocation = Optional.of(new Transform2d());
       }
       targetLocked = true;
       followTrajectoryCommand = drive.transformToPath(robotToScoringLocation.get());
