@@ -143,6 +143,10 @@ public class Intake extends SubsystemBase {
   }
 
   public void initialize() {
+    rezeroIntake();
+  }
+
+  public void rezeroIntake() {
     deployMotorEncoder.setPosition(
         AngleUtil.wrapAngle(
             deployMotorAbsoluteEncoder.getPosition()
