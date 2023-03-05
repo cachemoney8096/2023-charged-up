@@ -138,7 +138,7 @@ public final class Cal {
 
   public static final class Lift {
     /** Input in, output Volts */
-    public static final double ELEVATOR_P = 3.0, ELEVATOR_I = 0.0, ELEVATOR_D = 0.3;
+    public static final double ELEVATOR_P = 2.0, ELEVATOR_I = 0.0, ELEVATOR_D = 0.3;
 
     /** Input deg, output Volts */
     public static final double ARM_P = 0.1, ARM_I = 0.0, ARM_D = Cal.PLACEHOLDER_DOUBLE;
@@ -217,7 +217,7 @@ public final class Cal {
         ARM_NEGATIVE_LIMIT_DEGREES = 76.0f;
 
     /** Threshold for when the lift is out of the zone where the intake moves. */
-    public static final double ARM_INTAKE_ZONE_THRESHOLD_DEGREES = 114;
+    public static final double ARM_INTAKE_ZONE_THRESHOLD_DEGREES = 95;
 
     /**
      * Margin for when we consider the lift has reached a position. This is logical (for considering
@@ -254,7 +254,7 @@ public final class Cal {
 
   public static final class AutoBalance {
     /** Max speed to go on charge station in meters per second */
-    public static final double MAX_CHARGE_STATION_CLIMB_SPEED_MPS = 1.0;
+    public static final double MAX_CHARGE_STATION_CLIMB_SPEED_MPS = 0.8;
 
     /** Max speed to go on charge station in [-1,1] */
     public static final double MAX_CHARGE_STATION_CLIMB_NORM_SPEED =

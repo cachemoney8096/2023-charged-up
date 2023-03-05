@@ -195,6 +195,8 @@ public class Intake extends SubsystemBase {
 
     // Set the intake control position
     intakeControlPositionDegrees = Cal.Intake.RETRACTED_POSITION_DEGREES;
+
+    stopIntakingGamePiece();
   }
 
   /*Setter for whether intake is desired deploy is true retract is false */

@@ -1,9 +1,12 @@
 package frc.robot.commands;
 
+import java.util.Optional;
+
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Cal;
@@ -15,6 +18,8 @@ import frc.robot.utils.ScoringLocationUtil;
 
 /** Scores a game piece, then drives onto the charge station and balances */
 public class AutoScoreAndBalance extends SequentialCommandGroup {
+  private static final double DISTANCE_UP_CHARGE_STATION_METERS = 2.21;
+
   private PathPlannerTrajectory traj =
       PathPlanner.loadPath(
           "ScoreAndBalanceTraj",
@@ -29,14 +34,15 @@ public class AutoScoreAndBalance extends SequentialCommandGroup {
       Lights lights,
       ScoringLocationUtil scoringLocationUtil) {
     addCommands(
-        new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
-        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
-        new InstantCommand(lift::startScore, lift),
-        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
-        new finishScore(lift, lights),
-        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
-        drive.followTrajectoryCommand(traj, isFirstPath),
-        new AutoChargeStationBalance(drive));
+      new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
+      new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
+      new InstantCommand(lift::startScore, lift),
+      new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
+      new finishScore(lift, lights),
+      new PrintCommand("Finished score"),
+      new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
+      new PrintCommand("Got to start"),
+        new AutoChargeStationSequence(drive, DISTANCE_UP_CHARGE_STATION_METERS));
   }
 
   public PathPlannerTrajectory getTrajectory() {

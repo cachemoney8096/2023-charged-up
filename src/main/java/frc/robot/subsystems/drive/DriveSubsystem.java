@@ -5,6 +5,9 @@
 package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix.sensors.Pigeon2.AxisDirection;
+
+import java.util.Optional;
+
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -24,10 +27,14 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
@@ -322,14 +329,53 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /** Taken from Github */
-  public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
+  public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath, Optional<Double> timeoutSeconds) {
+    PPSwerveControllerCommand controllerCommand = new PPSwerveControllerCommand(
+      traj,
+      this::getPose, // Pose supplier
+      Constants.SwerveDrive.DRIVE_KINEMATICS, // SwerveDriveKinematics
+      Cal.SwerveSubsystem
+          .PATH_X_CONTROLLER, // X controller. Tune these values for your robot. Leaving
+      // them
+      // 0 will only use feedforwards.
+      Cal.SwerveSubsystem
+          .PATH_Y_CONTROLLER, // Y controller (usually the same values as X controller)
+      Cal.SwerveSubsystem
+          .PATH_THETA_CONTROLLER, // Rotation controller. Tune these values for your
+      // robot.
+      // Leaving them 0 will only use feedforwards.
+      this::setModuleStates, // Module states consumer
+      false, // Should the path be automatically mirrored depending on alliance color.
+      // Optional, defaults to true
+      this // Requires this drive subsystem
+      );
+      PPSwerveControllerCommand controllerCommand2 = new PPSwerveControllerCommand(
+        traj,
+        this::getPose, // Pose supplier
+        Constants.SwerveDrive.DRIVE_KINEMATICS, // SwerveDriveKinematics
+        Cal.SwerveSubsystem
+            .PATH_X_CONTROLLER, // X controller. Tune these values for your robot. Leaving
+        // them
+        // 0 will only use feedforwards.
+        Cal.SwerveSubsystem
+            .PATH_Y_CONTROLLER, // Y controller (usually the same values as X controller)
+        Cal.SwerveSubsystem
+            .PATH_THETA_CONTROLLER, // Rotation controller. Tune these values for your
+        // robot.
+        // Leaving them 0 will only use feedforwards.
+        this::setModuleStates, // Module states consumer
+        false, // Should the path be automatically mirrored depending on alliance color.
+        // Optional, defaults to true
+        this // Requires this drive subsystem
+        );
+    
     return new SequentialCommandGroup(
-            // new RunCommand(() -> setForward())
-            //     .withTimeout(0.1)
-            //     .unless(
-            //         () -> {
-            //           return !isFirstPath;
-            //         }),
+            new RunCommand(() -> setForward())
+                .withTimeout(0.1)
+                .unless(
+                    () -> {
+                      return !isFirstPath;
+                    }),
             new InstantCommand(
                 () -> {
                   // Reset odometry for the first path you run during auto
@@ -337,29 +383,22 @@ public class DriveSubsystem extends SubsystemBase {
                     this.resetOdometry(traj.getInitialHolonomicPose());
                   }
                 }),
-            new PPSwerveControllerCommand(
-                traj,
-                this::getPose, // Pose supplier
-                Constants.SwerveDrive.DRIVE_KINEMATICS, // SwerveDriveKinematics
-                Cal.SwerveSubsystem
-                    .PATH_X_CONTROLLER, // X controller. Tune these values for your robot. Leaving
-                // them
-                // 0 will only use feedforwards.
-                Cal.SwerveSubsystem
-                    .PATH_Y_CONTROLLER, // Y controller (usually the same values as X controller)
-                Cal.SwerveSubsystem
-                    .PATH_THETA_CONTROLLER, // Rotation controller. Tune these values for your
-                // robot.
-                // Leaving them 0 will only use feedforwards.
-                this::setModuleStates, // Module states consumer
-                false, // Should the path be automatically mirrored depending on alliance color.
-                // Optional, defaults to true
-                this // Requires this drive subsystem
+            new ConditionalCommand(
+              new ParallelRaceGroup(
+                controllerCommand.finallyDo(
+                  (boolean interrupted) -> {
+                    System.out.println("Follow interrupted by timeout?");
+                    System.out.println(interrupted);
+                  }
                 ),
+                new WaitCommand(timeoutSeconds.isPresent() ? timeoutSeconds.get() : 1000.0)),
+                controllerCommand2,
+              () -> {return timeoutSeconds.isPresent();}),
             new InstantCommand(
                 () -> {
                   targetHeadingDegrees = getPose().getRotation().getDegrees();
-                }))
+                }),
+            new PrintCommand("End of follow trajectory"))
         .withName("Follow trajectory");
   }
 
@@ -384,8 +423,9 @@ public class DriveSubsystem extends SubsystemBase {
             // We know the robot needs to be at zero relative to start of match so let's just use
             // that
             new PathPoint(
-                finalTransform.getTranslation(), finalHeading, Rotation2d.fromDegrees(0)));
-    return followTrajectoryCommand(path, false);
+                // finalTransform.getTranslation(), finalHeading, Rotation2d.fromDegrees(0)));
+                finalTransform.getTranslation(), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)));
+    return followTrajectoryCommand(path, false, Optional.of(3.0));
   }
 
   public void toggleSkids() {

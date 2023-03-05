@@ -35,6 +35,10 @@ public class DriveToTagSimple extends CommandBase {
       followTrajectoryCommand = drive.transformToPath(robotToScoringLocation.get());
       followTrajectoryCommand.schedule();
     }
+    else if (followTrajectoryCommand != null) {
+      System.out.println("Trajectory running?");
+      System.out.println(followTrajectoryCommand.isScheduled());
+    }
   }
 
   @Override
@@ -50,6 +54,8 @@ public class DriveToTagSimple extends CommandBase {
     if (followTrajectoryCommand == null) {
       return false;
     }
+    System.out.println("Trajectory finished?");
+    System.out.println(followTrajectoryCommand.isFinished());
     return followTrajectoryCommand.isFinished();
   }
 }

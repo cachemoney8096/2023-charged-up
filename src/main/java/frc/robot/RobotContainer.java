@@ -17,9 +17,11 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoChargeStationSequence;
+import frc.robot.commands.AutoScoreAndBalance;
 import frc.robot.commands.DriveToTagSimple;
 import frc.robot.commands.IntakeSequence;
 import frc.robot.commands.OuttakeSequence;
+import frc.robot.commands.TwoGamePiecesThatEngage;
 import frc.robot.commands.finishScore;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
@@ -46,7 +48,7 @@ public class RobotContainer {
           Constants.INTAKE_LIMELIGHT_PITCH_DEGREES,
           Constants.INTAKE_LIMELIGHT_HEIGHT_METERS,
           Constants.INTAKE_TARGET_HEIGHT_METERS);
-  private final TagLimelightV2 tagLimelight = new TagLimelightV2(scoreLoc);
+  public final TagLimelightV2 tagLimelight = new TagLimelightV2(scoreLoc);
   private final Lights lights = new Lights();
   public final PneumaticHub pneumaticHub = new PneumaticHub();
 
@@ -65,8 +67,8 @@ public class RobotContainer {
     configureBindings();
 
     Shuffleboard.getTab("Subsystems").add(drive.getName(), drive);
-    Shuffleboard.getTab("Subsystems").add(intake.getName(), intake);
-    Shuffleboard.getTab("Subsystems").add(intakeLimelight.getName(), intakeLimelight);
+    // Shuffleboard.getTab("Subsystems").add(intake.getName(), intake);
+    // Shuffleboard.getTab("Subsystems").add(intakeLimelight.getName(), intakeLimelight);
     Shuffleboard.getTab("Subsystems").add(tagLimelight.getName(), tagLimelight);
     // Shuffleboard.getTab("Subsystems").add(lights.getName(), lights);
     Shuffleboard.getTab("Subsystems").add(lift.getName(), lift);
@@ -76,7 +78,8 @@ public class RobotContainer {
     // autons
 
     autonChooser.setDefaultOption(
-        "Simple Balance Sequence", new AutoChargeStationSequence(drive, 2.21));
+            "One plus balance", new AutoScoreAndBalance(true, lift, drive, lights, scoreLoc));
+        // "Two plus balance", new TwoGamePiecesThatEngage(lift, intake, drive, lights, tagLimelight, scoreLoc));
     // autonChooser.addOption(
     //     "Score, balance", new AutoScoreAndBalance(true, lift, drive, lights, scoreLoc));
 

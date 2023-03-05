@@ -46,17 +46,20 @@ public class IntakeSequence extends SequentialCommandGroup {
         new WaitUntilCommand(
             () -> (lift.atPosition(Lift.LiftPosition.GRAB_FROM_INTAKE) && intake.seeGamePiece())),
 
+        // triggers the grabber to close
+        new InstantCommand(lift::closeGrabber, lift),
+
+        // give the intake time to unclamp
+        new WaitCommand(0.2),
+
         // stop intake
         new InstantCommand(intake::stopIntakingGamePiece, intake),
 
         // indicate the robot has obtained a game piece
-        new InstantCommand(
-            () -> {
-              lights.toggleCode(LightCode.GAME_OBJECT);
-            }),
-
-        // triggers the grabber to close
-        new InstantCommand(lift::closeGrabber, lift),
+        // new InstantCommand(
+        //     () -> {
+        //       lights.toggleCode(LightCode.GAME_OBJECT);
+        //     }),
 
         // // wait until the grabber has closed
         // new WaitCommand(Cal.Lift.GRABBER_CLOSE_TIME_SECONDS),
@@ -73,6 +76,11 @@ public class IntakeSequence extends SequentialCommandGroup {
 
         // triggers the lift to move to the starting position. This does not need a timeout even
         // though it is a longer action, because it is the final action in the sequence
-        new InstantCommand(lift::home, lift));
+        new InstantCommand(lift::home, lift),
+        new InstantCommand(
+                () -> {
+                  intake.setDesiredDeployed(false);
+                },
+                intake));
   }
 }

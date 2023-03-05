@@ -89,7 +89,7 @@ public class TagLimelightV2 extends SubsystemBase {
       robotToScoringLocation = Optional.empty();
       return Optional.empty();
     }
-    if (LimelightHelpers.getFiducialID("") != 8.0)
+    if (LimelightHelpers.getFiducialID("") != 6.0)
     {
       robotToScoringLocation = Optional.empty();
       return Optional.empty();
@@ -100,7 +100,7 @@ public class TagLimelightV2 extends SubsystemBase {
 
   @Override
   public void periodic() {
-    checkForTag();
+    // checkForTag();
   }
 
   @Override

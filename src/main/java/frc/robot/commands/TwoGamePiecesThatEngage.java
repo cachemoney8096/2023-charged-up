@@ -6,6 +6,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.FollowPathWithEvents;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Cal;
@@ -20,6 +21,7 @@ import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreCol;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 import java.util.HashMap;
+import java.util.Optional;
 
 /**
  * This does the following: Robot starts at right postion at left grid Score the game piece at the
@@ -57,7 +59,13 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
     /** Events include: open intake and close intake before and after obtaining game piece */
     eventMap.put(
         "deployIntake",
-        new IntakeSequence(intake, lift, lights).withTimeout(4.0));
+        new IntakeSequence(intake, lift, lights).finallyDo(
+            (boolean interrupted) -> {
+              lift.home();
+              lift.closeGrabber();
+              intake.setDesiredClamped(false);
+              intake.stopIntakingGamePiece();
+            }).withTimeout(3.5));
     eventMap.put(
         "closeIntake",
         new InstantCommand(
@@ -80,8 +88,9 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         new finishScore(lift, lights),
         new InstantCommand(() -> scoringLocationUtil.setScoreCol(ScoreCol.LEFT)),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
+        new PrintCommand("Driving to cone"),
         new FollowPathWithEvents(
-            drive.followTrajectoryCommand(trajInit, true), trajInit.getMarkers(), eventMap),
+            drive.followTrajectoryCommand(trajInit, true, Optional.empty()), trajInit.getMarkers(), eventMap),
         /** TODO: Limelight code goes here */
         // new InstantCommand(
         //     () -> {
@@ -89,15 +98,18 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         //         lights.toggleCode(LightCode.NO_TAG);
         //       }
         //     }),
+        new PrintCommand("About to LL"),
         new DriveToTagSimple(tagLimelight, drive),
+        new PrintCommand("Done LL"),
         new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
+        new PrintCommand("Ready to score"),
         new InstantCommand(lift::startScore, lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
         new finishScore(lift, lights),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
         drive.followTrajectoryCommand(
-            trajCharge, false), // this does not accept the FollowPathWithEvents
+            trajCharge, false, Optional.empty()), // this does not accept the FollowPathWithEvents
         new AutoChargeStationSequence(drive, DISTANCE_UP_CHARGE_STATION_METERS));
   }
 }

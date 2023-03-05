@@ -43,7 +43,7 @@ public class AutoChargeStationBalance extends CommandBase {
 
     // stop driving (and thus set x) if there is less than one second left in auton
     drive.drive(
-        matchTime > 1.0 ? deadbandedNormVelocity : 0.0,
+        matchTime > 0.3 ? deadbandedNormVelocity : 0.0,
         NOT_MOVING_IN_Y,
         NOT_ROTATING,
         ROBOT_RELATIVE);

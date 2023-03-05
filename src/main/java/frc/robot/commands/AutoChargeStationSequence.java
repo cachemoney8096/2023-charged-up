@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -17,13 +18,19 @@ public class AutoChargeStationSequence extends SequentialCommandGroup {
     addCommands(
         new RunCommand(
                 () -> {
-                  drive.drive(NORM_SPEED_UP_CHARGE_STATION, 0, 0, false);
+                  /** Time remaining in current match period (auto or teleop) in seconds */
+                  double matchTime = DriverStation.getMatchTime();
+                  if (matchTime > 0.3) {
+                    drive.drive(NORM_SPEED_UP_CHARGE_STATION, 0, 0, false);
+                  } else {
+                    drive.drive(0.0, 0, 0, false);
+                  }
                 },
                 drive)
             .until(
                 () -> {
                   return drive.getPose().getX() > distanceMeters;
                 }),
-          new AutoChargeStationBalance(drive));
+        new AutoChargeStationBalance(drive));
   }
 }
