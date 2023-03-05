@@ -424,7 +424,7 @@ public class DriveSubsystem extends SubsystemBase {
             // that
             new PathPoint(
                 // finalTransform.getTranslation(), finalHeading, Rotation2d.fromDegrees(0)));
-                finalTransform.getTranslation(), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)));
+                finalTransform.getTranslation(), Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(0)));
     return followTrajectoryCommand(path, false, Optional.of(3.0));
   }
 
