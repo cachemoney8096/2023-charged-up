@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import java.util.Optional;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -9,8 +7,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.LimelightHelpers;
-import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.LimelightHelpers.LimelightTarget_Fiducial;
+import frc.robot.utils.ScoringLocationUtil;
+import java.util.Optional;
 
 public class TagLimelightV2 extends SubsystemBase {
   private ScoringLocationUtil scoreLoc;
@@ -25,33 +24,35 @@ public class TagLimelightV2 extends SubsystemBase {
 
   private static Transform2d getBotFromTarget(Pose3d botPoseTargetSpace) {
     /**
-     * Target space:
-     * 3d Cartesian Coordinate System with (0,0,0) at the center of the target.
+     * Target space: 3d Cartesian Coordinate System with (0,0,0) at the center of the target.
+     *
      * <p>X+ → Pointing to the right of the target (If you are looking at the target)
+     *
      * <p>Y+ → Pointing downward
+     *
      * <p>Z+ → Pointing out of the target (orthogonal to target’s plane).
      */
 
     /**
-     * We convert to 2d target space:
-     * X+ -> Out of the target
-     * Y+ -> Pointing to the right of the target (If you are looking at the target)
-     * This means positive yaw is based on Z+ being up
+     * We convert to 2d target space: X+ -> Out of the target Y+ -> Pointing to the right of the
+     * target (If you are looking at the target) This means positive yaw is based on Z+ being up
      */
     Translation2d translation =
-        new Translation2d(
-          botPoseTargetSpace.getZ(),
-          botPoseTargetSpace.getX());
+        new Translation2d(botPoseTargetSpace.getZ(), botPoseTargetSpace.getX());
     Rotation2d rot = Rotation2d.fromDegrees(-botPoseTargetSpace.getRotation().getY());
     return new Transform2d(translation, rot);
   }
 
   private static boolean validScoringTag(double tagId) {
     long tagIdRounded = Math.round(tagId);
-    if (tagIdRounded == 1 || tagIdRounded == 2 || tagIdRounded == 3 || tagIdRounded == 6 || tagIdRounded == 7 || tagIdRounded == 8) {
+    if (tagIdRounded == 1
+        || tagIdRounded == 2
+        || tagIdRounded == 3
+        || tagIdRounded == 6
+        || tagIdRounded == 7
+        || tagIdRounded == 8) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
@@ -76,7 +77,7 @@ public class TagLimelightV2 extends SubsystemBase {
 
   private Transform2d getRobotToScoringLocation(Pose3d targetPoseRobotSpace) {
     Transform2d targetFromBot = getBotFromTarget(targetPoseRobotSpace);
-        Transform2d scoringLocationFromTag = scoreLoc.scoringLocationFromTag();
+    Transform2d scoringLocationFromTag = scoreLoc.scoringLocationFromTag();
     return targetFromBot.plus(scoringLocationFromTag);
   }
 
@@ -89,43 +90,46 @@ public class TagLimelightV2 extends SubsystemBase {
       robotToScoringLocation = Optional.empty();
       return Optional.empty();
     }
-    robotToScoringLocation = Optional.of(getRobotToScoringLocation(LimelightHelpers.getTargetPose3d_RobotSpace("")));
+    robotToScoringLocation =
+        Optional.of(getRobotToScoringLocation(LimelightHelpers.getTargetPose3d_RobotSpace("")));
     return robotToScoringLocation;
   }
 
   @Override
-  public void periodic() {
-  }
+  public void periodic() {}
 
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
-    builder.addStringProperty("Translation X (m)",
-    () -> {
-      if (robotToScoringLocation.isPresent()) {
-        return String.valueOf(robotToScoringLocation.get().getX());
-      }
-      else {
-        return "empty";
-      }
-      }, null);
-      builder.addStringProperty("Translation Y (m)",
-      () -> {
-        if (robotToScoringLocation.isPresent()) {
-          return String.valueOf(robotToScoringLocation.get().getY());
-        }
-        else {
-          return "empty";
-        }
-        }, null);
-        builder.addStringProperty("Rotation (deg)",
+    builder.addStringProperty(
+        "Translation X (m)",
+        () -> {
+          if (robotToScoringLocation.isPresent()) {
+            return String.valueOf(robotToScoringLocation.get().getX());
+          } else {
+            return "empty";
+          }
+        },
+        null);
+    builder.addStringProperty(
+        "Translation Y (m)",
+        () -> {
+          if (robotToScoringLocation.isPresent()) {
+            return String.valueOf(robotToScoringLocation.get().getY());
+          } else {
+            return "empty";
+          }
+        },
+        null);
+    builder.addStringProperty(
+        "Rotation (deg)",
         () -> {
           if (robotToScoringLocation.isPresent()) {
             return String.valueOf(robotToScoringLocation.get().getRotation().getDegrees());
-          }
-          else {
+          } else {
             return "empty";
           }
-          }, null);
+        },
+        null);
   }
 }

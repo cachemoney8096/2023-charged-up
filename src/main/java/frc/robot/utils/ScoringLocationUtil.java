@@ -56,23 +56,21 @@ public class ScoringLocationUtil {
 
   public Transform2d scoringLocationFromTag() {
     /**
-     * From tag space:
-     * X+ -> Out of the tag
-     * Y+ -> Pointing to the right of the tag (If you are looking at the target)
-     * This means positive yaw is based on Z+ being up
+     * From tag space: X+ -> Out of the tag Y+ -> Pointing to the right of the tag (If you are
+     * looking at the target) This means positive yaw is based on Z+ being up
      */
     double outwardMeters = -0.127;
     double rightLeftMeters = 0;
     switch (scoreCol) {
       case LEFT:
-      rightLeftMeters = -0.559;
-      break;
+        rightLeftMeters = -0.559;
+        break;
       case RIGHT:
-      rightLeftMeters = 0.559;
-      break;
+        rightLeftMeters = 0.559;
+        break;
       case CENTER:
-      rightLeftMeters = 0.0;
-      break;
+        rightLeftMeters = 0.0;
+        break;
     }
     Translation2d translation = new Translation2d(outwardMeters, rightLeftMeters);
     Rotation2d rot = Rotation2d.fromDegrees(0);
