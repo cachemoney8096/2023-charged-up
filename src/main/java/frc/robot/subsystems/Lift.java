@@ -127,33 +127,33 @@ public class Lift extends SubsystemBase {
     liftPositionMap = new TreeMap<LiftPosition, Pair<Double, Double>>();
     liftPositionMap.put(
         LiftPosition.GRAB_FROM_INTAKE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 77.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 78.0));
     liftPositionMap.put(
         LiftPosition.SHELF, new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 196.0));
     liftPositionMap.put(
         LiftPosition.SCORE_LOW,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 265.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 196.0));
     liftPositionMap.put(
         LiftPosition.SCORE_MID_CUBE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 224.0));
-    liftPositionMap.put(
-        LiftPosition.SCORE_MID_CONE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 224.0));
-    liftPositionMap.put(
-        LiftPosition.SCORE_HIGH_CUBE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 224.0));
-    liftPositionMap.put(
-        LiftPosition.SCORE_HIGH_CONE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 224.0));
-    liftPositionMap.put(
-        LiftPosition.PRE_SCORE_MID_CONE,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 216.0));
     liftPositionMap.put(
-        LiftPosition.PRE_SCORE_HIGH_CONE,
+        LiftPosition.SCORE_MID_CONE,
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 206.0));
+    liftPositionMap.put(
+        LiftPosition.SCORE_HIGH_CUBE,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 216.0));
     liftPositionMap.put(
+        LiftPosition.SCORE_HIGH_CONE,
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 206.0));
+    liftPositionMap.put(
+        LiftPosition.PRE_SCORE_MID_CONE,
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 196.0));
+    liftPositionMap.put(
+        LiftPosition.PRE_SCORE_HIGH_CONE,
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 196.0));
+    liftPositionMap.put(
         LiftPosition.POST_SCORE_HIGH,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 210.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 180.0));
     liftPositionMap.put(
         LiftPosition.OUTTAKING,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 196.0));
@@ -304,11 +304,11 @@ public class Lift extends SubsystemBase {
 
     // Set elevator encoder position from absolute encoders
     double elevatorDutyCycleEncodersDifferenceDegrees =
-        AngleUtil.wrapAngle(
-            elevatorRightAbsEncoder.getPosition() - elevatorLeftAbsEncoder.getPosition());
+        AngleUtil.wrapAngleAroundZero(
+            (elevatorLeftAbsEncoder.getPosition() - elevatorRightAbsEncoder.getPosition()));
     elevatorLeftEncoder.setPosition(
-        elevatorDutyCycleEncodersDifferenceDegrees
-                * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE
+        (elevatorDutyCycleEncodersDifferenceDegrees
+                * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE)
             - Cal.Lift.ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES);
 
     armController.setTolerance(Cal.Lift.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG);
@@ -458,9 +458,9 @@ public class Lift extends SubsystemBase {
     // TODO do we need a grabber zone?
 
     if (desiredGrabberClosed) {
-      grabber.set(true); // grab
+      grabber.set(false); // grab
     } else {
-      grabber.set(false); // drop
+      grabber.set(true); // drop
     }
   }
 
@@ -486,12 +486,23 @@ public class Lift extends SubsystemBase {
         "Elevator Position (in)",
         elevatorLeftEncoder::getPosition,
         elevatorLeftEncoder::setPosition);
-    builder.addDoubleProperty("Elevator Vel (in)", elevatorLeftEncoder::getVelocity, null);
+    builder.addDoubleProperty("Elevator Vel (in/s)", elevatorLeftEncoder::getVelocity, null);
     builder.addDoubleProperty(
-        "Elevator Left Abs Pos (in)", elevatorLeftAbsEncoder::getPosition, null);
+        "Elevator Left Abs Pos (deg)", elevatorLeftAbsEncoder::getPosition, null);
     builder.addDoubleProperty(
-        "Elevator Right Abs Pos (in)", elevatorRightAbsEncoder::getPosition, null);
-    builder.addBooleanProperty("Clear of intake", this::clearOfIntakeZone, null);
+        "Elevator Right Abs Pos (deg)", elevatorRightAbsEncoder::getPosition, null);
+    builder.addDoubleProperty("Elevator Pos per abs (in)", () -> {
+
+    // Set elevator encoder position from absolute encoders
+    double elevatorDutyCycleEncodersDifferenceDegrees =
+        AngleUtil.wrapAngleAroundZero(
+            (elevatorLeftAbsEncoder.getPosition() - elevatorRightAbsEncoder.getPosition()));
+            return (elevatorDutyCycleEncodersDifferenceDegrees
+            * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE)
+        - Cal.Lift.ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES;
+
+    }, null);
+        builder.addBooleanProperty("Clear of intake", this::clearOfIntakeZone, null);
     builder.addDoubleProperty(
         "Arm Abs Position (deg)", armAbsoluteEncoder::getPosition, armEncoder::setPosition);
     builder.addDoubleProperty(
@@ -516,8 +527,16 @@ public class Lift extends SubsystemBase {
           return latestPosition.toString();
         },
         null);
-    builder.addDoubleProperty("Elevator output", elevatorLeft::get, null);
+        builder.addStringProperty(
+            "Goal position",
+            () -> {
+              return goalPosition.toString();
+            },
+            null);
     builder.addDoubleProperty("Arm output", armMotor::get, null);
+    builder.addStringProperty("Score Loc Height", () -> {return scoreLoc.getScoreHeight().toString();}, null);
+    builder.addBooleanProperty("Score Loc Cone", () -> {return scoreLoc.isCone();}, null);
+    builder.addStringProperty("Score Loc Col", () -> {return scoreLoc.getScoreCol().toString();}, null);
   }
 
   /**
@@ -531,7 +550,7 @@ public class Lift extends SubsystemBase {
     new InstantCommand(
         () -> {
           lights.toggleCode(LightCode.WORKING);
-        });
+        }).schedule();
 
     // low for all columns is the same height
     if (height == ScoreHeight.LOW) {
@@ -542,7 +561,7 @@ public class Lift extends SubsystemBase {
       if (height == ScoreHeight.MID) {
         setDesiredPosition(LiftPosition.PRE_SCORE_MID_CONE);
       } else {
-        setDesiredPosition(LiftPosition.PRE_SCORE_MID_CONE);
+        setDesiredPosition(LiftPosition.PRE_SCORE_HIGH_CONE);
       }
     }
     // middle columns are for cubes
