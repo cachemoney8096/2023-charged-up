@@ -330,6 +330,11 @@ public class DriveSubsystem extends SubsystemBase {
     return gyro;
   }
 
+  
+  public interface TrajectoryGetterInterface {
+    PathPlannerTrajectory getTrajectory();
+}
+
   /** Taken from Github */
   public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath, Optional<Double> timeoutSeconds) {
     PPSwerveControllerCommand controllerCommand = new PPSwerveControllerCommand(
@@ -404,7 +409,7 @@ public class DriveSubsystem extends SubsystemBase {
         .withName("Follow trajectory");
   }
 
-  public Command transformToPath(Transform2d transform) {
+  public PathPlannerTrajectory transformToPath(Transform2d transform) {
     // Transform is to get the limelight to the correct location, not to get the robot
     // Here we correct for that
     Transform2d flipTransform =
@@ -427,8 +432,9 @@ public class DriveSubsystem extends SubsystemBase {
             // that
             new PathPoint(
                 // finalTransform.getTranslation(), finalHeading, Rotation2d.fromDegrees(0)));
-                finalTransform.getTranslation(), Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(0)));
-    return followTrajectoryCommand(path, false, Optional.of(3.0));
+                finalTransform.getTranslation(), Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(0))
+                .withPrevControlLength(0.0));
+    return path;
   }
 
   public void toggleSkids() {

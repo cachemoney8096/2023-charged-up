@@ -7,6 +7,7 @@ import com.pathplanner.lib.commands.FollowPathWithEvents;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Cal;
@@ -44,6 +45,8 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
               Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
               Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
+    private PathPlannerTrajectory pathToScoreBasedOnTag = null;
+
   private HashMap<String, Command> eventMap = new HashMap<>();
 
   private static final double DISTANCE_UP_CHARGE_STATION_METERS = 1.2;
@@ -76,6 +79,8 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
      * game piece to be more accurate with distance if limelight fails to find valid target/arpil
      * tag, then turn on NO_TAG light
      */
+    
+     // return followTrajectoryCommand(path, false, Optional.of(3.0));
 
     /** Initialize sequential commands that run for the "15 second autonomous phase" */
     addCommands(
@@ -99,7 +104,9 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         //       }
         //     }),
         new PrintCommand("About to LL"),
-        new DriveToTagSimple(tagLimelight, drive),
+        new DriveToTagSimple(tagLimelight, drive, (PathPlannerTrajectory path) -> {pathToScoreBasedOnTag = path;}),
+        new PrintCommand("Got a path"),
+        new ProxyCommand(() -> {return drive.followTrajectoryCommand(pathToScoreBasedOnTag, false, Optional.of(3.0));}),
         new PrintCommand("Done LL"),
         new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),

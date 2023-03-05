@@ -7,18 +7,25 @@ import frc.robot.subsystems.TagLimelightV2;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import java.util.Optional;
 
+import com.pathplanner.lib.PathPlannerTrajectory;
+
 public class DriveToTagSimple extends CommandBase {
+
+  public interface TrajectorySetterInterface {
+    void setTrajectory(PathPlannerTrajectory path);
+}
 
   private DriveSubsystem drive;
   private TagLimelightV2 tagLimelight;
   private boolean targetLocked = false;
-  private Command followTrajectoryCommand = null;
+  private TrajectorySetterInterface trajectorySetterFunc;
 
-  public DriveToTagSimple(TagLimelightV2 limelight, DriveSubsystem driveSubsystem) {
+  public DriveToTagSimple(TagLimelightV2 limelight, DriveSubsystem driveSubsystem, TrajectorySetterInterface trajectorySetter) {
     // Note: does not require the drive subsystem itself! It will schedule a command that will do
     // the driving.
     drive = driveSubsystem;
     tagLimelight = limelight;
+    trajectorySetterFunc = trajectorySetter;
   }
 
   @Override
@@ -32,30 +39,15 @@ public class DriveToTagSimple extends CommandBase {
         robotToScoringLocation = Optional.of(new Transform2d());
       }
       targetLocked = true;
-      followTrajectoryCommand = drive.transformToPath(robotToScoringLocation.get());
-      followTrajectoryCommand.schedule();
-    }
-    else if (followTrajectoryCommand != null) {
-      System.out.println("Trajectory running?");
-      System.out.println(followTrajectoryCommand.isScheduled());
+      trajectorySetterFunc.setTrajectory(drive.transformToPath(robotToScoringLocation.get()));
     }
   }
 
   @Override
-  public void end(boolean interrupted) {
-    if (targetLocked) {
-      followTrajectoryCommand.cancel();
-    }
-    targetLocked = false;
-  }
+  public void end(boolean interrupted) { }
 
   @Override
   public boolean isFinished() {
-    if (followTrajectoryCommand == null) {
-      return false;
-    }
-    System.out.println("Trajectory finished?");
-    System.out.println(followTrajectoryCommand.isFinished());
-    return followTrajectoryCommand.isFinished();
+    return targetLocked;
   }
 }

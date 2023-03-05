@@ -224,7 +224,7 @@ public class RobotContainer {
     // TODO add manual arm and elevator control
 
     // Drive controls
-    driverController.start().whileTrue(new DriveToTagSimple(tagLimelight, drive));
+    // driverController.start().whileTrue(new DriveToTagSimple(tagLimelight, drive));
 
     drive.setDefaultCommand(
         new RunCommand(
