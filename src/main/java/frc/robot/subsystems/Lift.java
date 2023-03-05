@@ -96,7 +96,7 @@ public class Lift extends SubsystemBase {
       elevatorRight.getAbsoluteEncoder(Type.kDutyCycle);
   private final RelativeEncoder armEncoder = armMotor.getEncoder();
   private final AbsoluteEncoder armAbsoluteEncoder = armMotor.getAbsoluteEncoder(Type.kDutyCycle);
-  private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
+  // private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
 
   // Members
   private LiftPosition latestPosition = LiftPosition.STARTING;
@@ -282,7 +282,9 @@ public class Lift extends SubsystemBase {
   /** Returns true if the game piece sensor sees a game piece */
   public boolean seeGamePiece() {
     // Sensor is false if there's a game piece
-    return !gamePieceSensor.get();
+    // TODO replace once the sensor is on
+    // return !gamePieceSensor.get();
+    return true;
   }
 
   /** Returns the cosine of the arm angle in degrees off of the horizontal. */
@@ -431,20 +433,22 @@ public class Lift extends SubsystemBase {
 
     // If the lift is going from below to above or above to below, we have to transit through
     // starting position. Otherwise, we can go directly to the desired position.
-    LiftPositionStartRelative latestPositionStartRelative = getRelativeLiftPosition(latestPosition);
-    LiftPositionStartRelative desiredPositionStartRelative =
-        getRelativeLiftPosition(desiredPosition);
-    if (!seeGamePiece()) {
-      controlPosition(desiredPosition);
-    } else if (desiredPositionStartRelative == LiftPositionStartRelative.BELOW_START
-        && latestPositionStartRelative == LiftPositionStartRelative.ABOVE_START) {
-      controlPosition(LiftPosition.STARTING);
-    } else if (desiredPositionStartRelative == LiftPositionStartRelative.ABOVE_START
-        && latestPositionStartRelative == LiftPositionStartRelative.BELOW_START) {
-      controlPosition(LiftPosition.STARTING);
-    } else {
-      controlPosition(desiredPosition);
-    }
+    // LiftPositionStartRelative latestPositionStartRelative = getRelativeLiftPosition(latestPosition);
+    // LiftPositionStartRelative desiredPositionStartRelative =
+    //     getRelativeLiftPosition(desiredPosition);
+    // if (!seeGamePiece()) {
+    //   controlPosition(desiredPosition);
+    // } else if (desiredPositionStartRelative == LiftPositionStartRelative.BELOW_START
+    //     && latestPositionStartRelative == LiftPositionStartRelative.ABOVE_START) {
+    //   controlPosition(LiftPosition.STARTING);
+    // } else if (desiredPositionStartRelative == LiftPositionStartRelative.ABOVE_START
+    //     && latestPositionStartRelative == LiftPositionStartRelative.BELOW_START) {
+    //   controlPosition(LiftPosition.STARTING);
+    // } else {
+    //   controlPosition(desiredPosition);
+    // }
+    controlPosition(desiredPosition);
+
 
     // // If the grabber is set to open and it is safe to open, open the grabber (drop). Otherwise,
     // // close it (grab).

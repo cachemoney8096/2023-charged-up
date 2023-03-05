@@ -57,8 +57,8 @@ public class IntakeSequence extends SequentialCommandGroup {
         // triggers the grabber to close
         new InstantCommand(lift::closeGrabber, lift),
 
-        // wait until the grabber has closed
-        new WaitCommand(Cal.Lift.GRABBER_CLOSE_TIME_SECONDS),
+        // // wait until the grabber has closed
+        // new WaitCommand(Cal.Lift.GRABBER_CLOSE_TIME_SECONDS),
 
         // immediately unclamps the intake.
         new InstantCommand(

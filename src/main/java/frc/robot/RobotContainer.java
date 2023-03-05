@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoChargeStationSequence;
-import frc.robot.commands.AutoScoreAndBalance;
+import frc.robot.commands.DriveToTagSimple;
 import frc.robot.commands.IntakeSequence;
 import frc.robot.commands.OuttakeSequence;
 import frc.robot.commands.finishScore;
@@ -46,13 +46,9 @@ public class RobotContainer {
           Constants.INTAKE_LIMELIGHT_PITCH_DEGREES,
           Constants.INTAKE_LIMELIGHT_HEIGHT_METERS,
           Constants.INTAKE_TARGET_HEIGHT_METERS);
-  private final TagLimelight tagLimelight =
-      new TagLimelight(
-          Constants.TAG_LIMELIGHT_PITCH_DEGREES,
-          Constants.TAG_LIMELIGHT_HEIGHT_METERS,
-          Constants.TAG_TARGET_HEIGHT_METERS);
+  private final TagLimelightV2 tagLimelight = new TagLimelightV2(scoreLoc);
   private final Lights lights = new Lights();
-  private final PneumaticHub pneumaticHub = new PneumaticHub();
+  public final PneumaticHub pneumaticHub = new PneumaticHub();
 
   // A chooser for autonomous commands
   private SendableChooser<Command> autonChooser = new SendableChooser<>();
@@ -72,14 +68,17 @@ public class RobotContainer {
     Shuffleboard.getTab("Subsystems").add(intake.getName(), intake);
     Shuffleboard.getTab("Subsystems").add(intakeLimelight.getName(), intakeLimelight);
     Shuffleboard.getTab("Subsystems").add(tagLimelight.getName(), tagLimelight);
-    Shuffleboard.getTab("Subsystems").add(lights.getName(), lights);
+    // Shuffleboard.getTab("Subsystems").add(lights.getName(), lights);
+    Shuffleboard.getTab("Subsystems").add(lift.getName(), lift);
   }
 
   public void initialize() {
     // autons
-    autonChooser.setDefaultOption("Balance", new AutoChargeStationSequence(true, drive));
-    autonChooser.addOption(
-        "Score, balance", new AutoScoreAndBalance(true, lift, drive, lights, scoreLoc));
+
+    autonChooser.setDefaultOption(
+        "Simple Balance Sequence", new AutoChargeStationSequence(true, drive));
+    // autonChooser.addOption(
+    //     "Score, balance", new AutoScoreAndBalance(true, lift, drive, lights, scoreLoc));
 
     // Put the chooser on the dashboard
     SmartDashboard.putData(autonChooser);
@@ -122,20 +121,21 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    driverController.a().onTrue(new InstantCommand(drive::toggleSkids));
-    driverController.b().onTrue(new OuttakeSequence(lift));
+    driverController.b().whileTrue(new OuttakeSequence(lift).finallyDo(
+                      (boolean interrupted) -> {
+                        lift.home();
+                        lift.closeGrabber();
+                      }));
     driverController.x().onTrue(new InstantCommand(lift::cancelScore, lift));
 
-    driverController
-        .y()
-        .onTrue(new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift));
+    driverController.rightBumper().onTrue(new InstantCommand(() -> {lift.ManualPrepScoreSequence(lights);}, lift));
 
     driverController.back().onTrue(new InstantCommand(lift::home, lift));
-    driverController.start().onTrue(new InstantCommand(drive::halfSpeedToggle));
+    // driverController.start().onTrue(new InstantCommand(drive::halfSpeedToggle));
 
     // TODO Maybe: steal
     // TODO: implement autoscore command for teleop
-    // driverController.rightBumper().onTrue(new InstantCommand(lift::prepScore, lift));
+    // // driverController.rightBumper().onTrue(new InstantCommand(lift::prepScore, lift));
     driverController
         .leftTrigger()
         .whileTrue(
@@ -144,13 +144,14 @@ public class RobotContainer {
                     (boolean interrupted) -> {
                       lift.home();
                       lift.closeGrabber();
+                      intake.stopIntakingGamePiece();
                     }));
     driverController.rightTrigger().onTrue(new InstantCommand(lift::startScore, lift));
     driverController
         .rightTrigger()
         .onFalse(
             new ConditionalCommand(
-                new InstantCommand(() -> lift.finishScoreCancelled(lights), lift),
+                new InstantCommand(() -> { lift.finishScoreCancelled(lights); }, lift),
                 new finishScore(lift, lights),
                 lift::getCancelScore));
 
@@ -159,7 +160,7 @@ public class RobotContainer {
         .onTrue(
             new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.LOW)));
     operatorController
-        .povLeft()
+        .povRight()
         .onTrue(
             new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
     operatorController
@@ -167,7 +168,7 @@ public class RobotContainer {
         .onTrue(
             new InstantCommand(
                 () -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH)));
-    operatorController.povRight().onTrue(new InstantCommand(() -> lights.togglePartyMode()));
+    // operatorController.povRight().onTrue(new InstantCommand(() -> lights.togglePartyMode()));
 
     operatorController
         .x()
@@ -206,16 +207,11 @@ public class RobotContainer {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  lights.toggleCode(LightCode.CONE);
+                  lights.toggleCode(Lights.LightCode.CONE);
                 }));
     operatorController
         .rightBumper()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  lights.toggleCode(LightCode.CUBE);
-                }));
-
+        .onTrue(new InstantCommand(() -> lights.toggleCode(Lights.LightCode.CONE), lights));
     operatorController.leftTrigger().onTrue(new InstantCommand(lift::openGrabber, lift));
     operatorController.leftTrigger().onFalse(new InstantCommand(lift::closeGrabber, lift));
     operatorController.rightTrigger().onTrue(new InstantCommand(scoreLoc::toggleMiddleGrid));
@@ -224,15 +220,17 @@ public class RobotContainer {
     // TODO add manual arm and elevator control
 
     // Drive controls
+    driverController.start().whileTrue(new DriveToTagSimple(tagLimelight, drive));
+
     drive.setDefaultCommand(
         new RunCommand(
                 () ->
                     drive.rotateOrKeepHeading(
-                        MathUtil.applyDeadband(-driverController.getLeftY(), 0.1),
-                        MathUtil.applyDeadband(-driverController.getLeftX(), 0.1),
+                        MathUtil.applyDeadband(-driverController.getRightY(), 0.1),
+                        MathUtil.applyDeadband(-driverController.getRightX(), 0.1),
                         JoystickUtil.squareAxis(
-                            MathUtil.applyDeadband(-driverController.getRightX(), 0.1)),
-                        driverController.getHID().getLeftBumper(),
+                            MathUtil.applyDeadband(-driverController.getLeftX(), 0.07)),
+                        !driverController.getHID().getLeftBumper(),
                         driverController.getHID().getPOV()),
                 drive)
             .withName("Manual Drive"));
