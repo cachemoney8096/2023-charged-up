@@ -70,6 +70,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   // The gyro sensor
   private final WPI_Pigeon2 gyro = new WPI_Pigeon2(RobotMap.PIGEON_CAN_ID);
+  private ChassisSpeeds lastSetChassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry odometry =
@@ -193,6 +194,7 @@ public class DriveSubsystem extends SubsystemBase {
             : new ChassisSpeeds(xSpeed, ySpeed, rot);
 
     desiredChassisSpeeds = correctForDynamics(desiredChassisSpeeds);
+    lastSetChassisSpeeds = desiredChassisSpeeds; 
 
     var swerveModuleStates =
         Constants.SwerveDrive.DRIVE_KINEMATICS.toSwerveModuleStates(desiredChassisSpeeds);
@@ -419,7 +421,8 @@ public class DriveSubsystem extends SubsystemBase {
     PathPlannerTrajectory path =
         PathPlanner.generatePath(
             new PathConstraints(1.0, 1.0),
-            new PathPoint(curPose.getTranslation(), startHeading, curPose.getRotation()),
+            PathPoint.fromCurrentHolonomicState(curPose, lastSetChassisSpeeds),
+            // new PathPoint(curPose.getTranslation(), startHeading, curPose.getRotation()),
             // We know the robot needs to be at zero relative to start of match so let's just use
             // that
             new PathPoint(
