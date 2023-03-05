@@ -40,8 +40,7 @@ public final class Cal {
      * relative to the ficture but they are actually slightly different.
      */
     public static final double SWERVE_FRONT_LEFT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 1.036;
-
-    public static final double SWERVE_FRONT_RIGHT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 1.005;
+    public static final double SWERVE_FRONT_RIGHT_ANGULAR_OFFSET_RAD = (1.0 * Math.PI) + 1.005;
     public static final double SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 0.987;
     public static final double SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 0.9075;
 
@@ -63,7 +62,7 @@ public final class Cal {
      * Controller on module speed for rotating to target, input degrees [-180,180], output [0,1].
      */
     public static final PIDController ROTATE_TO_TARGET_PID_CONTROLLER =
-        new PIDController(0.030, 0, 0.000); // From 2022
+        new PIDController(0.020, 0, 0.000); // From 2022
 
     /** Feed forward for rotating to target, gets added to or subtracted from PID controller. */
     public static final double ROTATE_TO_TARGET_FF = 0.1; // From 2022
@@ -75,13 +74,13 @@ public final class Cal {
     /** High profile constraints = pure P controller */
     public static final PIDController PATH_THETA_CONTROLLER = new PIDController(9.0, 0.0, 0.80);
 
-    /** If the desired chassi rotation is below this value in [0,1], it is ignored */
-    public static final double ROTATION_DEADBAND_THRESHOLD = 0.1;
+    /** If the desired chassis rotation is below this value in [0,1], it is ignored */
+    public static final double ROTATION_DEADBAND_THRESHOLD = 0.07;
 
     /** Current limits for swerveSubsystem sparksmax in amps */
     public static final int DRIVE_CURRENT_LIMIT_AMPS = 50;
 
-    public static final int STEER_CURRENT_LIMIT_AMPS = 35;
+    public static final int STEER_CURRENT_LIMIT_AMPS = 20;
   }
 
   public static final class Intake {
