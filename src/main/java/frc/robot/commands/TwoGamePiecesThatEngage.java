@@ -14,7 +14,7 @@ import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lift.LiftPosition;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Lights.LightCode;
-import frc.robot.subsystems.TagLimelight;
+import frc.robot.subsystems.TagLimelightV2;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreCol;
@@ -49,7 +49,7 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
       Intake intake,
       DriveSubsystem drive,
       Lights lights,
-      TagLimelight tagLimelight,
+      TagLimelightV2 tagLimelight,
       ScoringLocationUtil scoringLocationUtil) {
     addRequirements(lift, intake, drive, tagLimelight);
     /** Events include: open intake and close intake before and after obtaining game piece */
@@ -87,12 +87,12 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         new FollowPathWithEvents(
             drive.followTrajectoryCommand(trajInit, true), trajInit.getMarkers(), eventMap),
         /** TODO: Limelight code goes here */
-        new InstantCommand(
-            () -> {
-              if (!tagLimelight.isValidTarget()) {
-                lights.toggleCode(LightCode.NO_TAG);
-              }
-            }),
+        // new InstantCommand(
+        //     () -> {
+        //       if (!tagLimelight.isValidTarget()) {
+        //         lights.toggleCode(LightCode.NO_TAG);
+        //       }
+        //     }),
         new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
         new InstantCommand(lift::startScore, lift),

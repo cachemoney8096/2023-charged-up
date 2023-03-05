@@ -32,8 +32,8 @@ public final class Cal {
   public static final class SwerveSubsystem {
 
     /** For the purposes of trajectory constraints */
-    public static final double MAX_LINEAR_SPEED_METERS_PER_SEC = 3.0,
-        MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ = 3.0;
+    public static final double MAX_LINEAR_SPEED_METERS_PER_SEC = 2.0,
+        MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ = 2.0;
 
     /**
      * Angular offset of the modules relative to the zeroing fixture in radians. Ideally should be
