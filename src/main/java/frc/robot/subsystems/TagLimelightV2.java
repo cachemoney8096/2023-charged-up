@@ -89,12 +89,18 @@ public class TagLimelightV2 extends SubsystemBase {
       robotToScoringLocation = Optional.empty();
       return Optional.empty();
     }
+    if (LimelightHelpers.getFiducialID("") != 8.0)
+    {
+      robotToScoringLocation = Optional.empty();
+      return Optional.empty();
+    }
     robotToScoringLocation = Optional.of(getRobotToScoringLocation(LimelightHelpers.getTargetPose3d_RobotSpace("")));
     return robotToScoringLocation;
   }
 
   @Override
   public void periodic() {
+    checkForTag();
   }
 
   @Override

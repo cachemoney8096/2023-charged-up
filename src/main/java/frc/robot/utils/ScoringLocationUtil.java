@@ -61,7 +61,7 @@ public class ScoringLocationUtil {
      * Y+ -> Pointing to the right of the tag (If you are looking at the target)
      * This means positive yaw is based on Z+ being up
      */
-    double outwardMeters = -0.127;
+    double outwardMeters = -0.460;
     double rightLeftMeters = 0;
     switch (scoreCol) {
       case LEFT:

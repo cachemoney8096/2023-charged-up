@@ -49,7 +49,8 @@ public class Lift extends SubsystemBase {
     PRE_SCORE_HIGH_CONE,
     POST_SCORE_HIGH,
     OUTTAKING,
-    STARTING
+    STARTING,
+    ALT_HOME
   }
 
   /** Position of the lift relative to to the start position */
@@ -99,9 +100,9 @@ public class Lift extends SubsystemBase {
   // private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
 
   // Members
-  private LiftPosition latestPosition = LiftPosition.STARTING;
-  private LiftPosition desiredPosition = LiftPosition.STARTING;
-  private LiftPosition goalPosition = LiftPosition.STARTING;
+  private LiftPosition latestPosition = LiftPosition.ALT_HOME;
+  private LiftPosition desiredPosition = LiftPosition.ALT_HOME;
+  private LiftPosition goalPosition = LiftPosition.ALT_HOME;
   private boolean desiredGrabberClosed = true;
   public ScoringLocationUtil scoreLoc;
   private boolean scoringInProgress = false;
@@ -127,7 +128,7 @@ public class Lift extends SubsystemBase {
     liftPositionMap = new TreeMap<LiftPosition, Pair<Double, Double>>();
     liftPositionMap.put(
         LiftPosition.GRAB_FROM_INTAKE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 78.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 79.0));
     liftPositionMap.put(
         LiftPosition.SHELF, new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 196.0));
     liftPositionMap.put(
@@ -160,7 +161,10 @@ public class Lift extends SubsystemBase {
     liftPositionMap.put(
         LiftPosition.STARTING,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 148.0));
-
+    liftPositionMap.put(
+        LiftPosition.ALT_HOME,
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 148.0));
+        
     this.scoreLoc = scoreLoc;
   }
 

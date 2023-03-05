@@ -76,7 +76,7 @@ public class RobotContainer {
     // autons
 
     autonChooser.setDefaultOption(
-        "Simple Balance Sequence", new AutoChargeStationSequence(true, drive));
+        "Simple Balance Sequence", new AutoChargeStationSequence(drive, 2.21));
     // autonChooser.addOption(
     //     "Score, balance", new AutoScoreAndBalance(true, lift, drive, lights, scoreLoc));
 
@@ -131,7 +131,6 @@ public class RobotContainer {
     driverController.rightBumper().onTrue(new InstantCommand(() -> {lift.ManualPrepScoreSequence(lights);}, lift));
 
     driverController.back().onTrue(new InstantCommand(lift::home, lift));
-    // driverController.start().onTrue(new InstantCommand(drive::halfSpeedToggle));
 
     // TODO Maybe: steal
     // TODO: implement autoscore command for teleop
@@ -140,8 +139,10 @@ public class RobotContainer {
         .leftTrigger()
         .whileTrue(
             new IntakeSequence(intake, lift, lights)
-                .finallyDo(
+            .beforeStarting(new InstantCommand(() -> {drive.throttle(0.75);}))    
+            .finallyDo(
                     (boolean interrupted) -> {
+                      drive.throttle(1.0);
                       lift.home();
                       lift.closeGrabber();
                       intake.stopIntakingGamePiece();
@@ -229,7 +230,7 @@ public class RobotContainer {
                         MathUtil.applyDeadband(-driverController.getRightY(), 0.1),
                         MathUtil.applyDeadband(-driverController.getRightX(), 0.1),
                         JoystickUtil.squareAxis(
-                            MathUtil.applyDeadband(-driverController.getLeftX(), 0.07)),
+                            MathUtil.applyDeadband(-driverController.getLeftX(), 0.05)),
                         !driverController.getHID().getLeftBumper(),
                         driverController.getHID().getPOV()),
                 drive)

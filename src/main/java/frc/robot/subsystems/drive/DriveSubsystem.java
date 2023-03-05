@@ -76,7 +76,7 @@ public class DriveSubsystem extends SubsystemBase {
             rearRight.getPosition()
           });
 
-  private boolean halfSpeed = false;
+  private double throttleMultiplier = 1.0;
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -175,10 +175,9 @@ public class DriveSubsystem extends SubsystemBase {
     ySpeed *= Constants.SwerveDrive.MAX_SPEED_METERS_PER_SECOND;
     rot *= Constants.SwerveDrive.MAX_ANGULAR_SPEED_RAD_PER_SECONDS;
 
-    if (halfSpeed) {
-      xSpeed /= 2;
-      ySpeed /= 2;
-    }
+    xSpeed *= throttleMultiplier;
+    ySpeed *= throttleMultiplier;
+    rot *= throttleMultiplier;
 
     ChassisSpeeds desiredChassisSpeeds =
         fieldRelative
@@ -393,9 +392,9 @@ public class DriveSubsystem extends SubsystemBase {
     // TODO do this once we can add skids
   }
 
-  public void halfSpeedToggle() {
-    // Toggle halfSpeed. If it is true, set it to false, otherwise set it to true.
-    halfSpeed = !halfSpeed;
+  /** Driving inputs will get multiplied by the throttle value, so it should be in [0,1] */
+  public void throttle(double throttleValue) {
+    throttleMultiplier = throttleValue;
   }
 
   @Override
@@ -409,10 +408,10 @@ public class DriveSubsystem extends SubsystemBase {
     addChild("Front Left", frontLeft);
     addChild("Rear Right", rearRight);
     addChild("Rear Left", rearLeft);
-    builder.addBooleanProperty(
-        "Half speed?",
+    builder.addDoubleProperty(
+        "Throttle multiplier",
         () -> {
-          return halfSpeed;
+          return throttleMultiplier;
         },
         null);
     builder.addDoubleProperty(

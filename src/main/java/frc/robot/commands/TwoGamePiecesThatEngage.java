@@ -44,6 +44,8 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
 
   private HashMap<String, Command> eventMap = new HashMap<>();
 
+  private static final double DISTANCE_UP_CHARGE_STATION_METERS = 1.2;
+
   public TwoGamePiecesThatEngage(
       Lift lift,
       Intake intake,
@@ -55,17 +57,11 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
     /** Events include: open intake and close intake before and after obtaining game piece */
     eventMap.put(
         "deployIntake",
-        new InstantCommand(
-            () -> {
-              intake.setDesiredDeployed(true);
-            },
-            intake));
+        new IntakeSequence(intake, lift, lights).withTimeout(4.0));
     eventMap.put(
         "closeIntake",
         new InstantCommand(
-            () -> {
-              intake.setDesiredDeployed(false);
-            },
+            () -> { },
             intake));
     /**
      * TODO: configure limelight to "take over" driving process after certain point AFTER obtaining
@@ -93,6 +89,7 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         //         lights.toggleCode(LightCode.NO_TAG);
         //       }
         //     }),
+        new DriveToTagSimple(tagLimelight, drive),
         new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
         new InstantCommand(lift::startScore, lift),
@@ -101,6 +98,6 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
         drive.followTrajectoryCommand(
             trajCharge, false), // this does not accept the FollowPathWithEvents
-        new AutoChargeStationBalance(drive));
+        new AutoChargeStationSequence(drive, DISTANCE_UP_CHARGE_STATION_METERS));
   }
 }

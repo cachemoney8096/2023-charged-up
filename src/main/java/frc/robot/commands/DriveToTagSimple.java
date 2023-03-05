@@ -42,6 +42,7 @@ public class DriveToTagSimple extends CommandBase {
     if (targetLocked) {
       followTrajectoryCommand.cancel();
     }
+    targetLocked = false;
   }
 
   @Override
