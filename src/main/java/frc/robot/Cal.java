@@ -145,24 +145,26 @@ public final class Cal {
     public static final double ARM_P = 0.1, ARM_I = 0.0, ARM_D = Cal.PLACEHOLDER_DOUBLE;
 
     /** Absolute encoder position when the arm is at 0 degrees */
-    public static final double ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG = 141.55 + 180.0;
+    // 30.0 is the kickstand offset from 180 aka vertically up
+    // so 120 is the encoder value on the kickstand
+    public static final double ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG = 120.0 + 30.0 + 180.0;
 
     /**
      * Position reading from the absolute encoders when the elevator is at the start (zero) position
      */
-    public static final double ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES = 0.7;
+    public static final double ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES = 0.2;
 
     /** Voltage required to hold the arm in the horizontal position */
     // Stall torque: 3.36 Nm * 75 = 252 Nm
     // Max torque: 3.4 kg * 9.81 (N/kg) * 0.68m = 22.68
     // Ratio: 1.08 V
-    public static final double ARBITRARY_ARM_FEED_FORWARD_VOLTS = 0.4;
+    public static final double ARBITRARY_ARM_FEED_FORWARD_VOLTS = 0.65;
 
     /** Voltage required to hold the elevator */
     // Stall force: 2 * 1.08 Nm * 14.11 / (0.5625 / 39.37) m = 2133 N
     // Max force: 6.4 kg * 9.81 N/kg = 63 N
     // Ratio: 0.32 V
-    public static final double ARBITRARY_ELEVATOR_FEED_FORWARD_VOLTS = 0.5;
+    public static final double ARBITRARY_ELEVATOR_FEED_FORWARD_VOLTS = 0.6;
 
     /** Parameters for arm controller */
     public static final double
@@ -170,9 +172,9 @@ public final class Cal {
         // Stall torque: 3.36 Nm * 75 = 252 Nm
         // Inertia: 3.4 kg * 0.68^2 m^2 = 1.57 kg-m^2
         // Accel = 160.5 rad/s^2 = 9200 deg/s^2
-        ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = 320.0,
+        ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = 160.0,
         // 5880 rpm / (60 sec/min) / 75 * (360 deg / rev) = 470
-        ARM_MAX_VELOCITY_DEG_PER_SECOND = 320.0,
+        ARM_MAX_VELOCITY_DEG_PER_SECOND = 160.0,
         // functional not logical
         ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG = 1.0;
 
@@ -181,17 +183,17 @@ public final class Cal {
         // accel = Force / mass.
         // Stall force: 2 * 1.08 Nm * 14.11 / (0.5625 / 39.37) m = 2133 N
         // mass: 6.4 kg
-        // Accel = 333 m/s^2
-        ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED = 240.0,
+        // Accel = 333 m/s^2 = 13110 in/s^2
+        ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED = 60.0,
         // 11710 rpm / (60 sec/min) * / 14.11 * (pi * 1.125 in) = 48.9 in/s
-        ELEVATOR_MAX_VELOCITY_IN_PER_SECOND = 50.0,
+        ELEVATOR_MAX_VELOCITY_IN_PER_SECOND = 30.0,
         // functional not logical
         ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN = 1.5;
 
     /** Input deg/s, output volts. From recalc */
     public static final SimpleMotorFeedforward ARM_FEEDFORWARD =
         new SimpleMotorFeedforward(
-            0.0, 3 * (2.0 * Math.PI) / 360.0, 0.08 * (2.0 * Math.PI) / 360.0);
+            0.0, 1.5 * (2.0 * Math.PI) / 360.0, 0.08 * (2.0 * Math.PI) / 360.0);
 
     /** Input in/s, output volts. From recalc */
     public static final SimpleMotorFeedforward ELEVATOR_FEEDFORWARD =
@@ -207,13 +209,13 @@ public final class Cal {
                 ));
 
     public static final double ELEVATOR_LOW_POSITION_INCHES = 0.0,
-        ELEVATOR_HIGH_POSITION_INCHES = 19.5;
+        ELEVATOR_HIGH_POSITION_INCHES = 20.25;
 
     /** Sets the min and max positions that the elevator and arm motors will be allowed to reach */
-    public static final float ELEVATOR_POSITIVE_LIMIT_INCHES = 19.5f,
-        ELEVATOR_NEGATIVE_LIMIT_INCHES = 0.0f,
-        ARM_POSITIVE_LIMIT_DEGREES = 273.0f,
-        ARM_NEGATIVE_LIMIT_DEGREES = 74.0f;
+    public static final float ELEVATOR_POSITIVE_LIMIT_INCHES = 20.25f,
+        ELEVATOR_NEGATIVE_LIMIT_INCHES = -0.5f,
+        ARM_POSITIVE_LIMIT_DEGREES = 265.0f,
+        ARM_NEGATIVE_LIMIT_DEGREES = 76.0f;
 
     /** Threshold for when the lift is out of the zone where the intake moves. */
     public static final double ARM_INTAKE_ZONE_THRESHOLD_DEGREES = 114;
@@ -246,7 +248,7 @@ public final class Cal {
     public static final double SAFE_TO_RETURN_TO_START_SECONDS = 0.5;
 
     /** Current limits for elevator sparksmax in amps */
-    public static final int ELEVATOR_CURRENT_LIMIT_AMPS = 25;
+    public static final int ELEVATOR_CURRENT_LIMIT_AMPS = 20;
 
     public static final int ARM_CURRENT_LIMIT_AMPS = 40;
   }
