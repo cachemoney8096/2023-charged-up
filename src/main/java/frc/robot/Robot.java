@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Lift;
-import frc.robot.utils.ScoringLocationUtil;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -22,9 +21,8 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
-  private ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
-  private Lift lift = new Lift(scoreLoc);
-  private Intake intake = new Intake(lift::clearOfIntakeZone);
+  private Lift lift;
+  private Intake intake;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -37,6 +35,9 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
 
     m_robotContainer.initialize();
+
+    lift = m_robotContainer.lift;
+    intake = m_robotContainer.intake;
   }
 
   /**
