@@ -491,18 +491,20 @@ public class Lift extends SubsystemBase {
         "Elevator Left Abs Pos (deg)", elevatorLeftAbsEncoder::getPosition, null);
     builder.addDoubleProperty(
         "Elevator Right Abs Pos (deg)", elevatorRightAbsEncoder::getPosition, null);
-    builder.addDoubleProperty("Elevator Pos per abs (in)", () -> {
+    builder.addDoubleProperty(
+        "Elevator Pos per abs (in)",
+        () -> {
 
-    // Set elevator encoder position from absolute encoders
-    double elevatorDutyCycleEncodersDifferenceDegrees =
-        AngleUtil.wrapAngleAroundZero(
-            (elevatorLeftAbsEncoder.getPosition() - elevatorRightAbsEncoder.getPosition()));
-            return (elevatorDutyCycleEncodersDifferenceDegrees
-            * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE)
-        - Cal.Lift.ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES;
-
-    }, null);
-        builder.addBooleanProperty("Clear of intake", this::clearOfIntakeZone, null);
+          // Set elevator encoder position from absolute encoders
+          double elevatorDutyCycleEncodersDifferenceDegrees =
+              AngleUtil.wrapAngleAroundZero(
+                  (elevatorLeftAbsEncoder.getPosition() - elevatorRightAbsEncoder.getPosition()));
+          return (elevatorDutyCycleEncodersDifferenceDegrees
+                  * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE)
+              - Cal.Lift.ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES;
+        },
+        null);
+    builder.addBooleanProperty("Clear of intake", this::clearOfIntakeZone, null);
     builder.addDoubleProperty(
         "Arm Abs Position (deg)", armAbsoluteEncoder::getPosition, armEncoder::setPosition);
     builder.addDoubleProperty(
@@ -527,16 +529,31 @@ public class Lift extends SubsystemBase {
           return latestPosition.toString();
         },
         null);
-        builder.addStringProperty(
-            "Goal position",
-            () -> {
-              return goalPosition.toString();
-            },
-            null);
+    builder.addStringProperty(
+        "Goal position",
+        () -> {
+          return goalPosition.toString();
+        },
+        null);
     builder.addDoubleProperty("Arm output", armMotor::get, null);
-    builder.addStringProperty("Score Loc Height", () -> {return scoreLoc.getScoreHeight().toString();}, null);
-    builder.addBooleanProperty("Score Loc Cone", () -> {return scoreLoc.isCone();}, null);
-    builder.addStringProperty("Score Loc Col", () -> {return scoreLoc.getScoreCol().toString();}, null);
+    builder.addStringProperty(
+        "Score Loc Height",
+        () -> {
+          return scoreLoc.getScoreHeight().toString();
+        },
+        null);
+    builder.addBooleanProperty(
+        "Score Loc Cone",
+        () -> {
+          return scoreLoc.isCone();
+        },
+        null);
+    builder.addStringProperty(
+        "Score Loc Col",
+        () -> {
+          return scoreLoc.getScoreCol().toString();
+        },
+        null);
   }
 
   /**
@@ -548,9 +565,10 @@ public class Lift extends SubsystemBase {
 
     // indicate the robot is currently working on prep score
     new InstantCommand(
-        () -> {
-          lights.toggleCode(LightCode.WORKING);
-        }).schedule();
+            () -> {
+              lights.toggleCode(LightCode.WORKING);
+            })
+        .schedule();
 
     // low for all columns is the same height
     if (height == ScoreHeight.LOW) {

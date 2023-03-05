@@ -135,7 +135,10 @@ public final class Constants {
 
     /** Scalar for the difference in the elevator's absolute encoders in inches per degree */
     public static final double ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE =
-        1.245 * ELEVATOR_WINCH_CIRCUMFERENCE_INCHES * (26.0 / (28.0 - 26.0)) / REVOLUTIONS_TO_DEGREES;
+        1.245
+            * ELEVATOR_WINCH_CIRCUMFERENCE_INCHES
+            * (26.0 / (28.0 - 26.0))
+            / REVOLUTIONS_TO_DEGREES;
 
     /** Scalar for the difference in the elevator's absolute encoders in degrees per inch */
     public static final double ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_DEGREES_PER_INCH =

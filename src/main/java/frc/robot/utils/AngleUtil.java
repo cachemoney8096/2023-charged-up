@@ -10,7 +10,6 @@ public class AngleUtil {
     return wrappedAngleDeg;
   }
 
-  
   /** Wraps angle to [-180,180) */
   public static double wrapAngleAroundZero(double angleDeg) {
     double wrappedAngleDeg = angleDeg % 360.0;
