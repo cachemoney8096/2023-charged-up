@@ -25,8 +25,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
 import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lights;
-import frc.robot.subsystems.Lights.LightCode;
-import frc.robot.subsystems.TagLimelight;
+import frc.robot.subsystems.TagLimelightV2;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.JoystickUtil;
 import frc.robot.utils.ScoringLocationUtil;
@@ -47,11 +46,7 @@ public class RobotContainer {
           Constants.INTAKE_LIMELIGHT_PITCH_DEGREES,
           Constants.INTAKE_LIMELIGHT_HEIGHT_METERS,
           Constants.INTAKE_TARGET_HEIGHT_METERS);
-  private final TagLimelight tagLimelight =
-      new TagLimelight(
-          Constants.TAG_LIMELIGHT_PITCH_DEGREES,
-          Constants.TAG_LIMELIGHT_HEIGHT_METERS,
-          Constants.TAG_TARGET_HEIGHT_METERS);
+  private final TagLimelightV2 tagLimelight = new TagLimelightV2(scoreLoc);
   private final Lights lights = new Lights();
   private final PneumaticHub pneumaticHub = new PneumaticHub();
 
@@ -207,14 +202,14 @@ public class RobotContainer {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  lights.toggleCode(LightCode.CONE);
+                  lights.toggleCode(Lights.LightCode.CONE);
                 }));
     operatorController
         .rightBumper()
         .onTrue(
             new InstantCommand(
                 () -> {
-                  lights.toggleCode(LightCode.CUBE);
+                  lights.toggleCode(Lights.LightCode.CUBE);
                 }));
 
     operatorController.leftTrigger().onTrue(new InstantCommand(lift::openGrabber, lift));
