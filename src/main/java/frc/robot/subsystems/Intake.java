@@ -26,7 +26,6 @@ import frc.robot.RobotMap;
 import frc.robot.utils.AngleUtil;
 import frc.robot.utils.SendableHelper;
 import frc.robot.utils.SparkMaxUtils;
-import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
 /**
@@ -66,9 +65,9 @@ public class Intake extends SubsystemBase {
       deployMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
   // Members
-  private double intakeDesiredPositionDegrees = Cal.Intake.STARTING_POSITION_DEGREES;
+  private double intakeControlPositionDegrees = Cal.Intake.STARTING_POSITION_DEGREES;
   private double intakeMostRecentGoalDegrees = Cal.Intake.STARTING_POSITION_DEGREES;
-  private Optional<Boolean> desiredDeployed = Optional.empty();
+  private boolean desiredDeployed = false;
   private boolean desireClamped = false;
   private BooleanSupplier clearOfIntake;
 
@@ -186,21 +185,21 @@ public class Intake extends SubsystemBase {
   private void deploy() {
     desireClamped = true;
 
-    // Set the desired intake position
-    intakeDesiredPositionDegrees = Cal.Intake.DEPLOYED_POSITION_DEGREES;
+    // Set the intake control position
+    intakeControlPositionDegrees = Cal.Intake.DEPLOYED_POSITION_DEGREES;
   }
 
   /** Brings the intake back in */
   private void retract() {
     desireClamped = false;
 
-    // Set the desired intake position
-    intakeDesiredPositionDegrees = Cal.Intake.RETRACTED_POSITION_DEGREES;
+    // Set the intake control position
+    intakeControlPositionDegrees = Cal.Intake.RETRACTED_POSITION_DEGREES;
   }
 
   /*Setter for whether intake is desired deploy is true retract is false */
   public void setDesiredDeployed(boolean desired) {
-    desiredDeployed = Optional.of(desired);
+    desiredDeployed = desired;
   }
 
   /** Returns the cosine of the intake angle in degrees off of the horizontal. */
@@ -212,7 +211,12 @@ public class Intake extends SubsystemBase {
 
   /** If the intake has achieved its desired position, return true */
   public boolean atDesiredPosition() {
-    return (Math.abs(intakeDesiredPositionDegrees - deployMotorEncoder.getPosition())
+    // May not be the same as the control position, if the lift is in the way
+    double desiredPositionDegrees =
+        desiredDeployed
+            ? Cal.Intake.DEPLOYED_POSITION_DEGREES
+            : Cal.Intake.RETRACTED_POSITION_DEGREES;
+    return (Math.abs(desiredPositionDegrees - deployMotorEncoder.getPosition())
         < Cal.Intake.DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG);
   }
 
@@ -253,20 +257,18 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     if (clearOfIntake.getAsBoolean()) {
-      if (desiredDeployed.isPresent()) {
-        if (desiredDeployed.get() == true) {
-          deploy();
-        } else {
-          retract();
-        }
+      if (desiredDeployed) {
+        deploy();
+      } else {
+        retract();
       }
     }
 
-    controlPosition(intakeDesiredPositionDegrees);
+    controlPosition(intakeControlPositionDegrees);
 
     // Only clamp if it is safe to do so and clamping is desired
     if (desireClamped
-        && deployMotorAbsoluteEncoder.getPosition() > Cal.Intake.CLAMP_POSITION_THRESHOLD_DEGREES) {
+        && deployMotorEncoder.getPosition() > Cal.Intake.CLAMP_POSITION_THRESHOLD_DEGREES) {
       clampIntake();
     } else {
       unclampIntake();
@@ -283,7 +285,7 @@ public class Intake extends SubsystemBase {
     super.initSendable(builder);
     SendableHelper.addChild(builder, this, deployMotorController, "DeployController");
     builder.addDoubleProperty(
-        "Intake Desired Position (Degrees)", () -> intakeDesiredPositionDegrees, null);
+        "Intake Desired Position (Degrees)", () -> intakeControlPositionDegrees, null);
     builder.addDoubleProperty(
         "Intake Current Position (Degrees)",
         deployMotorEncoder::getPosition,
@@ -302,18 +304,10 @@ public class Intake extends SubsystemBase {
         null);
     builder.addBooleanProperty("At Desired Pos", this::atDesiredPosition, null);
     builder.addDoubleProperty("Intake wheel power in [-1,1]", intakeLeft::get, null);
-    builder.addStringProperty(
+    builder.addBooleanProperty(
         "Desire deployed",
         () -> {
-          if (desiredDeployed.isPresent()) {
-            if (desiredDeployed.get()) {
-              return "deploy";
-            } else {
-              return "retract";
-            }
-          } else {
-            return "no desire";
-          }
+          return desiredDeployed;
         },
         null);
   }
