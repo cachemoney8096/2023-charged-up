@@ -212,8 +212,10 @@ public class Intake extends SubsystemBase {
   /** If the intake has achieved its desired position, return true */
   public boolean atDesiredPosition() {
     // May not be the same as the control position, if the lift is in the way
-    double desiredPositionDegrees = desiredDeployed ? 
-    Cal.Intake.DEPLOYED_POSITION_DEGREES : Cal.Intake.RETRACTED_POSITION_DEGREES;
+    double desiredPositionDegrees =
+        desiredDeployed
+            ? Cal.Intake.DEPLOYED_POSITION_DEGREES
+            : Cal.Intake.RETRACTED_POSITION_DEGREES;
     return (Math.abs(desiredPositionDegrees - deployMotorEncoder.getPosition())
         < Cal.Intake.DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG);
   }
@@ -255,12 +257,12 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     if (clearOfIntake.getAsBoolean()) {
-        if (desiredDeployed) {
-          deploy();
-        } else {
-          retract();
-        }
+      if (desiredDeployed) {
+        deploy();
+      } else {
+        retract();
       }
+    }
 
     controlPosition(intakeControlPositionDegrees);
 
@@ -304,7 +306,8 @@ public class Intake extends SubsystemBase {
     builder.addDoubleProperty("Intake wheel power in [-1,1]", intakeLeft::get, null);
     builder.addBooleanProperty(
         "Desire deployed",
-        () -> { return desiredDeployed;
+        () -> {
+          return desiredDeployed;
         },
         null);
   }
