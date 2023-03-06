@@ -127,7 +127,7 @@ public final class Constants {
         ELEVATOR_MOTOR_ENCODER_IN_PER_REV / 60.0;
 
     /** Gear ratio for the arm motor */
-    public static final double ARM_MOTOR_GEAR_RATIO = 108.0;
+    public static final double ARM_MOTOR_GEAR_RATIO = 75.0;
 
     /** When are is at this position, the arm is horizontal and pointing up */
     // TODO adjust based on arm CoM instead of arm angle
@@ -135,7 +135,10 @@ public final class Constants {
 
     /** Scalar for the difference in the elevator's absolute encoders in inches per degree */
     public static final double ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE =
-        ELEVATOR_WINCH_CIRCUMFERENCE_INCHES * (26.0 / (28.0 - 26.0)) / REVOLUTIONS_TO_DEGREES;
+        1.245
+            * ELEVATOR_WINCH_CIRCUMFERENCE_INCHES
+            * (26.0 / (28.0 - 26.0))
+            / REVOLUTIONS_TO_DEGREES;
 
     /** Scalar for the difference in the elevator's absolute encoders in degrees per inch */
     public static final double ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_DEGREES_PER_INCH =
