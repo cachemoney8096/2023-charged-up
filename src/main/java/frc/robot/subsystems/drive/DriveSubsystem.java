@@ -390,17 +390,18 @@ public class DriveSubsystem extends SubsystemBase {
                     this.resetOdometry(traj.getInitialHolonomicPose());
                   }
                 }),
-            new ConditionalCommand(
-              new ParallelRaceGroup(
-                controllerCommand.finallyDo(
-                  (boolean interrupted) -> {
-                    System.out.println("Follow interrupted by timeout?");
-                    System.out.println(interrupted);
-                  }
-                ),
-                new WaitCommand(timeoutSeconds.isPresent() ? timeoutSeconds.get() : 1000.0)),
-                controllerCommand2,
-              () -> {return timeoutSeconds.isPresent();}),
+            // new ConditionalCommand(
+            //   new ParallelRaceGroup(
+            //     controllerCommand.finallyDo(
+            //       (boolean interrupted) -> {
+            //         System.out.println("Follow interrupted by timeout?");
+            //         System.out.println(interrupted);
+            //       }
+            //     ),
+            //     new WaitCommand(timeoutSeconds.isPresent() ? timeoutSeconds.get() : 1000.0)),
+            //     controllerCommand2,
+            //   () -> {return timeoutSeconds.isPresent();}),
+            controllerCommand,
             new InstantCommand(
                 () -> {
                   targetHeadingDegrees = getPose().getRotation().getDegrees();
@@ -433,7 +434,7 @@ public class DriveSubsystem extends SubsystemBase {
             new PathPoint(
                 // finalTransform.getTranslation(), finalHeading, Rotation2d.fromDegrees(0)));
                 finalTransform.getTranslation(), Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(0))
-                .withPrevControlLength(0.0));
+                .withPrevControlLength(0.25));
     return path;
   }
 

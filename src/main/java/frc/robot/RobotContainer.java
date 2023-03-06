@@ -78,8 +78,8 @@ public class RobotContainer {
     // autons
 
     autonChooser.setDefaultOption(
-            "One plus balance", new AutoScoreAndBalance(true, lift, drive, lights, scoreLoc));
-        // "Two plus balance", new TwoGamePiecesThatEngage(lift, intake, drive, lights, tagLimelight, scoreLoc));
+            // "One plus balance", new AutoScoreAndBalance(true, lift, drive, lights, scoreLoc));
+        "Two plus balance", new TwoGamePiecesThatEngage(lift, intake, drive, lights, tagLimelight, scoreLoc));
     // autonChooser.addOption(
     //     "Score, balance", new AutoScoreAndBalance(true, lift, drive, lights, scoreLoc));
 

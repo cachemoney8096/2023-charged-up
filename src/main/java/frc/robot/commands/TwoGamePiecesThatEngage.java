@@ -68,7 +68,7 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
               lift.closeGrabber();
               intake.setDesiredClamped(false);
               intake.stopIntakingGamePiece();
-            }).withTimeout(3.5));
+            }));
     eventMap.put(
         "closeIntake",
         new InstantCommand(
@@ -106,17 +106,20 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         new PrintCommand("About to LL"),
         new DriveToTagSimple(tagLimelight, drive, (PathPlannerTrajectory path) -> {pathToScoreBasedOnTag = path;}),
         new PrintCommand("Got a path"),
-        new ProxyCommand(() -> {return drive.followTrajectoryCommand(pathToScoreBasedOnTag, false, Optional.of(3.0));}),
-        new PrintCommand("Done LL"),
-        new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
-        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
-        new PrintCommand("Ready to score"),
-        new InstantCommand(lift::startScore, lift),
-        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
-        new finishScore(lift, lights),
-        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
-        drive.followTrajectoryCommand(
-            trajCharge, false, Optional.empty()), // this does not accept the FollowPathWithEvents
-        new AutoChargeStationSequence(drive, DISTANCE_UP_CHARGE_STATION_METERS));
+        new ProxyCommand(() -> {
+            return drive.followTrajectoryCommand(pathToScoreBasedOnTag, false, Optional.of(3.0))
+            .andThen(new PrintCommand("Done with drive to LL"));}),
+        new PrintCommand("Done LL")
+        // new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
+        // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
+        // new PrintCommand("Ready to score"),
+        // new InstantCommand(lift::startScore, lift),
+        // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
+        // new finishScore(lift, lights),
+        // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
+        // drive.followTrajectoryCommand(
+        //     trajCharge, false, Optional.empty()), // this does not accept the FollowPathWithEvents
+        // new AutoChargeStationSequence(drive, DISTANCE_UP_CHARGE_STATION_METERS)
+        );
   }
 }
