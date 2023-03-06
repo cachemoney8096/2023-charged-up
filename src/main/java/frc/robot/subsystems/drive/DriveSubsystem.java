@@ -41,7 +41,7 @@ import frc.robot.RobotMap;
 import frc.robot.utils.GeometryUtils;
 
 public class DriveSubsystem extends SubsystemBase {
-  private double targetHeadingDegrees;
+  public double targetHeadingDegrees;
 
   // Create SwerveModules
   private final SwerveModule frontLeft =
@@ -71,6 +71,8 @@ public class DriveSubsystem extends SubsystemBase {
   // The gyro sensor
   private final WPI_Pigeon2 gyro = new WPI_Pigeon2(RobotMap.PIGEON_CAN_ID);
   private ChassisSpeeds lastSetChassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
+  public Pose2d targetPose = new Pose2d();
+  public PathPlannerTrajectory pathToScoreBasedOnTag;
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry odometry =
@@ -420,6 +422,7 @@ public class DriveSubsystem extends SubsystemBase {
     System.out.println(flipTransform.getX());
     System.out.println(flipTransform.getY());
     Pose2d curPose = getPose();
+    targetPose = curPose.plus(flipTransform);
     Transform2d curPoseTransform = new Transform2d(curPose.getTranslation(), curPose.getRotation());
     Transform2d finalTransform = curPoseTransform.plus(flipTransform);
     Rotation2d startHeading = flipTransform.getTranslation().getAngle().plus(curPose.getRotation());
@@ -435,6 +438,7 @@ public class DriveSubsystem extends SubsystemBase {
                 // finalTransform.getTranslation(), finalHeading, Rotation2d.fromDegrees(0)));
                 finalTransform.getTranslation(), Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(0))
                 .withPrevControlLength(0.25));
+    pathToScoreBasedOnTag = path;
     return path;
   }
 

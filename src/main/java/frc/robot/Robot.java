@@ -48,6 +48,9 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
+    
+    // CommandScheduler.getInstance().onCommandExecute((Command cmd) -> {System.out.println(cmd.getName());});
+
     SmartDashboard.putNumber("Pressure", m_robotContainer.pneumaticHub.getPressure(0));
   }
 

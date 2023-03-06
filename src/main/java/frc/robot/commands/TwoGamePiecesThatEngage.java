@@ -6,9 +6,11 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.FollowPathWithEvents;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Cal;
 import frc.robot.subsystems.Intake;
@@ -106,9 +108,18 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         new PrintCommand("About to LL"),
         new DriveToTagSimple(tagLimelight, drive, (PathPlannerTrajectory path) -> {pathToScoreBasedOnTag = path;}),
         new PrintCommand("Got a path"),
-        new ProxyCommand(() -> {
-            return drive.followTrajectoryCommand(pathToScoreBasedOnTag, false, Optional.of(3.0))
-            .andThen(new PrintCommand("Done with drive to LL"));}),
+        new ParallelCommandGroup(
+            new ProxyCommand(() -> {
+                return drive.followTrajectoryCommand(pathToScoreBasedOnTag, false, Optional.of(3.0))
+                .andThen(new PrintCommand("Done with drive to LL"));})
+                .finallyDo((boolean interrupted) -> {
+                    System.out.println("proxy interrupted by time?");
+                    System.out.println(interrupted);
+                }),
+            new PrintCommand("start wait").andThen(new WaitCommand(2.0).andThen(new PrintCommand("Alt done with LL")))
+        ),
+        // new DriveToPoint(drive),
+        // new SwerveFollowerWrapper(drive),
         new PrintCommand("Done LL")
         // new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
         // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
