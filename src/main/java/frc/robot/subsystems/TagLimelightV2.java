@@ -99,6 +99,13 @@ public class TagLimelightV2 extends SubsystemBase {
     return robotToScoringLocation;
   }
 
+  public double getLatencySeconds() {
+    return (
+      LimelightHelpers.getLatency_Capture("") +
+      LimelightHelpers.getLatency_Pipeline(""))
+      / 1000.0;
+  }
+
   @Override
   public void periodic() {
     // checkForTag();

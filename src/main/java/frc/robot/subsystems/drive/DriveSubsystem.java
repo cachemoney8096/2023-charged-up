@@ -387,7 +387,7 @@ public class DriveSubsystem extends SubsystemBase {
         .withName("Follow trajectory");
   }
 
-  public void setLimelightTargetFromTransform(Transform2d transform) {
+  public void setLimelightTargetFromTransform(Transform2d transform, double latencySec) {
     // Transform is to get the limelight to the correct location, not to get the robot
     // Here we correct for that
     Transform2d flipTransform =
@@ -396,9 +396,22 @@ public class DriveSubsystem extends SubsystemBase {
     System.out.println("Transform:");
     System.out.println(flipTransform.getX());
     System.out.println(flipTransform.getY());
-    // TODO consider using a previous pose based on chassis speeds using LL latency
+    
     Pose2d curPose = getPose();
-    targetPose = Optional.of(curPose.plus(flipTransform));
+    Transform2d pastTransform =
+        new Transform2d(
+          new Translation2d(
+          lastSetChassisSpeeds.vxMetersPerSecond * latencySec,
+          lastSetChassisSpeeds.vyMetersPerSecond * latencySec),
+          Rotation2d.fromRadians(lastSetChassisSpeeds.omegaRadiansPerSecond * latencySec)).inverse();
+    Pose2d pastPose = curPose.plus(pastTransform);
+
+    final boolean useLatencyAdjustment = true;
+
+    targetPose =
+      useLatencyAdjustment ?
+      Optional.of(pastPose.plus(flipTransform)) :
+      Optional.of(curPose.plus(flipTransform));
   }
 
   public PathPlannerTrajectory poseToPath(boolean red) {

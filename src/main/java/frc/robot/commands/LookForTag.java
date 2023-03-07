@@ -33,8 +33,9 @@ public class LookForTag extends CommandBase {
       if (!robotToScoringLocation.isPresent()) {
         robotToScoringLocation = Optional.of(new Transform2d());
       }
+      double latencySeconds = tagLimelight.getLatencySeconds();
       targetLocked = true;
-      drive.setLimelightTargetFromTransform(robotToScoringLocation.get());
+      drive.setLimelightTargetFromTransform(robotToScoringLocation.get(), latencySeconds);
       lights.toggleCode(LightCode.WORKING);
       // trajectorySetterFunc.setTrajectory(drive.transformToPath());
     }
