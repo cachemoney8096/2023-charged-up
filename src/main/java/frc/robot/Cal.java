@@ -32,7 +32,7 @@ public final class Cal {
   public static final class SwerveSubsystem {
 
     /** For the purposes of trajectory constraints */
-    public static final double MAX_LINEAR_SPEED_METERS_PER_SEC = 2.0,
+    public static final double MAX_LINEAR_SPEED_METERS_PER_SEC = 4.0,
         MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ = 2.0;
 
     /**
@@ -141,7 +141,7 @@ public final class Cal {
     public static final double ELEVATOR_P = 2.0, ELEVATOR_I = 0.0, ELEVATOR_D = 0.3;
 
     /** Input deg, output Volts */
-    public static final double ARM_P = 0.1, ARM_I = 0.0, ARM_D = Cal.PLACEHOLDER_DOUBLE;
+    public static final double ARM_P = 0.07, ARM_I = 0.0, ARM_D = Cal.PLACEHOLDER_DOUBLE;
 
     /** Absolute encoder position when the arm is at 0 degrees */
     // 30.0 is the kickstand offset from 180 aka vertically up
@@ -151,7 +151,7 @@ public final class Cal {
     /**
      * Position reading from the absolute encoders when the elevator is at the start (zero) position
      */
-    public static final double ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES = 0.2;
+    public static final double ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES = -12.3;
 
     /** Voltage required to hold the arm in the horizontal position */
     // Stall torque: 3.36 Nm * 75 = 252 Nm
@@ -171,9 +171,9 @@ public final class Cal {
         // Stall torque: 3.36 Nm * 75 = 252 Nm
         // Inertia: 3.4 kg * 0.68^2 m^2 = 1.57 kg-m^2
         // Accel = 160.5 rad/s^2 = 9200 deg/s^2
-        ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = 160.0,
+        ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = 640.0,
         // 5880 rpm / (60 sec/min) / 75 * (360 deg / rev) = 470
-        ARM_MAX_VELOCITY_DEG_PER_SECOND = 160.0,
+        ARM_MAX_VELOCITY_DEG_PER_SECOND = 320.0,
         // functional not logical
         ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG = 1.0;
 
@@ -183,9 +183,9 @@ public final class Cal {
         // Stall force: 2 * 1.08 Nm * 14.11 / (0.5625 / 39.37) m = 2133 N
         // mass: 6.4 kg
         // Accel = 333 m/s^2 = 13110 in/s^2
-        ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED = 60.0,
+        ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED = 90.0,
         // 11710 rpm / (60 sec/min) * / 14.11 * (pi * 1.125 in) = 48.9 in/s
-        ELEVATOR_MAX_VELOCITY_IN_PER_SECOND = 30.0,
+        ELEVATOR_MAX_VELOCITY_IN_PER_SECOND = 45.0,
         // functional not logical
         ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN = 1.5;
 
@@ -271,7 +271,7 @@ public final class Cal {
      * Maximum speed to deadband at (that is to say, it won't auto-balance if the velocity is <=
      * 0.05, for a velocity of [-1,1])
      */
-    public static final double CHARGE_STATION_DEADBAND_NORM_VELOCITY = 0.05;
+    public static final double CHARGE_STATION_DEADBAND_NORM_VELOCITY = 0.1;
   }
 
   public static final int SPARK_INIT_RETRY_ATTEMPTS = 5;

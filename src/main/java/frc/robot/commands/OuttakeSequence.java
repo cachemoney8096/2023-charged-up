@@ -16,8 +16,6 @@ public class OuttakeSequence extends SequentialCommandGroup {
     addCommands(
         new RunCommand(() -> lift.setDesiredPosition(LiftPosition.OUTTAKING), lift)
             .until(() -> lift.atPosition(LiftPosition.OUTTAKING)),
-        new InstantCommand(lift::openGrabber, lift),
-        new WaitCommand(Cal.Lift.OUTTAKE_GRABBER_WAIT_TIME_SECONDS),
-        new InstantCommand(lift::closeGrabber, lift));
+        new InstantCommand(lift::openGrabber, lift));
   }
 }

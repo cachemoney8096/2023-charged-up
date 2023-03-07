@@ -17,13 +17,12 @@ public class finishScore extends SequentialCommandGroup {
         new InstantCommand(() -> lift.setScoringInProgress(false)),
         new InstantCommand(lift::openGrabber, lift),
         new WaitCommand(Cal.Lift.GRABBER_OPEN_TIME_SECONDS),
-        new ConditionalCommand(
-            // TODO consider whether we even need POST_SCORE_HIGH
-            new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.POST_SCORE_HIGH), lift),
-            new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.STARTING)),
-            lift.scoreLoc::isScoringHigh),
-          new WaitCommand(Cal.Lift.SAFE_TO_RETURN_TO_START_SECONDS),
-        new InstantCommand(lift::closeGrabber, lift),
+        // new ConditionalCommand(
+        //     // TODO consider whether we even need POST_SCORE_HIGH
+        //     new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.POST_SCORE_HIGH), lift),
+        //     new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.STARTING)),
+        //     lift.scoreLoc::isScoringHigh),
+          // new WaitCommand(Cal.Lift.SAFE_TO_RETURN_TO_START_SECONDS),
         new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.STARTING)),
         new InstantCommand(() -> lights.toggleCode(LightCode.READY_TO_SCORE)));
   }

@@ -28,6 +28,7 @@ import frc.robot.subsystems.IntakeLimelight;
 import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.TagLimelightV2;
+import frc.robot.subsystems.Lift.LiftPosition;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.JoystickUtil;
 import frc.robot.utils.ScoringLocationUtil;
@@ -127,13 +128,26 @@ public class RobotContainer {
     driverController.b().whileTrue(new OuttakeSequence(lift).finallyDo(
                       (boolean interrupted) -> {
                         lift.home();
-                        lift.closeGrabber();
                       }));
     driverController.x().onTrue(new InstantCommand(lift::cancelScore, lift));
 
     driverController.rightBumper().onTrue(new InstantCommand(() -> {lift.ManualPrepScoreSequence(lights);}, lift));
 
     driverController.back().onTrue(new InstantCommand(lift::home, lift));
+
+    driverController
+    .start()
+    .onTrue(
+        new InstantCommand(drive::resetYaw));
+
+    driverController.leftBumper().onTrue(
+        new InstantCommand(() -> {lift.setDesiredPosition(LiftPosition.SHELF);})
+        .andThen(new InstantCommand(lift::openGrabber))
+    );
+    driverController.leftBumper().onTrue(
+        new InstantCommand(() -> {lift.setDesiredPosition(LiftPosition.STARTING);})
+        .andThen(new InstantCommand(lift::closeGrabber))
+    );
 
     // TODO Maybe: steal
     // TODO: implement autoscore command for teleop
@@ -147,7 +161,6 @@ public class RobotContainer {
                     (boolean interrupted) -> {
                       drive.throttle(1.0);
                       lift.home();
-                      lift.closeGrabber();
                       intake.stopIntakingGamePiece();
                     }));
     driverController.rightTrigger().onTrue(new InstantCommand(lift::startScore, lift));
@@ -172,7 +185,7 @@ public class RobotContainer {
         .onTrue(
             new InstantCommand(
                 () -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH)));
-    // operatorController.povRight().onTrue(new InstantCommand(() -> lights.togglePartyMode()));
+                // operatorController.povRight().onTrue(new InstantCommand(() -> lights.togglePartyMode()));
 
     operatorController
         .x()
@@ -215,7 +228,7 @@ public class RobotContainer {
                 }));
     operatorController
         .rightBumper()
-        .onTrue(new InstantCommand(() -> lights.toggleCode(Lights.LightCode.CONE), lights));
+        .onTrue(new InstantCommand(() -> lights.toggleCode(Lights.LightCode.CUBE), lights));
     operatorController.leftTrigger().onTrue(new InstantCommand(lift::openGrabber, lift));
     operatorController.leftTrigger().onFalse(new InstantCommand(lift::closeGrabber, lift));
     operatorController.rightTrigger().onTrue(new InstantCommand(scoreLoc::toggleMiddleGrid));

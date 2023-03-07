@@ -41,7 +41,7 @@ import frc.robot.RobotMap;
 import frc.robot.utils.GeometryUtils;
 
 public class DriveSubsystem extends SubsystemBase {
-  public double targetHeadingDegrees;
+  private double targetHeadingDegrees;
 
   // Create SwerveModules
   private final SwerveModule frontLeft =
@@ -139,6 +139,22 @@ public class DriveSubsystem extends SubsystemBase {
           rearRight.getPosition()
         },
         pose);
+  }
+
+  public void resetYaw() {
+    gyro.reset();
+    Pose2d curPose = getPose();
+    Pose2d resetPose = new Pose2d(curPose.getTranslation(), Rotation2d.fromDegrees(0));
+    odometry.resetPosition(
+        Rotation2d.fromDegrees(0),
+        new SwerveModulePosition[] {
+          frontLeft.getPosition(),
+          frontRight.getPosition(),
+          rearLeft.getPosition(),
+          rearRight.getPosition()
+        },
+        resetPose);
+    targetHeadingDegrees = 0.0;
   }
 
   /**
@@ -406,7 +422,7 @@ public class DriveSubsystem extends SubsystemBase {
             controllerCommand,
             new InstantCommand(
                 () -> {
-                  targetHeadingDegrees = getPose().getRotation().getDegrees();
+                  targetHeadingDegrees = getHeadingDegrees();
                 }),
             new PrintCommand("End of follow trajectory"))
         .withName("Follow trajectory");
@@ -429,7 +445,7 @@ public class DriveSubsystem extends SubsystemBase {
     Rotation2d finalHeading = startHeading.plus(Rotation2d.fromDegrees(180));
     PathPlannerTrajectory path =
         PathPlanner.generatePath(
-            new PathConstraints(1.0, 1.0),
+            new PathConstraints(2.0, 2.0),
             PathPoint.fromCurrentHolonomicState(curPose, lastSetChassisSpeeds),
             // new PathPoint(curPose.getTranslation(), startHeading, curPose.getRotation()),
             // We know the robot needs to be at zero relative to start of match so let's just use

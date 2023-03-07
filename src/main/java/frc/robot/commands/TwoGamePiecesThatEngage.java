@@ -67,7 +67,6 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         new IntakeSequence(intake, lift, lights).finallyDo(
             (boolean interrupted) -> {
               lift.home();
-              lift.closeGrabber();
               intake.setDesiredClamped(false);
               intake.stopIntakingGamePiece();
             }));
@@ -88,14 +87,14 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
     addCommands(
         new InstantCommand(() -> scoringLocationUtil.setScoreCol(ScoreCol.RIGHT)),
         new InstantCommand(() -> scoringLocationUtil.setScoreHeight(ScoreHeight.HIGH)),
-        new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
-        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
+        // new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
+        // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
         new InstantCommand(lift::startScore, lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
         new finishScore(lift, lights),
         new InstantCommand(() -> scoringLocationUtil.setScoreCol(ScoreCol.LEFT)),
-        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
-        new PrintCommand("Driving to cone"),
+        new WaitCommand(1.0), // going to start
+        // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
         new FollowPathWithEvents(
             drive.followTrajectoryCommand(trajInit, true, Optional.empty()), trajInit.getMarkers(), eventMap),
         /** TODO: Limelight code goes here */
@@ -105,32 +104,32 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         //         lights.toggleCode(LightCode.NO_TAG);
         //       }
         //     }),
-        new PrintCommand("About to LL"),
         new DriveToTagSimple(tagLimelight, drive, (PathPlannerTrajectory path) -> {pathToScoreBasedOnTag = path;}),
-        new PrintCommand("Got a path"),
-        new ParallelCommandGroup(
-            new ProxyCommand(() -> {
-                return drive.followTrajectoryCommand(pathToScoreBasedOnTag, false, Optional.of(3.0))
-                .andThen(new PrintCommand("Done with drive to LL"));})
-                .finallyDo((boolean interrupted) -> {
-                    System.out.println("proxy interrupted by time?");
-                    System.out.println(interrupted);
-                }),
-            new PrintCommand("start wait").andThen(new WaitCommand(2.0).andThen(new PrintCommand("Alt done with LL")))
-        ),
+        // new ParallelCommandGroup(
+        //     new ProxyCommand(() -> {
+        //         return drive.followTrajectoryCommand(pathToScoreBasedOnTag, false, Optional.of(3.0))
+        //         .andThen(new PrintCommand("Done with drive to LL"));})
+        //         .finallyDo((boolean interrupted) -> {
+        //             System.out.println("proxy interrupted by time?");
+        //             System.out.println(interrupted);
+        //         }),
+        //     new PrintCommand("start wait").andThen(new WaitCommand(2.0).andThen(new PrintCommand("Alt done with LL")))
+        // ),
         // new DriveToPoint(drive),
-        // new SwerveFollowerWrapper(drive),
-        new PrintCommand("Done LL")
+        new SwerveFollowerWrapper(drive).withTimeout(2.5).finallyDo( (boolean interrupted) -> {
+            if (interrupted) {
+                drive.drive(0, 0, 0, true);
+        }}),
         // new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
         // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
-        // new PrintCommand("Ready to score"),
-        // new InstantCommand(lift::startScore, lift),
-        // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
-        // new finishScore(lift, lights),
+        new InstantCommand(lift::startScore, lift),
+        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
+        new finishScore(lift, lights),
+        new WaitCommand(1.0), // going to start
         // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
-        // drive.followTrajectoryCommand(
-        //     trajCharge, false, Optional.empty()), // this does not accept the FollowPathWithEvents
-        // new AutoChargeStationSequence(drive, DISTANCE_UP_CHARGE_STATION_METERS)
+        drive.followTrajectoryCommand(
+            trajCharge, false, Optional.empty()).withTimeout(2.0), // this does not accept the FollowPathWithEvents
+        new AutoChargeStationSequence(drive, DISTANCE_UP_CHARGE_STATION_METERS)
         );
   }
 }

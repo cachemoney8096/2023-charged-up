@@ -128,7 +128,7 @@ public class Lift extends SubsystemBase {
     liftPositionMap = new TreeMap<LiftPosition, Pair<Double, Double>>();
     liftPositionMap.put(
         LiftPosition.GRAB_FROM_INTAKE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 79.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 81.0));
     liftPositionMap.put(
         LiftPosition.SHELF, new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 196.0));
     liftPositionMap.put(
@@ -339,7 +339,6 @@ public class Lift extends SubsystemBase {
   public void finishScoreCancelled(Lights lights) {
     setCancelScore(false);
     ManualPrepScoreSequence(lights);
-    closeGrabber();
   }
 
   /** returns cancelScore (true if scoring action is cancelled) */

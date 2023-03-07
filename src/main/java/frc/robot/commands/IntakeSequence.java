@@ -45,22 +45,22 @@ public class IntakeSequence extends SequentialCommandGroup {
         // wait until the lift is in position and the intake sees a game piece
         new WaitUntilCommand(
             () -> (lift.atPosition(Lift.LiftPosition.GRAB_FROM_INTAKE) && intake.seeGamePiece())),
-
+            
         // triggers the grabber to close
         new InstantCommand(lift::closeGrabber, lift),
-
+        
+        // indicate the robot has obtained a game piece
+        new InstantCommand(
+            () -> {
+              lights.toggleCode(LightCode.GAME_OBJECT);
+            }),
+        
         // give the intake time to unclamp
         new WaitCommand(0.2),
-
+        
         // stop intake
         new InstantCommand(intake::stopIntakingGamePiece, intake),
-
-        // indicate the robot has obtained a game piece
-        // new InstantCommand(
-        //     () -> {
-        //       lights.toggleCode(LightCode.GAME_OBJECT);
-        //     }),
-
+        
         // // wait until the grabber has closed
         // new WaitCommand(Cal.Lift.GRABBER_CLOSE_TIME_SECONDS),
 
