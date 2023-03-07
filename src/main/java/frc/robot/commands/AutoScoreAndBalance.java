@@ -1,12 +1,9 @@
 package frc.robot.commands;
 
-import java.util.Optional;
-
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Cal;
@@ -33,14 +30,12 @@ public class AutoScoreAndBalance extends SequentialCommandGroup {
       Lights lights,
       ScoringLocationUtil scoringLocationUtil) {
     addCommands(
-      new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
-      new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
+      // new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
+      // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
       new InstantCommand(lift::startScore, lift),
       new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
       new finishScore(lift, lights),
-      new PrintCommand("Finished score"),
       new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
-      new PrintCommand("Got to start"),
         new AutoChargeStationSequence(drive, DISTANCE_UP_CHARGE_STATION_METERS));
   }
 

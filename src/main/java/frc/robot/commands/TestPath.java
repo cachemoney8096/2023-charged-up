@@ -4,8 +4,6 @@
 
 package frc.robot.commands;
 
-import java.util.Optional;
-
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -23,7 +21,7 @@ public class TestPath extends SequentialCommandGroup {
               Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
   public TestPath(boolean isFirstPath, DriveSubsystem drive) {
-    addCommands(drive.followTrajectoryCommand(traj, isFirstPath, Optional.empty()));
+    addCommands(drive.followTrajectoryCommand(traj, isFirstPath));
   }
 
   public PathPlannerTrajectory getTrajectory() {

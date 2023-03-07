@@ -27,14 +27,10 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
@@ -71,7 +67,7 @@ public class DriveSubsystem extends SubsystemBase {
   // The gyro sensor
   private final WPI_Pigeon2 gyro = new WPI_Pigeon2(RobotMap.PIGEON_CAN_ID);
   private ChassisSpeeds lastSetChassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
-  public Pose2d targetPose = new Pose2d();
+  public Optional<Pose2d> targetPose = Optional.empty();
   public PathPlannerTrajectory pathToScoreBasedOnTag;
 
   // Odometry class for tracking robot pose
@@ -255,11 +251,6 @@ public class DriveSubsystem extends SubsystemBase {
     rearRight.resetEncoders();
   }
 
-  /** Zeroes the heading of the robot. */
-  public void zeroHeading() {
-    gyro.reset();
-  }
-
   /**
    * Returns the heading of the robot.
    *
@@ -348,52 +339,13 @@ public class DriveSubsystem extends SubsystemBase {
     return gyro;
   }
 
-  
   public interface TrajectoryGetterInterface {
     PathPlannerTrajectory getTrajectory();
 }
 
   /** Taken from Github */
-  public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath, Optional<Double> timeoutSeconds) {
-    PPSwerveControllerCommand controllerCommand = new PPSwerveControllerCommand(
-      traj,
-      this::getPose, // Pose supplier
-      Constants.SwerveDrive.DRIVE_KINEMATICS, // SwerveDriveKinematics
-      Cal.SwerveSubsystem
-          .PATH_X_CONTROLLER, // X controller. Tune these values for your robot. Leaving
-      // them
-      // 0 will only use feedforwards.
-      Cal.SwerveSubsystem
-          .PATH_Y_CONTROLLER, // Y controller (usually the same values as X controller)
-      Cal.SwerveSubsystem
-          .PATH_THETA_CONTROLLER, // Rotation controller. Tune these values for your
-      // robot.
-      // Leaving them 0 will only use feedforwards.
-      this::setModuleStates, // Module states consumer
-      false, // Should the path be automatically mirrored depending on alliance color.
-      // Optional, defaults to true
-      this // Requires this drive subsystem
-      );
-      PPSwerveControllerCommand controllerCommand2 = new PPSwerveControllerCommand(
-        traj,
-        this::getPose, // Pose supplier
-        Constants.SwerveDrive.DRIVE_KINEMATICS, // SwerveDriveKinematics
-        Cal.SwerveSubsystem
-            .PATH_X_CONTROLLER, // X controller. Tune these values for your robot. Leaving
-        // them
-        // 0 will only use feedforwards.
-        Cal.SwerveSubsystem
-            .PATH_Y_CONTROLLER, // Y controller (usually the same values as X controller)
-        Cal.SwerveSubsystem
-            .PATH_THETA_CONTROLLER, // Rotation controller. Tune these values for your
-        // robot.
-        // Leaving them 0 will only use feedforwards.
-        this::setModuleStates, // Module states consumer
-        false, // Should the path be automatically mirrored depending on alliance color.
-        // Optional, defaults to true
-        this // Requires this drive subsystem
-        );
-    
+  public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
+   
     return new SequentialCommandGroup(
             new RunCommand(() -> setForward())
                 .withTimeout(0.1)
@@ -408,27 +360,34 @@ public class DriveSubsystem extends SubsystemBase {
                     this.resetOdometry(traj.getInitialHolonomicPose());
                   }
                 }),
-            // new ConditionalCommand(
-            //   new ParallelRaceGroup(
-            //     controllerCommand.finallyDo(
-            //       (boolean interrupted) -> {
-            //         System.out.println("Follow interrupted by timeout?");
-            //         System.out.println(interrupted);
-            //       }
-            //     ),
-            //     new WaitCommand(timeoutSeconds.isPresent() ? timeoutSeconds.get() : 1000.0)),
-            //     controllerCommand2,
-            //   () -> {return timeoutSeconds.isPresent();}),
-            controllerCommand,
+
+                new PPSwerveControllerCommand(
+                  traj,
+                  this::getPose, // Pose supplier
+                  Constants.SwerveDrive.DRIVE_KINEMATICS, // SwerveDriveKinematics
+                  Cal.SwerveSubsystem
+                      .PATH_X_CONTROLLER, // X controller. Tune these values for your robot. Leaving
+                  // them
+                  // 0 will only use feedforwards.
+                  Cal.SwerveSubsystem
+                      .PATH_Y_CONTROLLER, // Y controller (usually the same values as X controller)
+                  Cal.SwerveSubsystem
+                      .PATH_THETA_CONTROLLER, // Rotation controller. Tune these values for your
+                  // robot.
+                  // Leaving them 0 will only use feedforwards.
+                  this::setModuleStates, // Module states consumer
+                  false, // Should the path be automatically mirrored depending on alliance color.
+                  // Optional, defaults to true
+                  this // Requires this drive subsystem
+                  ),
             new InstantCommand(
                 () -> {
                   targetHeadingDegrees = getHeadingDegrees();
-                }),
-            new PrintCommand("End of follow trajectory"))
+                }))
         .withName("Follow trajectory");
   }
 
-  public PathPlannerTrajectory transformToPath(Transform2d transform) {
+  public void setLimelightTargetFromTransform(Transform2d transform) {
     // Transform is to get the limelight to the correct location, not to get the robot
     // Here we correct for that
     Transform2d flipTransform =
@@ -437,12 +396,21 @@ public class DriveSubsystem extends SubsystemBase {
     System.out.println("Transform:");
     System.out.println(flipTransform.getX());
     System.out.println(flipTransform.getY());
+    // TODO consider using a previous pose based on chassis speeds using LL latency
     Pose2d curPose = getPose();
-    targetPose = curPose.plus(flipTransform);
-    Transform2d curPoseTransform = new Transform2d(curPose.getTranslation(), curPose.getRotation());
-    Transform2d finalTransform = curPoseTransform.plus(flipTransform);
-    Rotation2d startHeading = flipTransform.getTranslation().getAngle().plus(curPose.getRotation());
-    Rotation2d finalHeading = startHeading.plus(Rotation2d.fromDegrees(180));
+    targetPose = Optional.of(curPose.plus(flipTransform));
+  }
+
+  public PathPlannerTrajectory poseToPath(boolean red) {
+    Pose2d curPose = getPose();
+    System.out.println("Acquired target? " + targetPose.isPresent());
+    Pose2d finalPose = 
+      targetPose.isPresent() ?
+      targetPose.get() : 
+      curPose.plus(new Transform2d(new Translation2d(-0.79, red ? 1.15 : -1.15), Rotation2d.fromDegrees(0)));
+    Transform2d finalTransform = new Transform2d(finalPose.getTranslation(), finalPose.getRotation());
+    // Rotation2d startHeading = moveTransform.getTranslation().getAngle().plus(curPose.getRotation());
+    // Rotation2d finalHeading = startHeading.plus(Rotation2d.fromDegrees(180));
     PathPlannerTrajectory path =
         PathPlanner.generatePath(
             new PathConstraints(2.0, 2.0),
@@ -457,6 +425,36 @@ public class DriveSubsystem extends SubsystemBase {
     pathToScoreBasedOnTag = path;
     return path;
   }
+
+  // public PathPlannerTrajectory transformToPath(Transform2d transform) {
+  //   // Transform is to get the limelight to the correct location, not to get the robot
+  //   // Here we correct for that
+  //   Transform2d flipTransform =
+  //       new Transform2d(
+  //           new Translation2d(-transform.getX(), transform.getY()), transform.getRotation());
+  //   System.out.println("Transform:");
+  //   System.out.println(flipTransform.getX());
+  //   System.out.println(flipTransform.getY());
+  //   Pose2d curPose = getPose();
+  //   targetPose = curPose.plus(flipTransform);
+  //   Transform2d curPoseTransform = new Transform2d(curPose.getTranslation(), curPose.getRotation());
+  //   Transform2d finalTransform = curPoseTransform.plus(flipTransform);
+  //   Rotation2d startHeading = flipTransform.getTranslation().getAngle().plus(curPose.getRotation());
+  //   Rotation2d finalHeading = startHeading.plus(Rotation2d.fromDegrees(180));
+  //   PathPlannerTrajectory path =
+  //       PathPlanner.generatePath(
+  //           new PathConstraints(2.0, 2.0),
+  //           PathPoint.fromCurrentHolonomicState(curPose, lastSetChassisSpeeds),
+  //           // new PathPoint(curPose.getTranslation(), startHeading, curPose.getRotation()),
+  //           // We know the robot needs to be at zero relative to start of match so let's just use
+  //           // that
+  //           new PathPoint(
+  //               // finalTransform.getTranslation(), finalHeading, Rotation2d.fromDegrees(0)));
+  //               finalTransform.getTranslation(), Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(0))
+  //               .withPrevControlLength(0.25));
+  //   pathToScoreBasedOnTag = path;
+  //   return path;
+  // }
 
   public void toggleSkids() {
     // TODO do this once we can add skids

@@ -404,6 +404,7 @@ public class Lift extends SubsystemBase {
   /** Converts a lift position to a relative lift position (above or below starting position). */
   private static LiftPositionStartRelative getRelativeLiftPosition(LiftPosition pos) {
     switch (pos) {
+      case ALT_HOME:
       case STARTING:
         return LiftPositionStartRelative.AT_START;
       case SCORE_MID_CUBE:

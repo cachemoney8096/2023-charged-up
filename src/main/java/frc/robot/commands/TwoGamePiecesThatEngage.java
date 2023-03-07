@@ -6,9 +6,6 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.FollowPathWithEvents;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -24,7 +21,6 @@ import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreCol;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 import java.util.HashMap;
-import java.util.Optional;
 
 /**
  * This does the following: Robot starts at right postion at left grid Score the game piece at the
@@ -46,8 +42,6 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
           new PathConstraints(
               Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
               Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
-
-    private PathPlannerTrajectory pathToScoreBasedOnTag = null;
 
   private HashMap<String, Command> eventMap = new HashMap<>();
 
@@ -91,6 +85,10 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
               intake.setDesiredClamped(false);
               intake.stopIntakingGamePiece();
             }));
+    eventMap.put(
+        "limelight",
+        new LookForTag(tagLimelight, drive, lights).withTimeout(2.0));
+
     /**
      * TODO: configure limelight to "take over" driving process after certain point AFTER obtaining
      * game piece to be more accurate with distance if limelight fails to find valid target/arpil
@@ -105,6 +103,7 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         new InstantCommand(() -> scoringLocationUtil.setScoreHeight(ScoreHeight.HIGH)),
         // new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
         // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
+        new InstantCommand(() -> {lights.toggleCode(LightCode.READY_TO_SCORE);}),
         new InstantCommand(lift::startScore, lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
         new finishScore(lift, lights),
@@ -112,7 +111,7 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         new WaitCommand(1.0), // going to start
         // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
         new FollowPathWithEvents(
-            drive.followTrajectoryCommand(trajInit, true, Optional.empty()), trajInit.getMarkers(), eventMap),
+            drive.followTrajectoryCommand(trajInit, true), trajInit.getMarkers(), eventMap),
         /** TODO: Limelight code goes here */
         // new InstantCommand(
         //     () -> {
@@ -120,7 +119,7 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         //         lights.toggleCode(LightCode.NO_TAG);
         //       }
         //     }),
-        new DriveToTagSimple(tagLimelight, drive, (PathPlannerTrajectory path) -> {pathToScoreBasedOnTag = path;}),
+        // new DriveToTagSimple(tagLimelight, drive),
         // new ParallelCommandGroup(
         //     new ProxyCommand(() -> {
         //         return drive.followTrajectoryCommand(pathToScoreBasedOnTag, false, Optional.of(3.0))
@@ -132,10 +131,11 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         //     new PrintCommand("start wait").andThen(new WaitCommand(2.0).andThen(new PrintCommand("Alt done with LL")))
         // ),
         // new DriveToPoint(drive),
-        new SwerveFollowerWrapper(drive).withTimeout(2.0).finallyDo( (boolean interrupted) -> {
+        new SwerveFollowerWrapper(red, drive).withTimeout(2.0).finallyDo( (boolean interrupted) -> {
             if (interrupted) {
                 drive.drive(0, 0, 0, true);
         }}),
+        new InstantCommand(() -> {lights.toggleCode(LightCode.READY_TO_SCORE);}),
         // new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
         // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
         new InstantCommand(lift::startScore, lift),
@@ -144,7 +144,7 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         new WaitCommand(1.0), // going to start
         // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
         drive.followTrajectoryCommand(
-            trajCharge, false, Optional.empty()).withTimeout(2.0), // this does not accept the FollowPathWithEvents
+            trajCharge, false).withTimeout(2.0), // this does not accept the FollowPathWithEvents
         new AutoChargeStationSequence(drive, DISTANCE_UP_CHARGE_STATION_METERS)
         );
   }

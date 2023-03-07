@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoChargeStationSequence;
 import frc.robot.commands.AutoScoreAndBalance;
-import frc.robot.commands.DriveToTagSimple;
+import frc.robot.commands.LookForTag;
 import frc.robot.commands.IntakeSequence;
 import frc.robot.commands.OuttakeSequence;
 import frc.robot.commands.TwoGamePiecesThatEngage;

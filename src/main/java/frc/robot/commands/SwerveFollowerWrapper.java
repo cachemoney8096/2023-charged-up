@@ -1,7 +1,5 @@
 package frc.robot.commands;
 
-import java.util.Optional;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -10,15 +8,17 @@ public class SwerveFollowerWrapper extends CommandBase {
   
   public Command swerveFollowerCmd;
   private DriveSubsystem drive;
+  boolean redAlliance;
 
-  public SwerveFollowerWrapper(DriveSubsystem driveSubsystem) {
+  public SwerveFollowerWrapper(boolean red, DriveSubsystem driveSubsystem) {
+    redAlliance = red;
     drive = driveSubsystem;
     addRequirements(drive);
   }
 
   @Override
   public void initialize() {
-    swerveFollowerCmd = drive.followTrajectoryCommand(drive.pathToScoreBasedOnTag, false, Optional.of(3.0));
+    swerveFollowerCmd = drive.followTrajectoryCommand(drive.poseToPath(redAlliance), false).withTimeout(3.0);
     swerveFollowerCmd.initialize();
   }
 

@@ -12,7 +12,6 @@ import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lift.LiftPosition;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Lights.LightCode;
-import frc.robot.subsystems.drive.DriveSubsystem;
 
 public class IntakeSequence extends SequentialCommandGroup {
 

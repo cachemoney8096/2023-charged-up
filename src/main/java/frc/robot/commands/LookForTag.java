@@ -1,35 +1,30 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.TagLimelightV2;
+import frc.robot.subsystems.Lights.LightCode;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import java.util.Optional;
 
-import com.pathplanner.lib.PathPlannerTrajectory;
-
-public class DriveToTagSimple extends CommandBase {
-
-  public interface TrajectorySetterInterface {
-    void setTrajectory(PathPlannerTrajectory path);
-}
-
+public class LookForTag extends CommandBase {
   private DriveSubsystem drive;
   private TagLimelightV2 tagLimelight;
+  private Lights lights;
   private boolean targetLocked = false;
-  private TrajectorySetterInterface trajectorySetterFunc;
 
-  public DriveToTagSimple(TagLimelightV2 limelight, DriveSubsystem driveSubsystem, TrajectorySetterInterface trajectorySetter) {
-    // Note: does not require the drive subsystem itself! It will schedule a command that will do
-    // the driving.
+  public LookForTag(TagLimelightV2 limelight, DriveSubsystem driveSubsystem, Lights lightsSubsysten) {
+    // Note: does not require the drive subsystem itself! It just sets the final point in the drive.
     drive = driveSubsystem;
     tagLimelight = limelight;
-    trajectorySetterFunc = trajectorySetter;
+    lights = lightsSubsysten;
   }
 
   @Override
-  public void initialize() { }
+  public void initialize() {
+    lights.toggleCode(LightCode.NO_TAG);
+  }
 
   @Override
   public void execute() {
@@ -39,7 +34,9 @@ public class DriveToTagSimple extends CommandBase {
         robotToScoringLocation = Optional.of(new Transform2d());
       }
       targetLocked = true;
-      trajectorySetterFunc.setTrajectory(drive.transformToPath(robotToScoringLocation.get()));
+      drive.setLimelightTargetFromTransform(robotToScoringLocation.get());
+      lights.toggleCode(LightCode.WORKING);
+      // trajectorySetterFunc.setTrajectory(drive.transformToPath());
     }
   }
 
