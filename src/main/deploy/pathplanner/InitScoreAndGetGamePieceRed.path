@@ -2,15 +2,15 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.8379491149917158,
-        "y": 5.012998637895293
+        "x": 14.725970927351693,
+        "y": 5.010160020320041
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.2394195836550335,
-        "y": 5.001644167594285
+        "x": 12.98620719496311,
+        "y": 5.044485737749699
       },
-      "holonomicAngle": 0,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -24,18 +24,18 @@
     },
     {
       "anchorPoint": {
-        "x": 6.7771436959304525,
-        "y": 4.729136880370078
+        "x": 9.83901156326903,
+        "y": 4.763758707845286
       },
       "prevControl": {
-        "x": 6.050457596665903,
-        "y": 4.729136880370078
+        "x": 10.512508484033361,
+        "y": 4.771972084927777
       },
       "nextControl": {
-        "x": 7.503829795195002,
-        "y": 4.729136880370078
+        "x": 9.115541890211302,
+        "y": 4.754935906954339
       },
-      "holonomicAngle": 0,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -49,15 +49,15 @@
     },
     {
       "anchorPoint": {
-        "x": 2.7406295039218986,
-        "y": 4.814295407627642
+        "x": 13.6774481096132,
+        "y": 4.665120698165925
       },
       "prevControl": {
-        "x": 4.31322364061159,
-        "y": 5.285505925119498
+        "x": 12.511148563899356,
+        "y": 5.149709946032946
       },
       "nextControl": null,
-      "holonomicAngle": 0,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": 2.0,
       "isLocked": false,
@@ -70,21 +70,5 @@
       }
     }
   ],
-  "maxVelocity": 2.0,
-  "maxAcceleration": 2.0,
-  "isReversed": null,
-  "markers": [
-    {
-      "position": 0.2909090909090909,
-      "names": [
-        "deployIntake"
-      ]
-    },
-    {
-      "position": 1.650909090909078,
-      "names": [
-        "closeIntake"
-      ]
-    }
-  ]
+  "markers": []
 }
