@@ -27,6 +27,9 @@ public class IntakeSequence extends SequentialCommandGroup {
                 },
                 intake)
             .until(intake::atDesiredPosition),
+        
+        // TODO: above seems to proceed right away, this Wait is kindof a hack
+        new WaitCommand(0.25),
 
         // run intake and move lift to intake position, until the robot sees an
         // object and the lift is in position

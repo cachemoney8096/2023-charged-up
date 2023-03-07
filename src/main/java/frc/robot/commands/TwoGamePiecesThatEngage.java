@@ -54,27 +54,43 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
   private static final double DISTANCE_UP_CHARGE_STATION_METERS = 1.2;
 
   public TwoGamePiecesThatEngage(
+      boolean red,
       Lift lift,
       Intake intake,
       DriveSubsystem drive,
       Lights lights,
       TagLimelightV2 tagLimelight,
       ScoringLocationUtil scoringLocationUtil) {
+    if (red) {
+        // default to blue, only change for red
+        trajInit =
+        PathPlanner.loadPath(
+            "InitScoreAndGetGamePieceRed",
+            new PathConstraints(
+                Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
+                Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
+
+        trajCharge =
+        PathPlanner.loadPath(
+            "ScoringLocToChargeStationRed",
+            new PathConstraints(
+                Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
+                Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
+    }
+
     addRequirements(lift, intake, drive, tagLimelight);
     /** Events include: open intake and close intake before and after obtaining game piece */
     eventMap.put(
         "deployIntake",
-        new IntakeSequence(intake, lift, lights).finallyDo(
+        new IntakeSequence(intake, lift, lights)
+            .withTimeout(3.0)
+            .finallyDo(
             (boolean interrupted) -> {
               lift.home();
+              intake.setDesiredDeployed(false);
               intake.setDesiredClamped(false);
               intake.stopIntakingGamePiece();
             }));
-    eventMap.put(
-        "closeIntake",
-        new InstantCommand(
-            () -> { },
-            intake));
     /**
      * TODO: configure limelight to "take over" driving process after certain point AFTER obtaining
      * game piece to be more accurate with distance if limelight fails to find valid target/arpil
@@ -116,7 +132,7 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         //     new PrintCommand("start wait").andThen(new WaitCommand(2.0).andThen(new PrintCommand("Alt done with LL")))
         // ),
         // new DriveToPoint(drive),
-        new SwerveFollowerWrapper(drive).withTimeout(2.5).finallyDo( (boolean interrupted) -> {
+        new SwerveFollowerWrapper(drive).withTimeout(2.0).finallyDo( (boolean interrupted) -> {
             if (interrupted) {
                 drive.drive(0, 0, 0, true);
         }}),

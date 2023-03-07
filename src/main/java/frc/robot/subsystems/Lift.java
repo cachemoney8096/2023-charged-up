@@ -554,10 +554,10 @@ public class Lift extends SubsystemBase {
     ScoreHeight height = scoreLoc.getScoreHeight();
 
     // indicate the robot is currently working on prep score
-    new InstantCommand(
-        () -> {
-          lights.toggleCode(LightCode.WORKING);
-        }).schedule();
+    // new InstantCommand(
+    //     () -> {
+    //       lights.toggleCode(LightCode.WORKING);
+    //     }).schedule();
 
     // low for all columns is the same height
     if (height == ScoreHeight.LOW) {

@@ -33,7 +33,7 @@ public final class Cal {
 
     /** For the purposes of trajectory constraints */
     public static final double MAX_LINEAR_SPEED_METERS_PER_SEC = 4.0,
-        MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ = 2.0;
+        MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ = 2.5;
 
     /**
      * Angular offset of the modules relative to the zeroing fixture in radians. Ideally should be
@@ -151,7 +151,7 @@ public final class Cal {
     /**
      * Position reading from the absolute encoders when the elevator is at the start (zero) position
      */
-    public static final double ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES = -12.3;
+    public static final double ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES = -11.8;
 
     /** Voltage required to hold the arm in the horizontal position */
     // Stall torque: 3.36 Nm * 75 = 252 Nm

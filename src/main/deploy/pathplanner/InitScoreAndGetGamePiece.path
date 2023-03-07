@@ -79,12 +79,6 @@
       "names": [
         "deployIntake"
       ]
-    },
-    {
-      "position": 1.650909090909078,
-      "names": [
-        "closeIntake"
-      ]
     }
   ]
 }

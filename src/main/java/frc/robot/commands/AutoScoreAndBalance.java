@@ -28,7 +28,6 @@ public class AutoScoreAndBalance extends SequentialCommandGroup {
               Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
   public AutoScoreAndBalance(
-      boolean isFirstPath,
       Lift lift,
       DriveSubsystem drive,
       Lights lights,
