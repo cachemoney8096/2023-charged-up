@@ -76,7 +76,7 @@ public class TagLimelightV2 extends SubsystemBase {
 
   private Transform2d getRobotToScoringLocation(Pose3d targetPoseRobotSpace) {
     Transform2d targetFromBot = getBotFromTarget(targetPoseRobotSpace);
-        Transform2d scoringLocationFromTag = scoreLoc.scoringLocationFromTag();
+    Transform2d scoringLocationFromTag = scoreLoc.scoringLocationFromTag();
     return targetFromBot.plus(scoringLocationFromTag);
   }
 
