@@ -36,7 +36,7 @@ public class AutoMobilityChargeStationSequence extends SequentialCommandGroup {
         new InstantCommand(() -> {
           drive.drive(0, 0, 0, true);
         }, drive),
-        new WaitCommand(0.5),
+        new WaitCommand(1.0),
         new RunCommand(
                 () -> {
                   /** Time remaining in current match period (auto or teleop) in seconds */

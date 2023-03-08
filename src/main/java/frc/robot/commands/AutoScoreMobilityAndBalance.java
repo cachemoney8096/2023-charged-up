@@ -15,7 +15,7 @@ import frc.robot.utils.ScoringLocationUtil;
 
 /** Scores a game piece, then drives onto the charge station and balances */
 public class AutoScoreMobilityAndBalance extends SequentialCommandGroup {
-  private static final double DISTANCE_UP_CHARGE_STATION_METERS = 4.75;
+  private static final double DISTANCE_UP_CHARGE_STATION_METERS = 5.0;
   private static final double DISTANCE_BACK_CHARGE_STATION_METERS = 2.9;
 
   private PathPlannerTrajectory traj =
