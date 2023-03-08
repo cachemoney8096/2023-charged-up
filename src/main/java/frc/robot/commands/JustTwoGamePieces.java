@@ -4,6 +4,8 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.FollowPathWithEvents;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -54,6 +56,9 @@ public class JustTwoGamePieces extends SequentialCommandGroup {
             new PathConstraints(
                 Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
                 Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
+
+        trajInit = PathPlannerTrajectory.transformTrajectoryForAlliance(
+            trajInit, DriverStation.Alliance.Red);
     }
 
     addRequirements(lift, intake, drive, tagLimelight);
@@ -124,7 +129,8 @@ public class JustTwoGamePieces extends SequentialCommandGroup {
         // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
         new InstantCommand(lift::startScore, lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
-        new finishScore(lift, lights)
+        new finishScore(lift, lights),
+        new InstantCommand(() -> {drive.resetYaw();})
         );
   }
 }

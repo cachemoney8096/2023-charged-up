@@ -4,6 +4,8 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.FollowPathWithEvents;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -64,12 +66,18 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
                 Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
                 Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
+        trajInit = PathPlannerTrajectory.transformTrajectoryForAlliance(
+            trajInit, DriverStation.Alliance.Red);
+
         trajCharge =
         PathPlanner.loadPath(
             "ScoringLocToChargeStationRed",
             new PathConstraints(
                 Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
                 Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
+
+        trajCharge = PathPlannerTrajectory.transformTrajectoryForAlliance(
+            trajCharge, DriverStation.Alliance.Red);
     }
 
     addRequirements(lift, intake, drive, tagLimelight);
@@ -145,6 +153,7 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
         drive.followTrajectoryCommand(
             trajCharge, false).withTimeout(2.0), // this does not accept the FollowPathWithEvents
+        new InstantCommand(() -> {drive.resetYaw();}),
         new AutoChargeStationSequence(drive, DISTANCE_UP_CHARGE_STATION_METERS)
         );
   }
