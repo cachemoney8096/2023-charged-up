@@ -26,6 +26,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
 import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lift.LiftPosition;
+import frc.robot.subsystems.Lights.LightCode;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.TagLimelightV2;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -187,6 +188,7 @@ public class RobotContainer {
                       drive.throttle(1.0);
                       lift.home();
                       intake.stopIntakingGamePiece();
+                      lights.setLight(LightCode.OFF);
                     }));
     driverController.rightTrigger().onTrue(new InstantCommand(lift::startScore, lift));
     driverController
