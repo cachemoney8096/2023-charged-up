@@ -45,7 +45,7 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
 
   private HashMap<String, Command> eventMap = new HashMap<>();
 
-  private static final double DISTANCE_UP_CHARGE_STATION_METERS = 1.2;
+  private static final double DISTANCE_UP_CHARGE_STATION_METERS = 1.6;
 
   public TwoGamePiecesThatEngage(
       boolean red,
