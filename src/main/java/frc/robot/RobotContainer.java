@@ -221,6 +221,10 @@ public class RobotContainer {
         .onTrue(
             new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
     operatorController
+        .povLeft()
+        .onTrue(
+            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
+    operatorController
         .povUp()
         .onTrue(
             new InstantCommand(
@@ -242,37 +246,31 @@ public class RobotContainer {
         .b()
         .onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.RIGHT)));
 
-    operatorController
-        .start()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  intake.setDesiredDeployed(true);
-                },
-                intake));
-    operatorController
-        .back()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  intake.setDesiredDeployed(false);
-                },
-                intake));
+    // operatorController
+    //     .start()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               intake.setDesiredDeployed(true);
+    //             },
+    //             intake));
 
     operatorController
-        .leftBumper()
+        .leftTrigger()
         .onTrue(
             new InstantCommand(
                 () -> {
                   lights.toggleCode(Lights.LightCode.CONE);
                 }));
     operatorController
-        .rightBumper()
+        .rightTrigger()
         .onTrue(new InstantCommand(() -> lights.toggleCode(Lights.LightCode.CUBE), lights));
-    operatorController.leftTrigger().onTrue(new InstantCommand(lift::openGrabber, lift));
-    operatorController.leftTrigger().onFalse(new InstantCommand(lift::closeGrabber, lift));
-    operatorController.rightTrigger().onTrue(new InstantCommand(scoreLoc::toggleMiddleGrid));
-    operatorController.rightTrigger().onFalse(new InstantCommand(scoreLoc::toggleMiddleGrid));
+    operatorController.leftBumper().onTrue(new InstantCommand(lift::bumpArmDown));
+    operatorController.rightBumper().onTrue(new InstantCommand(lift::bumpArmUp));
+    // operatorController.leftTrigger().onTrue(new InstantCommand(lift::openGrabber, lift));
+    // operatorController.leftTrigger().onFalse(new InstantCommand(lift::closeGrabber, lift));
+    // operatorController.rightTrigger().onTrue(new InstantCommand(scoreLoc::toggleMiddleGrid));
+    // operatorController.rightTrigger().onFalse(new InstantCommand(scoreLoc::toggleMiddleGrid));
 
     // TODO add manual arm and elevator control
 

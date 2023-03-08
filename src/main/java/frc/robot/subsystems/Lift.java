@@ -245,6 +245,18 @@ public class Lift extends SubsystemBase {
     return errors == 0;
   }
 
+  public void bumpArmDown() {
+    Pair<Double, Double> curPos = liftPositionMap.get(LiftPosition.GRAB_FROM_INTAKE);
+    Pair<Double, Double> newPos = new Pair<Double, Double>(curPos.getFirst(), curPos.getSecond() - 0.5);
+    liftPositionMap.replace(LiftPosition.GRAB_FROM_INTAKE, newPos);
+  }
+
+  public void bumpArmUp() {
+    Pair<Double, Double> curPos = liftPositionMap.get(LiftPosition.GRAB_FROM_INTAKE);
+    Pair<Double, Double> newPos = new Pair<Double, Double>(curPos.getFirst(), curPos.getSecond() + 0.5);
+    liftPositionMap.replace(LiftPosition.GRAB_FROM_INTAKE, newPos);
+  }
+
   /**
    * Burns the current settings to sparks so they keep current settings on reboot. Should be done
    * after all settings are set.
