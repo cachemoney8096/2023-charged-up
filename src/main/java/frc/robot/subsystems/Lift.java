@@ -580,11 +580,5 @@ public class Lift extends SubsystemBase {
         setDesiredPosition(LiftPosition.SCORE_HIGH_CUBE);
       }
     }
-
-    // indicate the robot is now ready to score
-    new InstantCommand(
-        () -> {
-          lights.toggleCode(LightCode.READY_TO_SCORE);
-        });
   }
 }

@@ -23,6 +23,6 @@ public class finishScore extends SequentialCommandGroup {
         //     lift.scoreLoc::isScoringHigh),
           // new WaitCommand(Cal.Lift.SAFE_TO_RETURN_TO_START_SECONDS),
         new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.STARTING)),
-        new InstantCommand(() -> lights.toggleCode(LightCode.READY_TO_SCORE)));
+        new InstantCommand(() -> lights.setLight(LightCode.OFF)));
   }
 }

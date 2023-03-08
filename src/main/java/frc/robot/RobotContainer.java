@@ -133,7 +133,7 @@ public class RobotContainer {
     driverController
         .b()
         .whileTrue(
-            new OuttakeSequence(lift)
+            new OuttakeSequence(lift, lights)
                 .finallyDo(
                     (boolean interrupted) -> {
                       lift.home();
