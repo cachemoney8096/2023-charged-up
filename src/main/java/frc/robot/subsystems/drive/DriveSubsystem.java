@@ -438,8 +438,8 @@ public class DriveSubsystem extends SubsystemBase {
     Transform2d finalTransform = new Transform2d(finalPose.getTranslation(), finalPose.getRotation());
     // Rotation2d startHeading = moveTransform.getTranslation().getAngle().plus(curPose.getRotation());
     // Rotation2d finalHeading = startHeading.plus(Rotation2d.fromDegrees(180));
-    Rotation2d finalHeading = Rotation2d.fromDegrees(red ? 0 : 180);
-    Rotation2d finalHolonomicRotation = Rotation2d.fromDegrees(red ? 180 : 0);
+    Rotation2d finalHeading = Rotation2d.fromDegrees(red ? 180 : 180);
+    Rotation2d finalHolonomicRotation = Rotation2d.fromDegrees(red ? 0 : 0);
     PathPlannerTrajectory path =
         PathPlanner.generatePath(
             new PathConstraints(2.0, 2.0),

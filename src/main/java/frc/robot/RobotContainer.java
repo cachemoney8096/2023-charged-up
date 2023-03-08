@@ -69,7 +69,7 @@ public class RobotContainer {
     configureBindings();
 
     Shuffleboard.getTab("Subsystems").add(drive.getName(), drive);
-    // Shuffleboard.getTab("Subsystems").add(intake.getName(), intake);
+    Shuffleboard.getTab("Subsystems").add(intake.getName(), intake);
     // Shuffleboard.getTab("Subsystems").add(intakeLimelight.getName(), intakeLimelight);
     Shuffleboard.getTab("Subsystems").add(tagLimelight.getName(), tagLimelight);
     // Shuffleboard.getTab("Subsystems").add(lights.getName(), lights);

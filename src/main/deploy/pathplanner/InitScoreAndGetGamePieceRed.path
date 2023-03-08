@@ -70,5 +70,18 @@
       }
     }
   ],
-  "markers": []
+  "markers": [
+    {
+      "position": 0.17,
+      "names": [
+        "deployIntake"
+      ]
+    },
+    {
+      "position": 1.98,
+      "names": [
+        "limelight"
+      ]
+    }
+  ]
 }
