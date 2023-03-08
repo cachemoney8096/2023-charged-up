@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoScoreAndBalance;
 import frc.robot.commands.AutoScoreMobilityAndBalance;
 import frc.robot.commands.IntakeSequence;
+import frc.robot.commands.JustTwoGamePieces;
 import frc.robot.commands.OuttakeSequence;
 import frc.robot.commands.TwoGamePiecesThatEngage;
 import frc.robot.commands.finishScore;
@@ -87,6 +88,12 @@ public class RobotContainer {
     autonChooser.addOption(
         "Two plus balance Red",
         new TwoGamePiecesThatEngage(true, lift, intake, drive, lights, tagLimelight, scoreLoc));
+    autonChooser.addOption(
+        "Just two blue",
+        new JustTwoGamePieces(false, lift, intake, drive, lights, tagLimelight, scoreLoc));
+    autonChooser.addOption(
+        "Just two red",
+        new JustTwoGamePieces(true, lift, intake, drive, lights, tagLimelight, scoreLoc));
     autonChooser.addOption(
         "Score, mobile, balance", new AutoScoreMobilityAndBalance(lift, drive, lights, scoreLoc));
 

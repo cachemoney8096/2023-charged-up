@@ -395,9 +395,7 @@ public class DriveSubsystem extends SubsystemBase {
     Transform2d flipTransform =
         new Transform2d(
             new Translation2d(-transform.getX(), transform.getY()), transform.getRotation());
-    System.out.println("Transform:");
-    System.out.println(flipTransform.getX());
-    System.out.println(flipTransform.getY());
+    System.out.println("Flip Transform: " + flipTransform.getX() + " " + flipTransform.getY());
     
     Pose2d curPose = getPose();
     latencySec = latencySec + 0.05;
@@ -429,6 +427,10 @@ public class DriveSubsystem extends SubsystemBase {
     Pose2d futurePose = curPose.plus(coastTransform);
 
     System.out.println("Acquired target? " + targetPose.isPresent());
+    if (targetPose.isPresent()) {
+      Transform2d trajectoryTransform = targetPose.get().minus(futurePose);
+      System.out.println("Trajectory Transform: " + trajectoryTransform.getX() + " " + trajectoryTransform.getY());
+    }
     Pose2d finalPose = 
       targetPose.isPresent() ?
       targetPose.get() : 

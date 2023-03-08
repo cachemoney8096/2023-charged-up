@@ -28,7 +28,7 @@ import java.util.HashMap;
  * it back to the left grid left side, and score at the high left position Go to charing station and
  * do the charge station balance sequence
  */
-public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
+public class JustTwoGamePieces extends SequentialCommandGroup {
   private PathPlannerTrajectory trajInit =
       PathPlanner.loadPath(
           "InitScoreAndGetGamePiece",
@@ -36,18 +36,9 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
               Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
               Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
-  private PathPlannerTrajectory trajCharge =
-      PathPlanner.loadPath(
-          "ScoringLocToChargeStation",
-          new PathConstraints(
-              Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
-              Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
-
   private HashMap<String, Command> eventMap = new HashMap<>();
 
-  private static final double DISTANCE_UP_CHARGE_STATION_METERS = 1.2;
-
-  public TwoGamePiecesThatEngage(
+  public JustTwoGamePieces(
       boolean red,
       Lift lift,
       Intake intake,
@@ -60,13 +51,6 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         trajInit =
         PathPlanner.loadPath(
             "InitScoreAndGetGamePieceRed",
-            new PathConstraints(
-                Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
-                Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
-
-        trajCharge =
-        PathPlanner.loadPath(
-            "ScoringLocToChargeStationRed",
             new PathConstraints(
                 Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
                 Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
@@ -108,7 +92,7 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
         new finishScore(lift, lights),
         new InstantCommand(() -> scoringLocationUtil.setScoreCol(red ? ScoreCol.RIGHT : ScoreCol.LEFT)),
-        new WaitCommand(0.2), // going to start
+        new WaitCommand(0.4), // going to start
         // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
         new FollowPathWithEvents(
             drive.followTrajectoryCommand(trajInit, true), trajInit.getMarkers(), eventMap),
@@ -140,12 +124,7 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
         new InstantCommand(lift::startScore, lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
-        new finishScore(lift, lights),
-        new WaitCommand(0.2), // going to start
-        // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
-        drive.followTrajectoryCommand(
-            trajCharge, false).withTimeout(2.0), // this does not accept the FollowPathWithEvents
-        new AutoChargeStationSequence(drive, DISTANCE_UP_CHARGE_STATION_METERS)
+        new finishScore(lift, lights)
         );
   }
 }
