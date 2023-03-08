@@ -16,9 +16,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.AutoChargeStationSequence;
 import frc.robot.commands.AutoScoreAndBalance;
-import frc.robot.commands.LookForTag;
+import frc.robot.commands.AutoScoreMobilityAndBalance;
 import frc.robot.commands.IntakeSequence;
 import frc.robot.commands.OuttakeSequence;
 import frc.robot.commands.TwoGamePiecesThatEngage;
@@ -26,9 +25,9 @@ import frc.robot.commands.finishScore;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
 import frc.robot.subsystems.Lift;
+import frc.robot.subsystems.Lift.LiftPosition;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.TagLimelightV2;
-import frc.robot.subsystems.Lift.LiftPosition;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.JoystickUtil;
 import frc.robot.utils.ScoringLocationUtil;
@@ -79,16 +78,17 @@ public class RobotContainer {
     // autons
 
     autonChooser.setDefaultOption(
-            // "One plus balance", new AutoScoreAndBalance(lift, drive, lights, scoreLoc));
+        // "One plus balance", new AutoScoreAndBalance(lift, drive, lights, scoreLoc));
         "Two plus balance Blue",
         new TwoGamePiecesThatEngage(false, lift, intake, drive, lights, tagLimelight, scoreLoc));
     autonChooser.addOption(
-        "Score, balance",
-        new AutoScoreAndBalance(lift, drive, lights, scoreLoc));
+        "Score, balance", new AutoScoreAndBalance(lift, drive, lights, scoreLoc));
     autonChooser.addOption(
         "Two plus balance Red",
         new TwoGamePiecesThatEngage(true, lift, intake, drive, lights, tagLimelight, scoreLoc));
-        
+    autonChooser.addOption(
+        "Score, mobile, balance", new AutoScoreMobilityAndBalance(lift, drive, lights, scoreLoc));
+
     // Put the chooser on the dashboard
     SmartDashboard.putData(autonChooser);
 
@@ -130,29 +130,45 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    driverController.b().whileTrue(new OuttakeSequence(lift).finallyDo(
-                      (boolean interrupted) -> {
-                        lift.home();
-                      }));
+    driverController
+        .b()
+        .whileTrue(
+            new OuttakeSequence(lift)
+                .finallyDo(
+                    (boolean interrupted) -> {
+                      lift.home();
+                    }));
     driverController.x().onTrue(new InstantCommand(lift::cancelScore, lift));
 
-    driverController.rightBumper().onTrue(new InstantCommand(() -> {lift.ManualPrepScoreSequence(lights);}, lift));
+    driverController
+        .rightBumper()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  lift.ManualPrepScoreSequence(lights);
+                },
+                lift));
 
     driverController.back().onTrue(new InstantCommand(lift::home, lift));
 
-    driverController
-    .start()
-    .onTrue(
-        new InstantCommand(drive::resetYaw));
+    driverController.start().onTrue(new InstantCommand(drive::resetYaw));
 
-    driverController.leftBumper().onTrue(
-        new InstantCommand(() -> {lift.setDesiredPosition(LiftPosition.SHELF);})
-        .andThen(new InstantCommand(lift::openGrabber))
-    );
-    driverController.leftBumper().onTrue(
-        new InstantCommand(() -> {lift.setDesiredPosition(LiftPosition.STARTING);})
-        .andThen(new InstantCommand(lift::closeGrabber))
-    );
+    driverController
+        .leftBumper()
+        .onTrue(
+            new InstantCommand(
+                    () -> {
+                      lift.setDesiredPosition(LiftPosition.SHELF);
+                    })
+                .andThen(new InstantCommand(lift::openGrabber)));
+    driverController
+        .leftBumper()
+        .onTrue(
+            new InstantCommand(
+                    () -> {
+                      lift.setDesiredPosition(LiftPosition.STARTING);
+                    })
+                .andThen(new InstantCommand(lift::closeGrabber)));
 
     // TODO Maybe: steal
     // TODO: implement autoscore command for teleop
@@ -161,8 +177,12 @@ public class RobotContainer {
         .leftTrigger()
         .whileTrue(
             new IntakeSequence(intake, lift, lights)
-            .beforeStarting(new InstantCommand(() -> {drive.throttle(0.75);}))    
-            .finallyDo(
+                .beforeStarting(
+                    new InstantCommand(
+                        () -> {
+                          drive.throttle(0.75);
+                        }))
+                .finallyDo(
                     (boolean interrupted) -> {
                       drive.throttle(1.0);
                       lift.home();
@@ -173,7 +193,11 @@ public class RobotContainer {
         .rightTrigger()
         .onFalse(
             new ConditionalCommand(
-                new InstantCommand(() -> { lift.finishScoreCancelled(lights); }, lift),
+                new InstantCommand(
+                    () -> {
+                      lift.finishScoreCancelled(lights);
+                    },
+                    lift),
                 new finishScore(lift, lights),
                 lift::getCancelScore));
 
@@ -190,7 +214,7 @@ public class RobotContainer {
         .onTrue(
             new InstantCommand(
                 () -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH)));
-                // operatorController.povRight().onTrue(new InstantCommand(() -> lights.togglePartyMode()));
+    // operatorController.povRight().onTrue(new InstantCommand(() -> lights.togglePartyMode()));
 
     operatorController
         .x()

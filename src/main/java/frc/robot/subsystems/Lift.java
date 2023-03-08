@@ -128,7 +128,7 @@ public class Lift extends SubsystemBase {
     liftPositionMap = new TreeMap<LiftPosition, Pair<Double, Double>>();
     liftPositionMap.put(
         LiftPosition.GRAB_FROM_INTAKE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 81.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 82.0));
     liftPositionMap.put(
         LiftPosition.SHELF, new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 196.0));
     liftPositionMap.put(

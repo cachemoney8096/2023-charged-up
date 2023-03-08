@@ -31,7 +31,9 @@ public class LookForTag extends CommandBase {
     if (!targetLocked) {
       Optional<Transform2d> robotToScoringLocation = tagLimelight.checkForTag();
       if (!robotToScoringLocation.isPresent()) {
-        robotToScoringLocation = Optional.of(new Transform2d());
+        // robotToScoringLocation = Optional.of(new Transform2d());
+        robotToScoringLocation = Optional.empty();
+        return;
       }
       double latencySeconds = tagLimelight.getLatencySeconds();
       targetLocked = true;

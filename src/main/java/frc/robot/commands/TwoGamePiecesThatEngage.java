@@ -77,7 +77,7 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
     eventMap.put(
         "deployIntake",
         new IntakeSequence(intake, lift, lights)
-            .withTimeout(3.0)
+            .withTimeout(2.5)
             .finallyDo(
             (boolean interrupted) -> {
               lift.home();
@@ -108,7 +108,7 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
         new finishScore(lift, lights),
         new InstantCommand(() -> scoringLocationUtil.setScoreCol(ScoreCol.LEFT)),
-        new WaitCommand(1.0), // going to start
+        new WaitCommand(0.2), // going to start
         // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
         new FollowPathWithEvents(
             drive.followTrajectoryCommand(trajInit, true), trajInit.getMarkers(), eventMap),
@@ -141,7 +141,7 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         new InstantCommand(lift::startScore, lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
         new finishScore(lift, lights),
-        new WaitCommand(1.0), // going to start
+        new WaitCommand(0.2), // going to start
         // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
         drive.followTrajectoryCommand(
             trajCharge, false).withTimeout(2.0), // this does not accept the FollowPathWithEvents

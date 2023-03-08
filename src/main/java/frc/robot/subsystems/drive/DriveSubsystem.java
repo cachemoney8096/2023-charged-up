@@ -28,6 +28,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -383,7 +384,8 @@ public class DriveSubsystem extends SubsystemBase {
             new InstantCommand(
                 () -> {
                   targetHeadingDegrees = getHeadingDegrees();
-                }))
+                }),
+            new PrintCommand("Finished a trajectory"))
         .withName("Follow trajectory");
   }
 
@@ -398,6 +400,7 @@ public class DriveSubsystem extends SubsystemBase {
     System.out.println(flipTransform.getY());
     
     Pose2d curPose = getPose();
+    latencySec = latencySec + 0.05;
     Transform2d pastTransform =
         new Transform2d(
           new Translation2d(
@@ -416,18 +419,27 @@ public class DriveSubsystem extends SubsystemBase {
 
   public PathPlannerTrajectory poseToPath(boolean red) {
     Pose2d curPose = getPose();
+    double coastLatencySec = 0.03;
+    Transform2d coastTransform =
+        new Transform2d(
+          new Translation2d(
+          lastSetChassisSpeeds.vxMetersPerSecond * coastLatencySec,
+          lastSetChassisSpeeds.vyMetersPerSecond * coastLatencySec),
+          Rotation2d.fromRadians(lastSetChassisSpeeds.omegaRadiansPerSecond * coastLatencySec));
+    Pose2d futurePose = curPose.plus(coastTransform);
+
     System.out.println("Acquired target? " + targetPose.isPresent());
     Pose2d finalPose = 
       targetPose.isPresent() ?
       targetPose.get() : 
-      curPose.plus(new Transform2d(new Translation2d(-0.79, red ? 1.15 : -1.15), Rotation2d.fromDegrees(0)));
+      futurePose.plus(new Transform2d(new Translation2d(-1.5, red ? 1.15 : -1.15), Rotation2d.fromDegrees(0)));
     Transform2d finalTransform = new Transform2d(finalPose.getTranslation(), finalPose.getRotation());
     // Rotation2d startHeading = moveTransform.getTranslation().getAngle().plus(curPose.getRotation());
     // Rotation2d finalHeading = startHeading.plus(Rotation2d.fromDegrees(180));
     PathPlannerTrajectory path =
         PathPlanner.generatePath(
             new PathConstraints(2.0, 2.0),
-            PathPoint.fromCurrentHolonomicState(curPose, lastSetChassisSpeeds),
+            PathPoint.fromCurrentHolonomicState(futurePose, lastSetChassisSpeeds),
             // new PathPoint(curPose.getTranslation(), startHeading, curPose.getRotation()),
             // We know the robot needs to be at zero relative to start of match so let's just use
             // that

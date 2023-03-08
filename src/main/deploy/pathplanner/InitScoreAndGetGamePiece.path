@@ -59,7 +59,7 @@
       "nextControl": null,
       "holonomicAngle": 0,
       "isReversal": false,
-      "velOverride": 2.0,
+      "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
@@ -70,18 +70,18 @@
       }
     }
   ],
-  "maxVelocity": 2.0,
-  "maxAcceleration": 2.0,
+  "maxVelocity": 4.0,
+  "maxAcceleration": 3.0,
   "isReversed": null,
   "markers": [
     {
-      "position": 0.2909090909090909,
+      "position": 0.1745454545454487,
       "names": [
         "deployIntake"
       ]
     },
     {
-      "position": 1.9272727272727224,
+      "position": 1.9781818181818254,
       "names": [
         "limelight"
       ]

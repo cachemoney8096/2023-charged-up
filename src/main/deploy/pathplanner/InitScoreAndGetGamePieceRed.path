@@ -59,7 +59,7 @@
       "nextControl": null,
       "holonomicAngle": 0.0,
       "isReversal": false,
-      "velOverride": 2.0,
+      "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
@@ -72,13 +72,13 @@
   ],
   "markers": [
     {
-      "position": 0.2909090909090909,
+      "position": 0.14545454545454545,
       "names": [
         "deployIntake"
       ]
     },
     {
-      "position": 1.9272727272727221,
+      "position": 1.97,
       "names": [
         "limelight"
       ]
