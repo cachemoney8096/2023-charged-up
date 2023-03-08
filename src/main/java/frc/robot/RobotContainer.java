@@ -53,6 +53,7 @@ public class RobotContainer {
   public final TagLimelightV2 tagLimelight = new TagLimelightV2(scoreLoc);
   private final Lights lights = new Lights();
   public final PneumaticHub pneumaticHub = new PneumaticHub();
+  boolean red;
 
   // A chooser for autonomous commands
   private SendableChooser<Command> autonChooser = new SendableChooser<>();
@@ -87,13 +88,19 @@ public class RobotContainer {
         "Score, balance", new AutoScoreAndBalance(lift, drive, lights, scoreLoc));
     autonChooser.addOption(
         "Two plus balance Red",
-        new TwoGamePiecesThatEngage(true, lift, intake, drive, lights, tagLimelight, scoreLoc));
+        new TwoGamePiecesThatEngage(true, lift, intake, drive, lights, tagLimelight, scoreLoc)
+        .finallyDo((boolean interrupted) -> {
+                      drive.resetYaw();
+                    }));
     autonChooser.addOption(
         "Just two blue",
         new JustTwoGamePieces(false, lift, intake, drive, lights, tagLimelight, scoreLoc));
     autonChooser.addOption(
         "Just two red",
-        new JustTwoGamePieces(true, lift, intake, drive, lights, tagLimelight, scoreLoc));
+        new JustTwoGamePieces(true, lift, intake, drive, lights, tagLimelight, scoreLoc)
+        .finallyDo((boolean interrupted) -> {
+            drive.resetYaw();
+          }));
     autonChooser.addOption(
         "Score, mobile, balance", new AutoScoreMobilityAndBalance(lift, drive, lights, scoreLoc));
 

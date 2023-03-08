@@ -36,7 +36,8 @@ public class AutoScoreAndBalance extends SequentialCommandGroup {
       new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
       new finishScore(lift, lights),
       new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
-        new AutoChargeStationSequence(drive, DISTANCE_UP_CHARGE_STATION_METERS));
+      // Note: even if we're red, the robot is never flipped so we can just pass false here:
+      new AutoChargeStationSequence(false, drive, DISTANCE_UP_CHARGE_STATION_METERS));
   }
 
   public PathPlannerTrajectory getTrajectory() {

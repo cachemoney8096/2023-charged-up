@@ -145,7 +145,7 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
         drive.followTrajectoryCommand(
             trajCharge, false).withTimeout(2.0), // this does not accept the FollowPathWithEvents
-        new AutoChargeStationSequence(drive, DISTANCE_UP_CHARGE_STATION_METERS)
+        new AutoChargeStationSequence(red, drive, DISTANCE_UP_CHARGE_STATION_METERS)
         );
   }
 }

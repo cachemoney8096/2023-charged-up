@@ -14,9 +14,15 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 public class AutoChargeStationSequence extends SequentialCommandGroup {
 
   private double startXMeters = 0.0;
-  private static final double NORM_SPEED_UP_CHARGE_STATION = 0.4;
+  private final double NORM_SPEED_UP_CHARGE_STATION;
 
-  public AutoChargeStationSequence(DriveSubsystem drive, double distanceMeters) {
+  public AutoChargeStationSequence(boolean red, DriveSubsystem drive, double distanceMeters) {
+    if (red) {
+      NORM_SPEED_UP_CHARGE_STATION = -0.4;
+    }
+    else {
+      NORM_SPEED_UP_CHARGE_STATION = 0.4;
+    }
     addCommands(
         new InstantCommand(() -> {startXMeters = drive.getPose().getX();}),
         new RunCommand(
@@ -32,7 +38,12 @@ public class AutoChargeStationSequence extends SequentialCommandGroup {
                 drive)
             .until(
                 () -> {
-                  return (drive.getPose().getX() - startXMeters) > distanceMeters;
+                  if (red) {
+                    return (drive.getPose().getX() - startXMeters) < distanceMeters;
+                  }
+                  else {
+                    return (drive.getPose().getX() - startXMeters) > distanceMeters;
+                  }
                 }),
         new AutoChargeStationBalance(drive));
   }
