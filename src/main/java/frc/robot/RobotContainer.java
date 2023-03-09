@@ -150,6 +150,7 @@ public class RobotContainer {
     driverController.a().onTrue(new InstantCommand(lift::cancelScore, lift));
     driverController.x().onTrue(new InstantCommand(() -> {drive.throttle(0.5);}, lift));
     driverController.x().onFalse(new InstantCommand(() -> {drive.throttle(1.0);}, lift));
+    driverController.y().onTrue(new InstantCommand(drive::setX, drive));
 
     driverController
         .rightBumper()

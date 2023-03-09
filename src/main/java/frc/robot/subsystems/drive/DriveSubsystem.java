@@ -176,6 +176,17 @@ public class DriveSubsystem extends SubsystemBase {
     return updatedSpeeds;
   }
 
+  public void setNoMove() {
+      Rotation2d frontLeftCurrRot = frontLeft.getPosition().angle;
+      Rotation2d frontRightCurrRot = frontRight.getPosition().angle;
+      Rotation2d rearLeftCurrRot = rearLeft.getPosition().angle;
+      Rotation2d rearRightCurrRot = rearRight.getPosition().angle;
+      frontLeft.setDesiredState(new SwerveModuleState(0, frontLeftCurrRot));
+      frontRight.setDesiredState(new SwerveModuleState(0, frontRightCurrRot));
+      rearLeft.setDesiredState(new SwerveModuleState(0, rearLeftCurrRot));
+      rearRight.setDesiredState(new SwerveModuleState(0, rearRightCurrRot));
+  }
+
   /**
    * Method to drive the robot using joystick info.
    *
@@ -189,7 +200,7 @@ public class DriveSubsystem extends SubsystemBase {
     // they're equal to 0
     // does account for controller deadzones.
     if (xSpeed == 0 && ySpeed == 0 && rot == 0) {
-      setX();
+      setNoMove();
       return;
     }
 
