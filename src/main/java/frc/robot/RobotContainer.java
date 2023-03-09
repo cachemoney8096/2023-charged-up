@@ -283,8 +283,9 @@ public class RobotContainer {
                     drive.rotateOrKeepHeading(
                         MathUtil.applyDeadband(-driverController.getRightY(), 0.1),
                         MathUtil.applyDeadband(-driverController.getRightX(), 0.1),
-                        JoystickUtil.squareAxis(
-                            MathUtil.applyDeadband(-driverController.getLeftX(), 0.05)),
+                        // JoystickUtil.squareAxis(
+                        //     MathUtil.applyDeadband(-driverController.getLeftX(), 0.05)),
+                        0.0,
                         !driverController.getHID().getLeftBumper(),
                         driverController.getHID().getPOV()),
                 drive)

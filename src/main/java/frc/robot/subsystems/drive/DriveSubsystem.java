@@ -297,9 +297,11 @@ public class DriveSubsystem extends SubsystemBase {
   public int convertCardinalDirections(int povAngleDeg) {
     // change d-pad values for left and right to 45 degree angles
     if (povAngleDeg == 270) {
-      povAngleDeg += 45;
+      povAngleDeg += 70;
     } else if (povAngleDeg == 90) {
-      povAngleDeg -= 45;
+      povAngleDeg -= 70;
+    } else if (povAngleDeg == 180) {
+      povAngleDeg = 0;
     }
     // targetHeadingDegrees is counterclockwise so need to flip povAngle
     povAngleDeg = 360 - povAngleDeg;
@@ -536,5 +538,6 @@ public class DriveSubsystem extends SubsystemBase {
           return getPose().getRotation().getDegrees();
         },
         null);
+    builder.addDoubleProperty("Front Left Abs Encoder", frontLeft::getAbsPosition, null);
   }
 }

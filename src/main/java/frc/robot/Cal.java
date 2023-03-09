@@ -84,7 +84,7 @@ public final class Cal {
   }
 
   public static final class Intake {
-    public static final double INTAKING_POWER = 1.0;
+    public static final double INTAKING_POWER = 0.75;
     public static final double EJECTION_POWER = -1.0;
 
     /** Intake positions in degrees */

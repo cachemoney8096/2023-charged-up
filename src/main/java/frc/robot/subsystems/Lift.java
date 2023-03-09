@@ -139,13 +139,13 @@ public class Lift extends SubsystemBase {
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 216.0));
     liftPositionMap.put(
         LiftPosition.SCORE_MID_CONE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 206.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 208.0));
     liftPositionMap.put(
         LiftPosition.SCORE_HIGH_CUBE,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 216.0));
     liftPositionMap.put(
         LiftPosition.SCORE_HIGH_CONE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 206.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 208.0));
     liftPositionMap.put(
         LiftPosition.PRE_SCORE_MID_CONE,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 196.0));
