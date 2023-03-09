@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoScoreAndBalance;
@@ -166,19 +167,25 @@ public class RobotContainer {
     driverController
         .leftBumper()
         .onTrue(
+            new InstantCommand(lift::openGrabber).andThen(
             new InstantCommand(
                     () -> {
                       lift.setDesiredPosition(LiftPosition.SHELF);
                     })
-                .andThen(new InstantCommand(lift::openGrabber)));
+            )
+        );
     driverController
         .leftBumper()
-        .onTrue(
-            new InstantCommand(
+        .onFalse(
+            new InstantCommand(lift::closeGrabber).andThen(
+                new WaitCommand(0.2)
+            ).andThen(
+                new InstantCommand(
                     () -> {
                       lift.setDesiredPosition(LiftPosition.STARTING);
                     })
-                .andThen(new InstantCommand(lift::closeGrabber)));
+            )
+        );
 
     // TODO Maybe: steal
     // TODO: implement autoscore command for teleop
