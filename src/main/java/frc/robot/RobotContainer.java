@@ -194,6 +194,7 @@ public class RobotContainer {
                         }))
                 .finallyDo(
                     (boolean interrupted) -> {
+                        lift.closeGrabber();
                       drive.throttle(1.0);
                       lift.home();
                       intake.stopIntakingGamePiece();
