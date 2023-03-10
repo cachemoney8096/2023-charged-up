@@ -97,7 +97,7 @@ public class Lift extends SubsystemBase {
       elevatorRight.getAbsoluteEncoder(Type.kDutyCycle);
   private final RelativeEncoder armEncoder = armMotor.getEncoder();
   private final AbsoluteEncoder armAbsoluteEncoder = armMotor.getAbsoluteEncoder(Type.kDutyCycle);
-  // private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
+  private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
 
   // Members
   private LiftPosition latestPosition = LiftPosition.ALT_HOME;
@@ -300,7 +300,7 @@ public class Lift extends SubsystemBase {
     // Sensor is false if there's a game piece
     // TODO replace once the sensor is on
     // return !gamePieceSensor.get();
-    return true;
+    return false;
   }
 
   /** Returns the cosine of the arm angle in degrees off of the horizontal. */

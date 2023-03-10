@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
@@ -47,7 +48,9 @@ public class IntakeSequence extends SequentialCommandGroup {
 
         // wait until the lift is in position and the intake sees a game piece
         new WaitUntilCommand(
-            () -> (lift.atPosition(Lift.LiftPosition.GRAB_FROM_INTAKE) && intake.seeGamePiece())),
+            () -> {
+              return lift.atPosition(Lift.LiftPosition.GRAB_FROM_INTAKE) && intake.seeGamePiece();
+            }),
             
             // indicate the robot has obtained a game piece
             new InstantCommand(

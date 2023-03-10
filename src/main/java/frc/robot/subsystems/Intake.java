@@ -252,6 +252,7 @@ public class Intake extends SubsystemBase {
   public boolean seeGamePiece() {
     // Sensor is false if there's a game piece
     return !gamePieceSensor.get();
+    // return false;
   }
 
   @Override

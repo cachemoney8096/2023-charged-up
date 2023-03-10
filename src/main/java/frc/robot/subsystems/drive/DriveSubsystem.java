@@ -239,6 +239,7 @@ public class DriveSubsystem extends SubsystemBase {
     frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+    targetHeadingDegrees = getHeadingDegrees();
   }
 
   /**

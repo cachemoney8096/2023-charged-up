@@ -14,7 +14,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoScoreAndBalance;
@@ -85,18 +88,18 @@ public class RobotContainer {
         "Two plus balance Blue",
         new TwoGamePiecesThatEngage(false, lift, intake, drive, lights, tagLimelight, scoreLoc));
     autonChooser.addOption(
-        "Score, balance", new AutoScoreAndBalance(lift, drive, lights, scoreLoc));
-    autonChooser.addOption(
         "Two plus balance Red",
         new TwoGamePiecesThatEngage(true, lift, intake, drive, lights, tagLimelight, scoreLoc));
+    autonChooser.addOption(
+        "One plus balance", new AutoScoreAndBalance(lift, drive, lights, scoreLoc));
+    autonChooser.addOption(
+        "One plus mobility plus balance", new AutoScoreMobilityAndBalance(lift, drive, lights, scoreLoc));
     autonChooser.addOption(
         "Just two blue",
         new JustTwoGamePieces(false, lift, intake, drive, lights, tagLimelight, scoreLoc));
     autonChooser.addOption(
         "Just two red",
         new JustTwoGamePieces(true, lift, intake, drive, lights, tagLimelight, scoreLoc));
-    autonChooser.addOption(
-        "Score, mobile, balance", new AutoScoreMobilityAndBalance(lift, drive, lights, scoreLoc));
 
     // Put the chooser on the dashboard
     SmartDashboard.putData(autonChooser);
@@ -105,7 +108,7 @@ public class RobotContainer {
     intake.initialize();
     lift.initialize();
 
-    pneumaticHub.enableCompressorAnalog(80, 110);
+    pneumaticHub.enableCompressorAnalog(90, 110);
 
     burnFlashSparks();
   }
@@ -150,7 +153,7 @@ public class RobotContainer {
     driverController.a().onTrue(new InstantCommand(lift::cancelScore, lift));
     driverController.x().onTrue(new InstantCommand(() -> {drive.throttle(0.5);}, lift));
     driverController.x().onFalse(new InstantCommand(() -> {drive.throttle(1.0);}, lift));
-    driverController.y().onTrue(new InstantCommand(drive::setX, drive));
+    driverController.y().whileTrue(new RunCommand(drive::setX, drive));
 
     driverController
         .rightBumper()
@@ -168,23 +171,30 @@ public class RobotContainer {
     driverController
         .leftBumper()
         .onTrue(
-            new InstantCommand(lift::openGrabber).andThen(
-            new InstantCommand(
+            new SequentialCommandGroup(
+                new InstantCommand(lift::openGrabber),
+                new InstantCommand(
                     () -> {
                       lift.setDesiredPosition(LiftPosition.SHELF);
-                    })
-            )
-        );
-    driverController
-        .leftBumper()
-        .onFalse(
-            new InstantCommand(lift::closeGrabber).andThen(
-                new WaitCommand(0.2)
-            ).andThen(
+                    }),
+                new WaitUntilCommand(() -> {return lift.seeGamePiece();}),
+                new InstantCommand(lift::closeGrabber),
+                new WaitCommand(0.2),
                 new InstantCommand(
                     () -> {
                       lift.setDesiredPosition(LiftPosition.STARTING);
-                    })
+                    }, lift)
+            ));
+    driverController
+        .leftBumper()
+        .onFalse(
+            new SequentialCommandGroup(
+                new InstantCommand(lift::closeGrabber),
+                new WaitCommand(0.2),
+                new InstantCommand(
+                    () -> {
+                      lift.setDesiredPosition(LiftPosition.STARTING);
+                    }, lift)
             )
         );
 
@@ -198,7 +208,7 @@ public class RobotContainer {
                 .beforeStarting(
                     new InstantCommand(
                         () -> {
-                          drive.throttle(0.75);
+                          drive.throttle(0.40 );
                         }))
                 .finallyDo(
                     (boolean interrupted) -> {
@@ -207,6 +217,7 @@ public class RobotContainer {
                       lift.home();
                       intake.stopIntakingGamePiece();
                       lights.setLight(LightCode.OFF);
+                      intake.setDesiredClamped(false);
                     }));
     driverController.rightTrigger().onTrue(new InstantCommand(lift::startScore, lift));
     driverController

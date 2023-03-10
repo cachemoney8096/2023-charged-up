@@ -65,7 +65,7 @@ public final class Cal {
         new PIDController(0.020, 0, 0.000); // From 2022
 
     /** Feed forward for rotating to target, gets added to or subtracted from PID controller. */
-    public static final double ROTATE_TO_TARGET_FF = 0.1; // From 2022
+    public static final double ROTATE_TO_TARGET_FF = 0.05; // From 2022
 
     /** Auton path finding controllers */
     public static final PIDController PATH_X_CONTROLLER = new PIDController(9.0, 0.0, 0.0),
@@ -96,7 +96,7 @@ public final class Cal {
     public static final double CLAMP_POSITION_THRESHOLD_DEGREES = 110.0;
 
     /** Absolute encoder position when the intake is at starting position */
-    public static final double ABSOLUTE_ENCODER_START_POS_DEG = 249.0;
+    public static final double ABSOLUTE_ENCODER_START_POS_DEG = 250.4;
 
     /** Voltage required to hold the intake in the horizontal position */
     // Stall torque: 3.36 Nm * 75 = 252 Nm
@@ -226,7 +226,7 @@ public final class Cal {
      * this position.
      */
     public static final double ELEVATOR_MARGIN_INCHES = 0.5,
-        ARM_MARGIN_DEGREES = 4.0,
+        ARM_MARGIN_DEGREES = 5.0,
         ELEVATOR_START_MARGIN_INCHES = 1.0,
         ARM_START_MARGIN_DEGREES = 8.0;
 
