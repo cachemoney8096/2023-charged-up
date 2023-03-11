@@ -187,7 +187,7 @@ public final class Cal {
         // 11710 rpm / (60 sec/min) * / 14.11 * (pi * 1.125 in) = 48.9 in/s
         ELEVATOR_MAX_VELOCITY_IN_PER_SECOND = 35.0,
         // functional not logical
-        ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN = 1.5;
+        ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN = 0.5;
 
     /** Input deg/s, output volts. From recalc */
     public static final SimpleMotorFeedforward ARM_FEEDFORWARD =
@@ -225,9 +225,9 @@ public final class Cal {
      * reached). We apply broader margins for the Starting position as the lift transits through
      * this position.
      */
-    public static final double ELEVATOR_MARGIN_INCHES = 0.5,
+    public static final double ELEVATOR_MARGIN_INCHES = 1.5,
         ARM_MARGIN_DEGREES = 5.0,
-        ELEVATOR_START_MARGIN_INCHES = 1.0,
+        ELEVATOR_START_MARGIN_INCHES = 1.5,
         ARM_START_MARGIN_DEGREES = 8.0;
 
     /** Zone where the grabber must be closed, in degrees. Bottom is closer to intake. */

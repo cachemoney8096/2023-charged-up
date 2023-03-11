@@ -413,6 +413,34 @@ public class Lift extends SubsystemBase {
     desiredPosition = pos;
   }
 
+  private boolean atDesiredArmPosition() {
+    double armMarginDegrees =
+        desiredPosition == LiftPosition.STARTING
+            ? Cal.Lift.ARM_START_MARGIN_DEGREES
+            : Cal.Lift.ARM_MARGIN_DEGREES;
+    double armPositionToCheckDegrees = liftPositionMap.get(desiredPosition).getSecond();
+    double armPositionDegrees = armEncoder.getPosition();
+    if (Math.abs(armPositionDegrees - armPositionToCheckDegrees) > armMarginDegrees) {
+      return false;
+    }
+    return true;
+  }
+
+  public boolean atDesiredElevatorPosition() {
+    double elevatorMarginInches =
+    desiredPosition == LiftPosition.STARTING
+            ? Cal.Lift.ELEVATOR_START_MARGIN_INCHES
+            : Cal.Lift.ELEVATOR_MARGIN_INCHES;
+    double elevatorPositionToCheckInches = liftPositionMap.get(desiredPosition).getFirst();
+    double elevatorPositionInches = elevatorLeftEncoder.getPosition();
+
+    if (Math.abs(elevatorPositionInches - elevatorPositionToCheckInches) > elevatorMarginInches) {
+      return false;
+    }
+
+    return true;
+  }
+
   /** True if the lift is at the queried position. */
   public boolean atPosition(LiftPosition positionToCheck) {
     double armMarginDegrees =
@@ -559,6 +587,14 @@ public class Lift extends SubsystemBase {
         () -> {
           return atPosition(desiredPosition);
         },
+        null);
+    builder.addBooleanProperty(
+        "At desired arm position",
+        this::atDesiredArmPosition,
+        null);
+    builder.addBooleanProperty(
+        "At desired elevator position",
+        this::atDesiredElevatorPosition,
         null);
     builder.addStringProperty(
         "Desired position",

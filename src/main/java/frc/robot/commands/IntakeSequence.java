@@ -49,6 +49,8 @@ public class IntakeSequence extends SequentialCommandGroup {
         // wait until the lift is in position and the intake sees a game piece
         new WaitUntilCommand(
             () -> {
+              SmartDashboard.putBoolean("Intaking arm pos", lift.atPosition(Lift.LiftPosition.GRAB_FROM_INTAKE));
+              SmartDashboard.putBoolean("Intaking sensor", lift.seeGamePiece());
               return 
               lift.atPosition(Lift.LiftPosition.GRAB_FROM_INTAKE) &&
               // intake.seeGamePiece();
