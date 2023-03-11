@@ -139,13 +139,13 @@ public class Lift extends SubsystemBase {
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 216.0));
     liftPositionMap.put(
         LiftPosition.SCORE_MID_CONE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 208.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 213.0));
     liftPositionMap.put(
         LiftPosition.SCORE_HIGH_CUBE,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 216.0));
     liftPositionMap.put(
         LiftPosition.SCORE_HIGH_CONE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 208.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 213.0));
     liftPositionMap.put(
         LiftPosition.PRE_SCORE_MID_CONE,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 196.0));
@@ -295,12 +295,37 @@ public class Lift extends SubsystemBase {
     desiredGrabberClosed = false;
   }
 
+  public boolean throttleForLift() {
+    switch (desiredPosition) {
+      case ALT_HOME:
+      case STARTING:
+        return false;
+      case SCORE_MID_CUBE:
+      case SCORE_MID_CONE:
+      case SCORE_HIGH_CUBE:
+      case SCORE_HIGH_CONE:
+      case SCORE_LOW:
+      case PRE_SCORE_MID_CONE:
+      case PRE_SCORE_HIGH_CONE:
+      case POST_SCORE_HIGH:
+        return true;
+      case OUTTAKING:
+        return false;
+      case SHELF:
+        return true;
+      case GRAB_FROM_INTAKE:
+        return false;
+      default:
+        return false;
+    }
+  }
+
   /** Returns true if the game piece sensor sees a game piece */
   public boolean seeGamePiece() {
     // Sensor is false if there's a game piece
     // TODO replace once the sensor is on
-    // return !gamePieceSensor.get();
-    return false;
+    return !gamePieceSensor.get();
+    // return false;
   }
 
   /** Returns the cosine of the arm angle in degrees off of the horizontal. */

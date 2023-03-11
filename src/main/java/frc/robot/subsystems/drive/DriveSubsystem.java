@@ -7,6 +7,7 @@ package frc.robot.subsystems.drive;
 import com.ctre.phoenix.sensors.Pigeon2.AxisDirection;
 
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathConstraints;
@@ -70,6 +71,7 @@ public class DriveSubsystem extends SubsystemBase {
   private ChassisSpeeds lastSetChassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
   public Optional<Pose2d> targetPose = Optional.empty();
   public PathPlannerTrajectory pathToScoreBasedOnTag;
+  private BooleanSupplier throttleForLift;
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry odometry =
@@ -86,7 +88,8 @@ public class DriveSubsystem extends SubsystemBase {
   private double throttleMultiplier = 1.0;
 
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {
+  public DriveSubsystem(BooleanSupplier throttleForLiftFunc) {
+    throttleForLift = throttleForLiftFunc;
     gyro.configFactoryDefault();
     gyro.reset();
     gyro.configMountPose(AxisDirection.PositiveY, AxisDirection.PositiveZ);
@@ -209,9 +212,19 @@ public class DriveSubsystem extends SubsystemBase {
     ySpeed *= Constants.SwerveDrive.MAX_SPEED_METERS_PER_SECOND;
     rot *= Constants.SwerveDrive.MAX_ANGULAR_SPEED_RAD_PER_SECONDS;
 
-    xSpeed *= throttleMultiplier;
-    ySpeed *= throttleMultiplier;
-    rot *= throttleMultiplier;
+    if (throttleForLift.getAsBoolean()) {
+
+      xSpeed *= 0.4;
+      ySpeed *= 0.4;
+      rot *= 0.4;
+    }
+    else {
+      xSpeed *= throttleMultiplier;
+      ySpeed *= throttleMultiplier;
+      rot *= throttleMultiplier;
+
+    }
+
 
     ChassisSpeeds desiredChassisSpeeds =
         fieldRelative

@@ -49,7 +49,11 @@ public class IntakeSequence extends SequentialCommandGroup {
         // wait until the lift is in position and the intake sees a game piece
         new WaitUntilCommand(
             () -> {
-              return lift.atPosition(Lift.LiftPosition.GRAB_FROM_INTAKE) && intake.seeGamePiece();
+              return 
+              lift.atPosition(Lift.LiftPosition.GRAB_FROM_INTAKE) &&
+              // intake.seeGamePiece();
+              lift.seeGamePiece();
+              // (lift.seeGamePiece() || intake.seeGamePiece());
             }),
             
             // indicate the robot has obtained a game piece

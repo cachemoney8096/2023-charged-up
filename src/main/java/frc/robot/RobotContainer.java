@@ -45,9 +45,9 @@ import frc.robot.utils.ScoringLocationUtil;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  private final DriveSubsystem drive = new DriveSubsystem();
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
   public final Lift lift = new Lift(scoreLoc);
+  private final DriveSubsystem drive = new DriveSubsystem(lift::throttleForLift);
   public final Intake intake = new Intake(lift::clearOfIntakeZone);
   private final IntakeLimelight intakeLimelight =
       new IntakeLimelight(
@@ -208,7 +208,7 @@ public class RobotContainer {
                 .beforeStarting(
                     new InstantCommand(
                         () -> {
-                          drive.throttle(0.40 );
+                          drive.throttle(0.55);
                         }))
                 .finallyDo(
                     (boolean interrupted) -> {
@@ -216,7 +216,6 @@ public class RobotContainer {
                       drive.throttle(1.0);
                       lift.home();
                       intake.stopIntakingGamePiece();
-                      lights.setLight(LightCode.OFF);
                       intake.setDesiredClamped(false);
                     }));
     driverController.rightTrigger().onTrue(new InstantCommand(lift::startScore, lift));

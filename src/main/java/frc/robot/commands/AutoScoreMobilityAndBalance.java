@@ -31,12 +31,12 @@ public class AutoScoreMobilityAndBalance extends SequentialCommandGroup {
       Lights lights,
       ScoringLocationUtil scoringLocationUtil) {
     addCommands(
-      // new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
-      // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
+      new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
+      new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)).withTimeout(0.75),
       new InstantCommand(lift::startScore, lift),
-      new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
+      new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)).withTimeout(0.25),
       new finishScore(lift, lights),
-      new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)),
+      new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)).withTimeout(0.5),
         new AutoMobilityChargeStationSequence(drive, DISTANCE_UP_CHARGE_STATION_METERS, DISTANCE_BACK_CHARGE_STATION_METERS));
   }
 

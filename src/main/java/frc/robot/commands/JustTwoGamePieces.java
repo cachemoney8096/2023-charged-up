@@ -66,7 +66,7 @@ public class JustTwoGamePieces extends SequentialCommandGroup {
     eventMap.put(
         "deployIntake",
         new IntakeSequence(intake, lift, lights)
-            .withTimeout(2.5)
+            .withTimeout(2.0)
             .finallyDo(
             (boolean interrupted) -> {
               lift.home();
@@ -90,11 +90,11 @@ public class JustTwoGamePieces extends SequentialCommandGroup {
     addCommands(
         new InstantCommand(() -> scoringLocationUtil.setScoreCol(red ? ScoreCol.LEFT : ScoreCol.RIGHT)),
         new InstantCommand(() -> scoringLocationUtil.setScoreHeight(ScoreHeight.HIGH)),
-        // new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
-        // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
+        new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
+        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)).withTimeout(0.75),
         new InstantCommand(() -> {lights.toggleCode(LightCode.READY_TO_SCORE);}),
         new InstantCommand(lift::startScore, lift),
-        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
+        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)).withTimeout(0.25),
         new finishScore(lift, lights),
         new InstantCommand(() -> scoringLocationUtil.setScoreCol(red ? ScoreCol.RIGHT : ScoreCol.LEFT)),
         new WaitCommand(0.4), // going to start
@@ -125,10 +125,10 @@ public class JustTwoGamePieces extends SequentialCommandGroup {
                 drive.drive(0, 0, 0, true);
         }}),
         new InstantCommand(() -> {lights.toggleCode(LightCode.READY_TO_SCORE);}),
-        // new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
-        // new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)),
+        new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
+        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE)).withTimeout(0.75),
         new InstantCommand(lift::startScore, lift),
-        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)),
+        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)).withTimeout(0.25),
         new finishScore(lift, lights),
         new InstantCommand(() -> {drive.resetYaw();})
         );

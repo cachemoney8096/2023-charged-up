@@ -65,7 +65,7 @@ public final class Cal {
         new PIDController(0.020, 0, 0.000); // From 2022
 
     /** Feed forward for rotating to target, gets added to or subtracted from PID controller. */
-    public static final double ROTATE_TO_TARGET_FF = 0.05; // From 2022
+    public static final double ROTATE_TO_TARGET_FF = 0.0; 
 
     /** Auton path finding controllers */
     public static final PIDController PATH_X_CONTROLLER = new PIDController(9.0, 0.0, 0.0),
@@ -138,7 +138,7 @@ public final class Cal {
 
   public static final class Lift {
     /** Input in, output Volts */
-    public static final double ELEVATOR_P = 2.0, ELEVATOR_I = 0.0, ELEVATOR_D = 0.3;
+    public static final double ELEVATOR_P = 2.0, ELEVATOR_I = 0.0, ELEVATOR_D = 0.0;
 
     /** Input deg, output Volts */
     public static final double ARM_P = 0.07, ARM_I = 0.0, ARM_D = Cal.PLACEHOLDER_DOUBLE;
@@ -183,9 +183,9 @@ public final class Cal {
         // Stall force: 2 * 1.08 Nm * 14.11 / (0.5625 / 39.37) m = 2133 N
         // mass: 6.4 kg
         // Accel = 333 m/s^2 = 13110 in/s^2
-        ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED = 90.0,
+        ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED = 70.0,
         // 11710 rpm / (60 sec/min) * / 14.11 * (pi * 1.125 in) = 48.9 in/s
-        ELEVATOR_MAX_VELOCITY_IN_PER_SECOND = 45.0,
+        ELEVATOR_MAX_VELOCITY_IN_PER_SECOND = 35.0,
         // functional not logical
         ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN = 1.5;
 
@@ -208,10 +208,10 @@ public final class Cal {
                 ));
 
     public static final double ELEVATOR_LOW_POSITION_INCHES = 0.0,
-        ELEVATOR_HIGH_POSITION_INCHES = 20.25;
+        ELEVATOR_HIGH_POSITION_INCHES = 22.0;
 
     /** Sets the min and max positions that the elevator and arm motors will be allowed to reach */
-    public static final float ELEVATOR_POSITIVE_LIMIT_INCHES = 20.25f,
+    public static final float ELEVATOR_POSITIVE_LIMIT_INCHES = 22.0f,
         ELEVATOR_NEGATIVE_LIMIT_INCHES = -0.5f,
         ARM_POSITIVE_LIMIT_DEGREES = 265.0f,
         ARM_NEGATIVE_LIMIT_DEGREES = 76.0f;
