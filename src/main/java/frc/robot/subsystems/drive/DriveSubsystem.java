@@ -411,7 +411,8 @@ public class DriveSubsystem extends SubsystemBase {
     System.out.println("Flip Transform: " + flipTransform.getX() + " " + flipTransform.getY());
 
     Pose2d curPose = getPose();
-    latencySec = latencySec + 0.05;
+    double latencyAdjustmentSec = 0.05;
+    latencySec += latencyAdjustmentSec;
     Transform2d pastTransform =
         new Transform2d(
                 new Translation2d(
@@ -446,6 +447,7 @@ public class DriveSubsystem extends SubsystemBase {
       System.out.println(
           "Trajectory Transform: " + trajectoryTransform.getX() + " " + trajectoryTransform.getY());
     }
+    // TODO we should probably just get rid of this guess if there's no target pose
     Pose2d finalPose =
         targetPose.isPresent()
             ? targetPose.get()
@@ -454,18 +456,13 @@ public class DriveSubsystem extends SubsystemBase {
                     new Translation2d(-1.5, red ? 1.15 : -1.15), Rotation2d.fromDegrees(0)));
     Transform2d finalTransform =
         new Transform2d(finalPose.getTranslation(), finalPose.getRotation());
-    // Rotation2d startHeading =
-    // moveTransform.getTranslation().getAngle().plus(curPose.getRotation());
-    // Rotation2d finalHeading = startHeading.plus(Rotation2d.fromDegrees(180));
     Rotation2d finalHeading = Rotation2d.fromDegrees(180);
     Rotation2d finalHolonomicRotation = Rotation2d.fromDegrees(0);
     PathPlannerTrajectory path =
         PathPlanner.generatePath(
             new PathConstraints(2.0, 2.0),
             PathPoint.fromCurrentHolonomicState(futurePose, lastSetChassisSpeeds),
-            new PathPoint(
-                    // finalTransform.getTranslation(), finalHeading, Rotation2d.fromDegrees(0)));
-                    finalTransform.getTranslation(), finalHeading, finalHolonomicRotation)
+            new PathPoint(finalTransform.getTranslation(), finalHeading, finalHolonomicRotation)
                 .withPrevControlLength(0.25));
     pathToScoreBasedOnTag = path;
     return path;

@@ -8,10 +8,7 @@ import frc.robot.Cal;
 import frc.robot.Cal.AutoBalance;
 import frc.robot.subsystems.drive.DriveSubsystem;
 
-/**
- * Command to balance on the charge station during autonomous, using the
- * gyroscope.
- */
+/** Command to balance on the charge station during autonomous, using the gyroscope. */
 public class AutoChargeStationBalance extends CommandBase {
   private final DriveSubsystem drive;
   private final WPI_Pigeon2 gyro;

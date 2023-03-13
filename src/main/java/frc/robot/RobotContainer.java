@@ -16,11 +16,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.IntakeSequence;
 import frc.robot.commands.OuttakeSequence;
+import frc.robot.commands.ShelfSequence;
 import frc.robot.commands.autos.AutoScoreAndBalance;
 import frc.robot.commands.autos.AutoScoreMobilityAndBalance;
 import frc.robot.commands.autos.JustTwoGamePieces;
@@ -177,26 +177,7 @@ public class RobotContainer {
 
     driverController.start().onTrue(new InstantCommand(drive::resetYaw));
 
-    driverController
-        .leftBumper()
-        .onTrue(
-            new SequentialCommandGroup(
-                new InstantCommand(lift::openGrabber),
-                new InstantCommand(
-                    () -> {
-                      lift.setDesiredPosition(LiftPosition.SHELF);
-                    }),
-                new WaitUntilCommand(
-                    () -> {
-                      return lift.seeGamePiece();
-                    }),
-                new InstantCommand(lift::closeGrabber),
-                new WaitCommand(0.2),
-                new InstantCommand(
-                    () -> {
-                      lift.setDesiredPosition(LiftPosition.STARTING);
-                    },
-                    lift)));
+    driverController.leftBumper().onTrue(new ShelfSequence(lift, lights));
     driverController
         .leftBumper()
         .onFalse(
