@@ -5,10 +5,9 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Lift;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -21,9 +20,6 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
-  private Lift lift;
-  private Intake intake;
-
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -35,9 +31,6 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
 
     m_robotContainer.initialize();
-
-    lift = m_robotContainer.lift;
-    intake = m_robotContainer.intake;
   }
 
   /**
@@ -54,16 +47,27 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+
+    SmartDashboard.putNumber("Pressure", m_robotContainer.pneumaticHub.getPressure(0));
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    if (m_autonomousCommand != null) {
+      m_autonomousCommand.cancel();
+    }
+
+    CommandScheduler.getInstance().cancelAll();
+
+    // Just to get network tables ready and everything initialized
+    m_robotContainer.tagLimelight.checkForTag();
+  }
 
   @Override
   public void disabledPeriodic() {
-    intake.rezeroIntake();
-    lift.rezeroLift();
+    m_robotContainer.intake.rezeroIntake();
+    m_robotContainer.lift.rezeroLift();
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */

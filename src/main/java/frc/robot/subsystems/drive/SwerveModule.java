@@ -225,6 +225,10 @@ public class SwerveModule implements Sendable {
     drivingEncoder.setPosition(0);
   }
 
+  public double getEncoderAbsPositionRad() {
+    return turningEncoder.getPosition();
+  }
+
   public void initSendable(SendableBuilder builder) {
     builder.addDoubleProperty("Driving kP", drivingPIDController::getP, drivingPIDController::setP);
     builder.addDoubleProperty("Driving kI", drivingPIDController::getI, drivingPIDController::setI);

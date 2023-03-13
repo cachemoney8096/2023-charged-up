@@ -32,7 +32,7 @@ public final class Cal {
   public static final class SwerveSubsystem {
 
     /** For the purposes of trajectory constraints */
-    public static final double MAX_LINEAR_SPEED_METERS_PER_SEC = 3.0,
+    public static final double MAX_LINEAR_SPEED_METERS_PER_SEC = 4.0,
         MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ = 3.0;
 
     /**
@@ -66,7 +66,7 @@ public final class Cal {
         new PIDController(0.020, 0, 0.000); // From 2022
 
     /** Feed forward for rotating to target, gets added to or subtracted from PID controller. */
-    public static final double ROTATE_TO_TARGET_FF = 0.1; // From 2022
+    public static final double ROTATE_TO_TARGET_FF = 0.0;
 
     /** Auton path finding controllers */
     public static final PIDController PATH_X_CONTROLLER = new PIDController(9.0, 0.0, 0.0),
@@ -82,10 +82,16 @@ public final class Cal {
     public static final int DRIVE_CURRENT_LIMIT_AMPS = 50;
 
     public static final int STEER_CURRENT_LIMIT_AMPS = 20;
+
+    /** Drive speed multipliers for teleop intaking and scoring */
+    public static final double THROTTLE_FOR_INTAKING = 0.55,
+        THROTTLE_FOR_SCORING = 0.6,
+        THROTTLE_FOR_SLOW_BUTTON = 0.5;
+    ;
   }
 
   public static final class Intake {
-    public static final double INTAKING_POWER = 1.0;
+    public static final double INTAKING_POWER = 0.75;
     public static final double EJECTION_POWER = -1.0;
 
     /** Intake positions in degrees */
@@ -97,7 +103,7 @@ public final class Cal {
     public static final double CLAMP_POSITION_THRESHOLD_DEGREES = 110.0;
 
     /** Absolute encoder position when the intake is at starting position */
-    public static final double ABSOLUTE_ENCODER_START_POS_DEG = 283.0;
+    public static final double ABSOLUTE_ENCODER_START_POS_DEG = 250.4;
 
     /** Voltage required to hold the intake in the horizontal position */
     // Stall torque: 3.36 Nm * 75 = 252 Nm
@@ -139,10 +145,10 @@ public final class Cal {
 
   public static final class Lift {
     /** Input in, output Volts */
-    public static final double ELEVATOR_P = 3.0, ELEVATOR_I = 0.0, ELEVATOR_D = 0.3;
+    public static final double ELEVATOR_P = 2.0, ELEVATOR_I = 0.0, ELEVATOR_D = 0.0;
 
     /** Input deg, output Volts */
-    public static final double ARM_P = 0.1, ARM_I = 0.0, ARM_D = Cal.PLACEHOLDER_DOUBLE;
+    public static final double ARM_P = 0.07, ARM_I = 0.0, ARM_D = Cal.PLACEHOLDER_DOUBLE;
 
     /** Absolute encoder position when the arm is at 0 degrees */
     // 30.0 is the kickstand offset from 180 aka vertically up
@@ -152,7 +158,7 @@ public final class Cal {
     /**
      * Position reading from the absolute encoders when the elevator is at the start (zero) position
      */
-    public static final double ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES = 0.2;
+    public static final double ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES = -11.8;
 
     /** Voltage required to hold the arm in the horizontal position */
     // Stall torque: 3.36 Nm * 75 = 252 Nm
@@ -172,9 +178,9 @@ public final class Cal {
         // Stall torque: 3.36 Nm * 75 = 252 Nm
         // Inertia: 3.4 kg * 0.68^2 m^2 = 1.57 kg-m^2
         // Accel = 160.5 rad/s^2 = 9200 deg/s^2
-        ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = 160.0,
+        ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = 640.0,
         // 5880 rpm / (60 sec/min) / 75 * (360 deg / rev) = 470
-        ARM_MAX_VELOCITY_DEG_PER_SECOND = 160.0,
+        ARM_MAX_VELOCITY_DEG_PER_SECOND = 320.0,
         // functional not logical
         ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG = 1.0;
 
@@ -184,11 +190,11 @@ public final class Cal {
         // Stall force: 2 * 1.08 Nm * 14.11 / (0.5625 / 39.37) m = 2133 N
         // mass: 6.4 kg
         // Accel = 333 m/s^2 = 13110 in/s^2
-        ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED = 60.0,
+        ELEVATOR_MAX_ACCELERATION_IN_PER_SECOND_SQUARED = 70.0,
         // 11710 rpm / (60 sec/min) * / 14.11 * (pi * 1.125 in) = 48.9 in/s
-        ELEVATOR_MAX_VELOCITY_IN_PER_SECOND = 30.0,
+        ELEVATOR_MAX_VELOCITY_IN_PER_SECOND = 35.0,
         // functional not logical
-        ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN = 1.5;
+        ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN = 0.5;
 
     /** Input deg/s, output volts. From recalc */
     public static final SimpleMotorFeedforward ARM_FEEDFORWARD =
@@ -209,16 +215,16 @@ public final class Cal {
                 ));
 
     public static final double ELEVATOR_LOW_POSITION_INCHES = 0.0,
-        ELEVATOR_HIGH_POSITION_INCHES = 20.25;
+        ELEVATOR_HIGH_POSITION_INCHES = 22.0;
 
     /** Sets the min and max positions that the elevator and arm motors will be allowed to reach */
-    public static final float ELEVATOR_POSITIVE_LIMIT_INCHES = 20.25f,
+    public static final float ELEVATOR_POSITIVE_LIMIT_INCHES = 22.0f,
         ELEVATOR_NEGATIVE_LIMIT_INCHES = -0.5f,
         ARM_POSITIVE_LIMIT_DEGREES = 265.0f,
         ARM_NEGATIVE_LIMIT_DEGREES = 76.0f;
 
     /** Threshold for when the lift is out of the zone where the intake moves. */
-    public static final double ARM_INTAKE_ZONE_THRESHOLD_DEGREES = 114;
+    public static final double ARM_INTAKE_ZONE_THRESHOLD_DEGREES = 95;
 
     /**
      * Margin for when we consider the lift has reached a position. This is logical (for considering
@@ -226,9 +232,9 @@ public final class Cal {
      * reached). We apply broader margins for the Starting position as the lift transits through
      * this position.
      */
-    public static final double ELEVATOR_MARGIN_INCHES = 0.5,
-        ARM_MARGIN_DEGREES = 4.0,
-        ELEVATOR_START_MARGIN_INCHES = 1.0,
+    public static final double ELEVATOR_MARGIN_INCHES = 1.5,
+        ARM_MARGIN_DEGREES = 5.0,
+        ELEVATOR_START_MARGIN_INCHES = 1.5,
         ARM_START_MARGIN_DEGREES = 8.0;
 
     /** Zone where the grabber must be closed, in degrees. Bottom is closer to intake. */
@@ -241,21 +247,22 @@ public final class Cal {
     /** The time in seconds for the grabber to open in OuttakeSequence */
     public static final double OUTTAKE_GRABBER_WAIT_TIME_SECONDS = 0.2;
 
-    /**
-     * The time in seconds it takes for it to be safe to return to the starting position, from the
-     * scoring high position
-     */
-    public static final double SAFE_TO_RETURN_TO_START_SECONDS = 0.5;
-
     /** Current limits for elevator sparksmax in amps */
     public static final int ELEVATOR_CURRENT_LIMIT_AMPS = 20;
 
     public static final int ARM_CURRENT_LIMIT_AMPS = 40;
+
+    /** Various timeouts for auto lift movements */
+    public static final double START_TO_PRESCORE_HIGH_SEC = 0.75,
+        PRESCORE_TO_SCORE_SEC = 0.25,
+        SCORE_TO_START_SEC = 0.5,
+        SCORE_TO_START_FAST_SEC = 0.2;
+    ;
   }
 
   public static final class AutoBalance {
     /** Max speed to go on charge station in meters per second */
-    public static final double MAX_CHARGE_STATION_CLIMB_SPEED_MPS = 1.0;
+    public static final double MAX_CHARGE_STATION_CLIMB_SPEED_MPS = 0.8;
 
     /** Max speed to go on charge station in [-1,1] */
     public static final double MAX_CHARGE_STATION_CLIMB_NORM_SPEED =
@@ -272,7 +279,10 @@ public final class Cal {
      * Maximum speed to deadband at (that is to say, it won't auto-balance if the velocity is <=
      * 0.05, for a velocity of [-1,1])
      */
-    public static final double CHARGE_STATION_DEADBAND_NORM_VELOCITY = 0.05;
+    public static final double CHARGE_STATION_DEADBAND_NORM_VELOCITY = 0.1;
+
+    /** While balancing, we will setX on the drive for the last this many seconds of auto */
+    public static final double SET_X_TIME_LEFT_SECONDS = 0.3;
   }
 
   public static final int SPARK_INIT_RETRY_ATTEMPTS = 5;

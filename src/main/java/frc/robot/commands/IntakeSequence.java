@@ -2,7 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -19,13 +19,21 @@ public class IntakeSequence extends SequentialCommandGroup {
     addRequirements(intake, lift, lights);
 
     addCommands(
+        new InstantCommand(
+            () -> {
+              lights.setLight(LightCode.OFF);
+            }),
+
         // deploy intake for specified amount of time
-        new RunCommand(
-                () -> {
-                  intake.setDesiredDeployed(true);
-                },
-                intake)
-            .until(intake::atDesiredPosition),
+        new InstantCommand(
+            () -> {
+              intake.setDesiredDeployed(true);
+            },
+            intake),
+        new ParallelRaceGroup(
+            new WaitUntilCommand(intake::atDesiredPosition),
+            // TODO: above seems to proceed right away, this Wait is kindof a hack
+            new WaitCommand(0.25)),
 
         // run intake and move lift to intake position, until the robot sees an
         // object and the lift is in position
@@ -43,22 +51,24 @@ public class IntakeSequence extends SequentialCommandGroup {
 
         // wait until the lift is in position and the intake sees a game piece
         new WaitUntilCommand(
-            () -> (lift.atPosition(Lift.LiftPosition.GRAB_FROM_INTAKE) && intake.seeGamePiece())),
-
-        // stop intake
-        new InstantCommand(intake::stopIntakingGamePiece, intake),
+            () -> {
+              return lift.atPosition(Lift.LiftPosition.GRAB_FROM_INTAKE) && lift.seeGamePiece();
+            }),
 
         // indicate the robot has obtained a game piece
         new InstantCommand(
             () -> {
-              lights.toggleCode(LightCode.GAME_OBJECT);
+              lights.setLight(LightCode.GAME_OBJECT);
             }),
 
         // triggers the grabber to close
         new InstantCommand(lift::closeGrabber, lift),
 
-        // wait until the grabber has closed
-        new WaitCommand(Cal.Lift.GRABBER_CLOSE_TIME_SECONDS),
+        // give the intake time to unclamp
+        new WaitCommand(0.2),
+
+        // stop intake
+        new InstantCommand(intake::stopIntakingGamePiece, intake),
 
         // immediately unclamps the intake.
         new InstantCommand(
@@ -72,6 +82,11 @@ public class IntakeSequence extends SequentialCommandGroup {
 
         // triggers the lift to move to the starting position. This does not need a timeout even
         // though it is a longer action, because it is the final action in the sequence
-        new InstantCommand(lift::home, lift));
+        new InstantCommand(lift::home, lift),
+        new InstantCommand(
+            () -> {
+              intake.setDesiredDeployed(false);
+            },
+            intake));
   }
 }

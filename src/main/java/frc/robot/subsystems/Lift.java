@@ -20,12 +20,10 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
-import frc.robot.subsystems.Lights.LightCode;
 import frc.robot.utils.AngleUtil;
 import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
@@ -49,7 +47,8 @@ public class Lift extends SubsystemBase {
     PRE_SCORE_HIGH_CONE,
     POST_SCORE_HIGH,
     OUTTAKING,
-    STARTING
+    STARTING,
+    ALT_HOME
   }
 
   /** Position of the lift relative to to the start position */
@@ -99,9 +98,9 @@ public class Lift extends SubsystemBase {
   private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
 
   // Members
-  private LiftPosition latestPosition = LiftPosition.STARTING;
-  private LiftPosition desiredPosition = LiftPosition.STARTING;
-  private LiftPosition goalPosition = LiftPosition.STARTING;
+  private LiftPosition latestPosition = LiftPosition.ALT_HOME;
+  private LiftPosition desiredPosition = LiftPosition.ALT_HOME;
+  private LiftPosition goalPosition = LiftPosition.ALT_HOME;
   private boolean desiredGrabberClosed = true;
   public ScoringLocationUtil scoreLoc;
   private boolean scoringInProgress = false;
@@ -127,7 +126,7 @@ public class Lift extends SubsystemBase {
     liftPositionMap = new TreeMap<LiftPosition, Pair<Double, Double>>();
     liftPositionMap.put(
         LiftPosition.GRAB_FROM_INTAKE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 78.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 82.0));
     liftPositionMap.put(
         LiftPosition.SHELF, new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 196.0));
     liftPositionMap.put(
@@ -138,13 +137,13 @@ public class Lift extends SubsystemBase {
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 216.0));
     liftPositionMap.put(
         LiftPosition.SCORE_MID_CONE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 206.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 213.0));
     liftPositionMap.put(
         LiftPosition.SCORE_HIGH_CUBE,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 216.0));
     liftPositionMap.put(
         LiftPosition.SCORE_HIGH_CONE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 206.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 213.0));
     liftPositionMap.put(
         LiftPosition.PRE_SCORE_MID_CONE,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 196.0));
@@ -159,6 +158,9 @@ public class Lift extends SubsystemBase {
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 196.0));
     liftPositionMap.put(
         LiftPosition.STARTING,
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 148.0));
+    liftPositionMap.put(
+        LiftPosition.ALT_HOME,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 148.0));
 
     this.scoreLoc = scoreLoc;
@@ -241,6 +243,20 @@ public class Lift extends SubsystemBase {
     return errors == 0;
   }
 
+  public void bumpArmDown() {
+    Pair<Double, Double> curPos = liftPositionMap.get(LiftPosition.GRAB_FROM_INTAKE);
+    Pair<Double, Double> newPos =
+        new Pair<Double, Double>(curPos.getFirst(), curPos.getSecond() - 0.5);
+    liftPositionMap.replace(LiftPosition.GRAB_FROM_INTAKE, newPos);
+  }
+
+  public void bumpArmUp() {
+    Pair<Double, Double> curPos = liftPositionMap.get(LiftPosition.GRAB_FROM_INTAKE);
+    Pair<Double, Double> newPos =
+        new Pair<Double, Double>(curPos.getFirst(), curPos.getSecond() + 0.5);
+    liftPositionMap.replace(LiftPosition.GRAB_FROM_INTAKE, newPos);
+  }
+
   /**
    * Burns the current settings to sparks so they keep current settings on reboot. Should be done
    * after all settings are set.
@@ -279,10 +295,35 @@ public class Lift extends SubsystemBase {
     desiredGrabberClosed = false;
   }
 
+  /** If true, we want the robot to drive slower so the driver can line up to score */
+  public boolean throttleForLift() {
+    switch (desiredPosition) {
+      case ALT_HOME:
+      case STARTING:
+      case OUTTAKING:
+      case GRAB_FROM_INTAKE: // note: this is already throttling in the intake sequence button
+        // trigger
+        return false;
+      case SCORE_MID_CUBE:
+      case SCORE_MID_CONE:
+      case SCORE_HIGH_CUBE:
+      case SCORE_HIGH_CONE:
+      case SCORE_LOW:
+      case PRE_SCORE_MID_CONE:
+      case PRE_SCORE_HIGH_CONE:
+      case POST_SCORE_HIGH:
+      case SHELF:
+        return true;
+      default:
+        return false;
+    }
+  }
+
   /** Returns true if the game piece sensor sees a game piece */
   public boolean seeGamePiece() {
     // Sensor is false if there's a game piece
     return !gamePieceSensor.get();
+    // return false;
   }
 
   /** Returns the cosine of the arm angle in degrees off of the horizontal. */
@@ -333,7 +374,6 @@ public class Lift extends SubsystemBase {
   public void finishScoreCancelled(Lights lights) {
     setCancelScore(false);
     ManualPrepScoreSequence(lights);
-    closeGrabber();
   }
 
   /** returns cancelScore (true if scoring action is cancelled) */
@@ -371,6 +411,34 @@ public class Lift extends SubsystemBase {
     desiredPosition = pos;
   }
 
+  private boolean atDesiredArmPosition() {
+    double armMarginDegrees =
+        desiredPosition == LiftPosition.STARTING
+            ? Cal.Lift.ARM_START_MARGIN_DEGREES
+            : Cal.Lift.ARM_MARGIN_DEGREES;
+    double armPositionToCheckDegrees = liftPositionMap.get(desiredPosition).getSecond();
+    double armPositionDegrees = armEncoder.getPosition();
+    if (Math.abs(armPositionDegrees - armPositionToCheckDegrees) > armMarginDegrees) {
+      return false;
+    }
+    return true;
+  }
+
+  public boolean atDesiredElevatorPosition() {
+    double elevatorMarginInches =
+        desiredPosition == LiftPosition.STARTING
+            ? Cal.Lift.ELEVATOR_START_MARGIN_INCHES
+            : Cal.Lift.ELEVATOR_MARGIN_INCHES;
+    double elevatorPositionToCheckInches = liftPositionMap.get(desiredPosition).getFirst();
+    double elevatorPositionInches = elevatorLeftEncoder.getPosition();
+
+    if (Math.abs(elevatorPositionInches - elevatorPositionToCheckInches) > elevatorMarginInches) {
+      return false;
+    }
+
+    return true;
+  }
+
   /** True if the lift is at the queried position. */
   public boolean atPosition(LiftPosition positionToCheck) {
     double armMarginDegrees =
@@ -399,6 +467,7 @@ public class Lift extends SubsystemBase {
   /** Converts a lift position to a relative lift position (above or below starting position). */
   private static LiftPositionStartRelative getRelativeLiftPosition(LiftPosition pos) {
     switch (pos) {
+      case ALT_HOME:
       case STARTING:
         return LiftPositionStartRelative.AT_START;
       case SCORE_MID_CUBE:
@@ -431,20 +500,22 @@ public class Lift extends SubsystemBase {
 
     // If the lift is going from below to above or above to below, we have to transit through
     // starting position. Otherwise, we can go directly to the desired position.
-    LiftPositionStartRelative latestPositionStartRelative = getRelativeLiftPosition(latestPosition);
-    LiftPositionStartRelative desiredPositionStartRelative =
-        getRelativeLiftPosition(desiredPosition);
-    if (!seeGamePiece()) {
-      controlPosition(desiredPosition);
-    } else if (desiredPositionStartRelative == LiftPositionStartRelative.BELOW_START
-        && latestPositionStartRelative == LiftPositionStartRelative.ABOVE_START) {
-      controlPosition(LiftPosition.STARTING);
-    } else if (desiredPositionStartRelative == LiftPositionStartRelative.ABOVE_START
-        && latestPositionStartRelative == LiftPositionStartRelative.BELOW_START) {
-      controlPosition(LiftPosition.STARTING);
-    } else {
-      controlPosition(desiredPosition);
-    }
+    // LiftPositionStartRelative latestPositionStartRelative =
+    // getRelativeLiftPosition(latestPosition);
+    // LiftPositionStartRelative desiredPositionStartRelative =
+    //     getRelativeLiftPosition(desiredPosition);
+    // if (!seeGamePiece()) {
+    //   controlPosition(desiredPosition);
+    // } else if (desiredPositionStartRelative == LiftPositionStartRelative.BELOW_START
+    //     && latestPositionStartRelative == LiftPositionStartRelative.ABOVE_START) {
+    //   controlPosition(LiftPosition.STARTING);
+    // } else if (desiredPositionStartRelative == LiftPositionStartRelative.ABOVE_START
+    //     && latestPositionStartRelative == LiftPositionStartRelative.BELOW_START) {
+    //   controlPosition(LiftPosition.STARTING);
+    // } else {
+    //   controlPosition(desiredPosition);
+    // }
+    controlPosition(desiredPosition);
 
     // // If the grabber is set to open and it is safe to open, open the grabber (drop). Otherwise,
     // // close it (grab).
@@ -517,6 +588,9 @@ public class Lift extends SubsystemBase {
           return atPosition(desiredPosition);
         },
         null);
+    builder.addBooleanProperty("At desired arm position", this::atDesiredArmPosition, null);
+    builder.addBooleanProperty(
+        "At desired elevator position", this::atDesiredElevatorPosition, null);
     builder.addStringProperty(
         "Desired position",
         () -> {
@@ -563,13 +637,6 @@ public class Lift extends SubsystemBase {
   public void ManualPrepScoreSequence(Lights lights) {
     ScoreHeight height = scoreLoc.getScoreHeight();
 
-    // indicate the robot is currently working on prep score
-    new InstantCommand(
-            () -> {
-              lights.toggleCode(LightCode.WORKING);
-            })
-        .schedule();
-
     // low for all columns is the same height
     if (height == ScoreHeight.LOW) {
       setDesiredPosition(LiftPosition.SCORE_LOW);
@@ -590,11 +657,5 @@ public class Lift extends SubsystemBase {
         setDesiredPosition(LiftPosition.SCORE_HIGH_CUBE);
       }
     }
-
-    // indicate the robot is now ready to score
-    new InstantCommand(
-        () -> {
-          lights.toggleCode(LightCode.READY_TO_SCORE);
-        });
   }
 }

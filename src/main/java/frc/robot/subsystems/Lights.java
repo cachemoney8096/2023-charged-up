@@ -36,7 +36,7 @@ public class Lights extends SubsystemBase {
     lightOptionsMap.put(LightCode.CONE, 0.69);
     lightOptionsMap.put(LightCode.CUBE, 0.91);
     lightOptionsMap.put(LightCode.GAME_OBJECT, 0.71);
-    lightOptionsMap.put(LightCode.NO_TAG, 0.71);
+    lightOptionsMap.put(LightCode.NO_TAG, 0.75);
     lightOptionsMap.put(LightCode.WORKING, 0.61);
     lightOptionsMap.put(LightCode.READY_TO_SCORE, 0.87);
     lightOptionsMap.put(LightCode.OFF, 0.99); // 0.99 = black, is this equivalent to OFF?
