@@ -43,17 +43,23 @@ import frc.robot.utils.ScoringLocationUtil;
  */
 public class RobotContainer {
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
+  public final TagLimelightV2 tagLimelight = new TagLimelightV2(scoreLoc);
   public final Lift lift = new Lift(scoreLoc);
-  private final DriveSubsystem drive = new DriveSubsystem(lift::throttleForLift);
+  private final DriveSubsystem drive = new DriveSubsystem(
+    tagLimelight,
+    lift::throttleForLift,
+    () -> this.red);
   public final Intake intake = new Intake(lift::clearOfIntakeZone);
   //   private final IntakeLimelight intakeLimelight =
   //       new IntakeLimelight(
   //           Constants.INTAKE_LIMELIGHT_PITCH_DEGREES,
   //           Constants.INTAKE_LIMELIGHT_HEIGHT_METERS,
   //           Constants.INTAKE_TARGET_HEIGHT_METERS);
-  public final TagLimelightV2 tagLimelight = new TagLimelightV2(scoreLoc);
   private final Lights lights = new Lights();
   public final PneumaticHub pneumaticHub = new PneumaticHub();
+
+  /** True if we're red, set in DS */
+  public boolean red = false;
 
   // A chooser for autonomous commands
   private SendableChooser<Command> autonChooser = new SendableChooser<>();
@@ -79,7 +85,6 @@ public class RobotContainer {
 
   public void initialize() {
     // autons
-
     autonChooser.setDefaultOption(
         "Two plus balance Blue",
         new TwoGamePiecesThatEngage(false, lift, intake, drive, lights, tagLimelight, scoreLoc));

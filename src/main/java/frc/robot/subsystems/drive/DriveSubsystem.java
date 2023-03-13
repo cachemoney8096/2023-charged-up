@@ -12,6 +12,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -32,7 +33,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
+import frc.robot.subsystems.TagLimelightV2;
 import frc.robot.utils.GeometryUtils;
+import frc.robot.utils.VectorUtils;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
@@ -70,18 +73,32 @@ public class DriveSubsystem extends SubsystemBase {
   public Optional<Pose2d> targetPose = Optional.empty();
   public PathPlannerTrajectory pathToScoreBasedOnTag;
   private BooleanSupplier throttleForLift;
+  private BooleanSupplier getRedAlliance;
+  private TagLimelightV2 tagLimelight;
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry odometry =
       new SwerveDriveOdometry(
           Constants.SwerveDrive.DRIVE_KINEMATICS,
+          Rotation2d.fromDegrees(0.0),
+          getModulePositions());
+
+  private final double modelTranslationStDevMeters = 0.1;
+  private final double modelRotationStDevDeg = 10.0;
+  private final double visionXStDevMeters = 15.0;
+  private final double visionYStDevMeters = 15.0;
+  private final double visionRotationStDevDeg = 1500.0; // basically don't use
+
+  SwerveDrivePoseEstimator poseEstimator =
+      new SwerveDrivePoseEstimator(
+          Constants.SwerveDrive.DRIVE_KINEMATICS,
           Rotation2d.fromDegrees(gyro.getYaw()),
-          new SwerveModulePosition[] {
-            frontLeft.getPosition(),
-            frontRight.getPosition(),
-            rearLeft.getPosition(),
-            rearRight.getPosition()
-          });
+          getModulePositions(),
+          getPose(),
+          VectorUtils.createStateStdDevs(
+              modelTranslationStDevMeters, modelTranslationStDevMeters, modelRotationStDevDeg),
+          VectorUtils.createVisionMeasurementStdDevs(
+              visionXStDevMeters, visionYStDevMeters, visionRotationStDevDeg));
 
   /** Multiplier for drive speed, does not affect trajectory following */
   private double throttleMultiplier = 1.0;
@@ -91,8 +108,14 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @param throttleForLiftFunc Function to check if we should throttle due to lift position.
    */
-  public DriveSubsystem(BooleanSupplier throttleForLiftFunc) {
+  public DriveSubsystem(
+      TagLimelightV2 limelight,
+      BooleanSupplier throttleForLiftFunc,
+      BooleanSupplier getRedAllianceFunc) {
+    tagLimelight = limelight;
     throttleForLift = throttleForLiftFunc;
+    getRedAlliance = getRedAllianceFunc;
+
     gyro.configFactoryDefault();
     gyro.reset();
     gyro.configMountPose(AxisDirection.PositiveY, AxisDirection.PositiveZ);
@@ -100,15 +123,26 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    poseEstimator.update(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions());
+    Optional<Pose2d> visionEstimate =
+        tagLimelight.getBotPose(
+            getRedAlliance.getAsBoolean(), poseEstimator.getEstimatedPosition());
+    if (visionEstimate.isPresent()) {
+      double timestamp = tagLimelight.getLastTimestampSeconds();
+      poseEstimator.addVisionMeasurement(visionEstimate.get(), timestamp);
+    }
+
     // Update the odometry in the periodic block
-    odometry.update(
-        Rotation2d.fromDegrees(gyro.getYaw()),
-        new SwerveModulePosition[] {
-          frontLeft.getPosition(),
-          frontRight.getPosition(),
-          rearLeft.getPosition(),
-          rearRight.getPosition()
-        });
+    odometry.update(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions());
+  }
+
+  public SwerveModulePosition[] getModulePositions() {
+    return new SwerveModulePosition[] {
+      frontLeft.getPosition(),
+      frontRight.getPosition(),
+      rearLeft.getPosition(),
+      rearRight.getPosition()
+    };
   }
 
   public void burnFlashSparks() {
@@ -128,35 +162,30 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
+   * Returns the currently-estimated pose of the robot.
+   *
+   * @return The pose.
+   */
+  public Pose2d getVisionPose() {
+    return poseEstimator.getEstimatedPosition();
+  }
+
+  /**
    * Resets the odometry to the specified pose.
    *
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    odometry.resetPosition(
-        Rotation2d.fromDegrees(gyro.getYaw()),
-        new SwerveModulePosition[] {
-          frontLeft.getPosition(),
-          frontRight.getPosition(),
-          rearLeft.getPosition(),
-          rearRight.getPosition()
-        },
-        pose);
+    poseEstimator.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions(), pose);
+    odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions(), pose);
   }
 
   public void resetYaw() {
     gyro.reset();
     Pose2d curPose = getPose();
     Pose2d resetPose = new Pose2d(curPose.getTranslation(), Rotation2d.fromDegrees(0));
-    odometry.resetPosition(
-        Rotation2d.fromDegrees(0),
-        new SwerveModulePosition[] {
-          frontLeft.getPosition(),
-          frontRight.getPosition(),
-          rearLeft.getPosition(),
-          rearRight.getPosition()
-        },
-        resetPose);
+    odometry.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(), resetPose);
+    poseEstimator.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(), resetPose);
     targetHeadingDegrees = 0.0;
   }
 
@@ -504,24 +533,14 @@ public class DriveSubsystem extends SubsystemBase {
         },
         null);
     builder.addDoubleProperty("Gyro Yaw (deg)", gyro::getYaw, null);
+    builder.addDoubleProperty("Odometry X (m)", () -> getPose().getX(), null);
+    builder.addDoubleProperty("Odometry Y (m)", () -> getPose().getY(), null);
     builder.addDoubleProperty(
-        "Odometry X (m)",
-        () -> {
-          return getPose().getX();
-        },
-        null);
+        "Odometry Yaw (deg)", () -> getPose().getRotation().getDegrees(), null);
+    builder.addDoubleProperty("Pose+Vis X (m)", () -> getVisionPose().getX(), null);
+    builder.addDoubleProperty("Pose+Vis Y (m)", () -> getVisionPose().getY(), null);
     builder.addDoubleProperty(
-        "Odometry Y (m)",
-        () -> {
-          return getPose().getY();
-        },
-        null);
-    builder.addDoubleProperty(
-        "Odometry Yaw (deg)",
-        () -> {
-          return getPose().getRotation().getDegrees();
-        },
-        null);
+        "Pose+Vis Yaw (deg)", () -> getVisionPose().getRotation().getDegrees(), null);
     builder.addDoubleProperty(
         "Front Left Abs Encoder (rad)", frontLeft::getEncoderAbsPositionRad, null);
   }

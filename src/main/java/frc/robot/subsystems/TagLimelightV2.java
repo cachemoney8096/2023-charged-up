@@ -1,12 +1,15 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.LimelightHelpers;
+import frc.robot.utils.LimelightHelpers.LimelightResults;
 import frc.robot.utils.LimelightHelpers.LimelightTarget_Fiducial;
 import frc.robot.utils.ScoringLocationUtil;
 import java.util.Optional;
@@ -16,10 +19,45 @@ public class TagLimelightV2 extends SubsystemBase {
 
   private Optional<Transform2d> robotToScoringLocation = Optional.empty();
 
+  private LimelightResults latestResults;
+  private boolean usedLatestResults = false;
+
   public TagLimelightV2(ScoringLocationUtil scoringLocUtil) {
     scoreLoc = scoringLocUtil;
 
     LimelightHelpers.setLEDMode_ForceOff("");
+  }
+
+  public void retrieveLatestResults() {
+    double lastPublishTime = latestResults.targetingResults.timestamp_LIMELIGHT_publish;
+    latestResults = LimelightHelpers.getLatestResults("");
+    if (lastPublishTime != latestResults.targetingResults.timestamp_LIMELIGHT_publish)
+    {
+      usedLatestResults = false;
+    }
+  }
+
+  public static boolean shouldUseVision(Pose2d visionEstimate, Pose2d filteredEstimate) {
+    // TODO 
+    // can also use latestResults, like checking for multiple targets
+    return true;
+  }
+
+  public Optional<Pose2d> getBotPose(boolean red, Pose2d filteredEstimate) {
+    if (usedLatestResults) {
+      return Optional.empty();
+    }
+    usedLatestResults = true;
+
+    Pose2d visionEstimate =
+      red ?
+      LimelightHelpers.getBotPose2d_wpiRed("") : 
+      LimelightHelpers.getBotPose2d_wpiBlue("");
+
+    if (shouldUseVision(visionEstimate, filteredEstimate)) {
+      return Optional.of(visionEstimate);
+    }
+    return Optional.empty();
   }
 
   private static Transform2d getBotFromTarget(Pose3d botPoseTargetSpace) {
@@ -97,6 +135,10 @@ public class TagLimelightV2 extends SubsystemBase {
     robotToScoringLocation =
         Optional.of(getRobotToScoringLocation(LimelightHelpers.getTargetPose3d_RobotSpace("")));
     return robotToScoringLocation;
+  }
+
+  public double getLastTimestampSeconds() {
+    return Timer.getFPGATimestamp() - getLatencySeconds();
   }
 
   public double getLatencySeconds() {
