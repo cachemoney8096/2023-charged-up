@@ -195,6 +195,8 @@ public class Intake extends SubsystemBase {
 
     // Set the intake control position
     intakeControlPositionDegrees = Cal.Intake.RETRACTED_POSITION_DEGREES;
+
+    stopIntakingGamePiece();
   }
 
   /*Setter for whether intake is desired deploy is true retract is false */
@@ -251,7 +253,8 @@ public class Intake extends SubsystemBase {
   /** Returns true if the game piece sensor sees a game piece */
   public boolean seeGamePiece() {
     // Sensor is false if there's a game piece
-    return !gamePieceSensor.get();
+    // return !gamePieceSensor.get();
+    return false;
   }
 
   @Override

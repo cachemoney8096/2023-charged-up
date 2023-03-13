@@ -42,11 +42,11 @@ public class AutoChargeStationBalance extends CommandBase {
     double matchTime = DriverStation.getMatchTime();
 
     // stop driving (and thus set x) if there is less than one second left in auton
-    drive.drive(
-        matchTime > 1.0 ? deadbandedNormVelocity : 0.0,
-        NOT_MOVING_IN_Y,
-        NOT_ROTATING,
-        ROBOT_RELATIVE);
+    if (matchTime > 0.3) {
+      drive.drive(deadbandedNormVelocity, NOT_MOVING_IN_Y, NOT_ROTATING, ROBOT_RELATIVE);
+    } else {
+      drive.setX();
+    }
   }
 
   // Called once the command ends or is interrupted.

@@ -23,8 +23,4 @@ public class TestPath extends SequentialCommandGroup {
   public TestPath(boolean isFirstPath, DriveSubsystem drive) {
     addCommands(drive.followTrajectoryCommand(traj, isFirstPath));
   }
-
-  public PathPlannerTrajectory getTrajectory() {
-    return this.traj;
-  }
 }

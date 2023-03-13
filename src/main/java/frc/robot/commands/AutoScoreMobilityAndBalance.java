@@ -10,10 +10,11 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.ScoringLocationUtil;
 
 /** Scores a game piece, then drives onto the charge station and balances */
-public class AutoScoreAndBalance extends SequentialCommandGroup {
-  private static final double DISTANCE_UP_CHARGE_STATION_METERS = 2.21;
+public class AutoScoreMobilityAndBalance extends SequentialCommandGroup {
+  private static final double DISTANCE_UP_CHARGE_STATION_METERS = 4.5;
+  private static final double DISTANCE_BACK_CHARGE_STATION_METERS = 3.15;
 
-  public AutoScoreAndBalance(
+  public AutoScoreMobilityAndBalance(
       Lift lift, DriveSubsystem drive, Lights lights, ScoringLocationUtil scoringLocationUtil) {
     addCommands(
         new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
@@ -23,6 +24,7 @@ public class AutoScoreAndBalance extends SequentialCommandGroup {
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)).withTimeout(0.25),
         new finishScore(lift, lights),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)).withTimeout(0.5),
-        new AutoChargeStationSequence(drive, DISTANCE_UP_CHARGE_STATION_METERS));
+        new AutoMobilityChargeStationSequence(
+            drive, DISTANCE_UP_CHARGE_STATION_METERS, DISTANCE_BACK_CHARGE_STATION_METERS));
   }
 }

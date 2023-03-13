@@ -6,11 +6,16 @@ package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix.sensors.Pigeon2.AxisDirection;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -20,6 +25,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -27,6 +33,8 @@ import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
 import frc.robot.utils.GeometryUtils;
+import java.util.Optional;
+import java.util.function.BooleanSupplier;
 
 public class DriveSubsystem extends SubsystemBase {
   private double targetHeadingDegrees;
@@ -58,6 +66,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   // The gyro sensor
   private final WPI_Pigeon2 gyro = new WPI_Pigeon2(RobotMap.PIGEON_CAN_ID);
+  private ChassisSpeeds lastSetChassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
+  public Optional<Pose2d> targetPose = Optional.empty();
+  public PathPlannerTrajectory pathToScoreBasedOnTag;
+  private BooleanSupplier throttleForLift;
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry odometry =
@@ -71,10 +83,16 @@ public class DriveSubsystem extends SubsystemBase {
             rearRight.getPosition()
           });
 
-  private boolean halfSpeed = false;
+  /** Multiplier for drive speed, does not affect trajectory following */
+  private double throttleMultiplier = 1.0;
 
-  /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {
+  /**
+   * Creates a new DriveSubsystem.
+   *
+   * @param throttleForLiftFunc Function to check if we should throttle due to lift position.
+   */
+  public DriveSubsystem(BooleanSupplier throttleForLiftFunc) {
+    throttleForLift = throttleForLiftFunc;
     gyro.configFactoryDefault();
     gyro.reset();
     gyro.configMountPose(AxisDirection.PositiveY, AxisDirection.PositiveZ);
@@ -126,6 +144,22 @@ public class DriveSubsystem extends SubsystemBase {
         pose);
   }
 
+  public void resetYaw() {
+    gyro.reset();
+    Pose2d curPose = getPose();
+    Pose2d resetPose = new Pose2d(curPose.getTranslation(), Rotation2d.fromDegrees(0));
+    odometry.resetPosition(
+        Rotation2d.fromDegrees(0),
+        new SwerveModulePosition[] {
+          frontLeft.getPosition(),
+          frontRight.getPosition(),
+          rearLeft.getPosition(),
+          rearRight.getPosition()
+        },
+        resetPose);
+    targetHeadingDegrees = 0.0;
+  }
+
   /**
    * Correction for swerve second order dynamics issue. Borrowed from 254:
    * https://github.com/Team254/FRC-2022-Public/blob/main/src/main/java/com/team254/frc2022/subsystems/Drive.java#L325
@@ -148,6 +182,19 @@ public class DriveSubsystem extends SubsystemBase {
     return updatedSpeeds;
   }
 
+  /** Keep modules in current position, don't drive */
+  public void setNoMove() {
+    Rotation2d frontLeftCurrRot = frontLeft.getPosition().angle;
+    Rotation2d frontRightCurrRot = frontRight.getPosition().angle;
+    Rotation2d rearLeftCurrRot = rearLeft.getPosition().angle;
+    Rotation2d rearRightCurrRot = rearRight.getPosition().angle;
+    frontLeft.setDesiredState(new SwerveModuleState(0, frontLeftCurrRot));
+    frontRight.setDesiredState(new SwerveModuleState(0, frontRightCurrRot));
+    rearLeft.setDesiredState(new SwerveModuleState(0, rearLeftCurrRot));
+    rearRight.setDesiredState(new SwerveModuleState(0, rearRightCurrRot));
+    targetHeadingDegrees = getHeadingDegrees();
+  }
+
   /**
    * Method to drive the robot using joystick info.
    *
@@ -161,7 +208,7 @@ public class DriveSubsystem extends SubsystemBase {
     // they're equal to 0
     // does account for controller deadzones.
     if (xSpeed == 0 && ySpeed == 0 && rot == 0) {
-      setX();
+      setNoMove();
       return;
     }
 
@@ -170,9 +217,15 @@ public class DriveSubsystem extends SubsystemBase {
     ySpeed *= Constants.SwerveDrive.MAX_SPEED_METERS_PER_SECOND;
     rot *= Constants.SwerveDrive.MAX_ANGULAR_SPEED_RAD_PER_SECONDS;
 
-    if (halfSpeed) {
-      xSpeed /= 2;
-      ySpeed /= 2;
+    if (throttleForLift.getAsBoolean()) {
+
+      xSpeed *= 0.4;
+      ySpeed *= 0.4;
+      rot *= 0.4;
+    } else {
+      xSpeed *= throttleMultiplier;
+      ySpeed *= throttleMultiplier;
+      rot *= throttleMultiplier;
     }
 
     ChassisSpeeds desiredChassisSpeeds =
@@ -182,6 +235,7 @@ public class DriveSubsystem extends SubsystemBase {
             : new ChassisSpeeds(xSpeed, ySpeed, rot);
 
     desiredChassisSpeeds = correctForDynamics(desiredChassisSpeeds);
+    lastSetChassisSpeeds = desiredChassisSpeeds;
 
     var swerveModuleStates =
         Constants.SwerveDrive.DRIVE_KINEMATICS.toSwerveModuleStates(desiredChassisSpeeds);
@@ -200,6 +254,7 @@ public class DriveSubsystem extends SubsystemBase {
     frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+    targetHeadingDegrees = getHeadingDegrees();
   }
 
   /**
@@ -222,11 +277,6 @@ public class DriveSubsystem extends SubsystemBase {
     rearLeft.resetEncoders();
     frontRight.resetEncoders();
     rearRight.resetEncoders();
-  }
-
-  /** Zeroes the heading of the robot. */
-  public void zeroHeading() {
-    gyro.reset();
   }
 
   /**
@@ -272,11 +322,11 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public int convertCardinalDirections(int povAngleDeg) {
-    // change d-pad values for left and right to 45 degree angles
+    // change d-pad values for left and right to 20 degree angles
     if (povAngleDeg == 270) {
-      povAngleDeg += 45;
+      povAngleDeg += 70;
     } else if (povAngleDeg == 90) {
-      povAngleDeg -= 45;
+      povAngleDeg -= 70;
     }
     // targetHeadingDegrees is counterclockwise so need to flip povAngle
     povAngleDeg = 360 - povAngleDeg;
@@ -319,50 +369,116 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Taken from Github */
   public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
+
     return new SequentialCommandGroup(
-        new RunCommand(() -> setForward())
-            .withTimeout(0.1)
-            .unless(
+            new RunCommand(() -> setForward())
+                .withTimeout(0.1)
+                .unless(
+                    () -> {
+                      return !isFirstPath;
+                    }),
+            new InstantCommand(
                 () -> {
-                  return !isFirstPath;
+                  // Reset odometry for the first path you run during auto
+                  if (isFirstPath) {
+                    this.resetOdometry(traj.getInitialHolonomicPose());
+                  }
                 }),
-        new InstantCommand(
-            () -> {
-              // Reset odometry for the first path you run during auto
-              if (isFirstPath) {
-                this.resetOdometry(traj.getInitialHolonomicPose());
-              }
-            }),
-        new PPSwerveControllerCommand(
-            traj,
-            this::getPose, // Pose supplier
-            Constants.SwerveDrive.DRIVE_KINEMATICS, // SwerveDriveKinematics
-            Cal.SwerveSubsystem
-                .PATH_X_CONTROLLER, // X controller. Tune these values for your robot. Leaving them
-            // 0 will only use feedforwards.
-            Cal.SwerveSubsystem
-                .PATH_Y_CONTROLLER, // Y controller (usually the same values as X controller)
-            Cal.SwerveSubsystem
-                .PATH_THETA_CONTROLLER, // Rotation controller. Tune these values for your robot.
-            // Leaving them 0 will only use feedforwards.
-            this::setModuleStates, // Module states consumer
-            true, // Should the path be automatically mirrored depending on alliance color.
-            // Optional, defaults to true
-            this // Requires this drive subsystem
-            ),
-        new InstantCommand(
-            () -> {
-              targetHeadingDegrees = getPose().getRotation().getDegrees();
-            }));
+            new PPSwerveControllerCommand(
+                traj,
+                this::getPose, // Pose supplier
+                Constants.SwerveDrive.DRIVE_KINEMATICS,
+                Cal.SwerveSubsystem.PATH_X_CONTROLLER,
+                Cal.SwerveSubsystem.PATH_Y_CONTROLLER, // usually the same values as X controller
+                Cal.SwerveSubsystem.PATH_THETA_CONTROLLER,
+                this::setModuleStates, // Module states consumer
+                false, // Should the path be automatically mirrored depending on alliance color.
+                this // Requires this drive subsystem
+                ),
+            new InstantCommand(
+                () -> {
+                  targetHeadingDegrees = getHeadingDegrees();
+                }),
+            new PrintCommand("Finished a trajectory"))
+        .withName("Follow trajectory");
+  }
+
+  public void setLimelightTargetFromTransform(Transform2d transform, double latencySec) {
+    // Transform is to get the limelight to the correct location, not to get the robot
+    // Here we correct for that
+    Transform2d flipTransform =
+        new Transform2d(
+            new Translation2d(-transform.getX(), transform.getY()), transform.getRotation());
+    System.out.println("Flip Transform: " + flipTransform.getX() + " " + flipTransform.getY());
+
+    Pose2d curPose = getPose();
+    latencySec = latencySec + 0.05;
+    Transform2d pastTransform =
+        new Transform2d(
+                new Translation2d(
+                    lastSetChassisSpeeds.vxMetersPerSecond * latencySec,
+                    lastSetChassisSpeeds.vyMetersPerSecond * latencySec),
+                Rotation2d.fromRadians(lastSetChassisSpeeds.omegaRadiansPerSecond * latencySec))
+            .inverse();
+    Pose2d pastPose = curPose.plus(pastTransform);
+
+    final boolean useLatencyAdjustment = true;
+
+    targetPose =
+        useLatencyAdjustment
+            ? Optional.of(pastPose.plus(flipTransform))
+            : Optional.of(curPose.plus(flipTransform));
+  }
+
+  public PathPlannerTrajectory poseToPath(boolean red) {
+    Pose2d curPose = getPose();
+    double coastLatencySec = 0.03;
+    Transform2d coastTransform =
+        new Transform2d(
+            new Translation2d(
+                lastSetChassisSpeeds.vxMetersPerSecond * coastLatencySec,
+                lastSetChassisSpeeds.vyMetersPerSecond * coastLatencySec),
+            Rotation2d.fromRadians(lastSetChassisSpeeds.omegaRadiansPerSecond * coastLatencySec));
+    Pose2d futurePose = curPose.plus(coastTransform);
+
+    System.out.println("Acquired target? " + targetPose.isPresent());
+    if (targetPose.isPresent()) {
+      Transform2d trajectoryTransform = targetPose.get().minus(futurePose);
+      System.out.println(
+          "Trajectory Transform: " + trajectoryTransform.getX() + " " + trajectoryTransform.getY());
+    }
+    Pose2d finalPose =
+        targetPose.isPresent()
+            ? targetPose.get()
+            : futurePose.plus(
+                new Transform2d(
+                    new Translation2d(-1.5, red ? 1.15 : -1.15), Rotation2d.fromDegrees(0)));
+    Transform2d finalTransform =
+        new Transform2d(finalPose.getTranslation(), finalPose.getRotation());
+    // Rotation2d startHeading =
+    // moveTransform.getTranslation().getAngle().plus(curPose.getRotation());
+    // Rotation2d finalHeading = startHeading.plus(Rotation2d.fromDegrees(180));
+    Rotation2d finalHeading = Rotation2d.fromDegrees(180);
+    Rotation2d finalHolonomicRotation = Rotation2d.fromDegrees(0);
+    PathPlannerTrajectory path =
+        PathPlanner.generatePath(
+            new PathConstraints(2.0, 2.0),
+            PathPoint.fromCurrentHolonomicState(futurePose, lastSetChassisSpeeds),
+            new PathPoint(
+                    // finalTransform.getTranslation(), finalHeading, Rotation2d.fromDegrees(0)));
+                    finalTransform.getTranslation(), finalHeading, finalHolonomicRotation)
+                .withPrevControlLength(0.25));
+    pathToScoreBasedOnTag = path;
+    return path;
   }
 
   public void toggleSkids() {
     // TODO do this once we can add skids
   }
 
-  public void halfSpeedToggle() {
-    // Toggle halfSpeed. If it is true, set it to false, otherwise set it to true.
-    halfSpeed = !halfSpeed;
+  /** Driving inputs will get multiplied by the throttle value, so it should be in [0,1] */
+  public void throttle(double throttleValue) {
+    throttleMultiplier = throttleValue;
   }
 
   @Override
@@ -376,10 +492,10 @@ public class DriveSubsystem extends SubsystemBase {
     addChild("Front Left", frontLeft);
     addChild("Rear Right", rearRight);
     addChild("Rear Left", rearLeft);
-    builder.addBooleanProperty(
-        "Half speed?",
+    builder.addDoubleProperty(
+        "Throttle multiplier",
         () -> {
-          return halfSpeed;
+          return throttleMultiplier;
         },
         null);
     builder.addDoubleProperty(
@@ -407,5 +523,7 @@ public class DriveSubsystem extends SubsystemBase {
           return getPose().getRotation().getDegrees();
         },
         null);
+    builder.addDoubleProperty(
+        "Front Left Abs Encoder (rad)", frontLeft::getEncoderAbsPositionRad, null);
   }
 }

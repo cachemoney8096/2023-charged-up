@@ -8,15 +8,18 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.drive.DriveSubsystem;
 
 /** Drives onto the charge station and balances */
-public class AutoChargeStationSequence extends SequentialCommandGroup {
+public class AutoMobilityChargeStationSequence extends SequentialCommandGroup {
 
   private double startXMeters = 0.0;
-  private static final double NORM_SPEED_UP_CHARGE_STATION = 0.4;
+  private static final double NORM_SPEED_UP_CHARGE_STATION = 0.6;
+  private static final double NORM_SPEED_BACK_CHARGE_STATION = -0.4;
 
-  public AutoChargeStationSequence(DriveSubsystem drive, double distanceMeters) {
+  public AutoMobilityChargeStationSequence(
+      DriveSubsystem drive, double distanceMeters, double distanceBackMeters) {
     addCommands(
         new InstantCommand(
             () -> {
@@ -24,10 +27,25 @@ public class AutoChargeStationSequence extends SequentialCommandGroup {
             }),
         new RunCommand(
                 () -> {
+                  drive.drive(NORM_SPEED_UP_CHARGE_STATION, 0, 0, true);
+                },
+                drive)
+            .until(
+                () -> {
+                  return (drive.getPose().getX() - startXMeters) > distanceMeters;
+                }),
+        new InstantCommand(
+            () -> {
+              drive.drive(0, 0, 0, true);
+            },
+            drive),
+        new WaitCommand(1.0),
+        new RunCommand(
+                () -> {
                   /** Time remaining in current match period (auto or teleop) in seconds */
                   double matchTime = DriverStation.getMatchTime();
                   if (matchTime > 0.3) {
-                    drive.drive(NORM_SPEED_UP_CHARGE_STATION, 0, 0, true);
+                    drive.drive(NORM_SPEED_BACK_CHARGE_STATION, 0, 0, true);
                   } else {
                     drive.setX();
                   }
@@ -35,7 +53,7 @@ public class AutoChargeStationSequence extends SequentialCommandGroup {
                 drive)
             .until(
                 () -> {
-                  return (drive.getPose().getX() - startXMeters) > distanceMeters;
+                  return (drive.getPose().getX() - startXMeters) < distanceBackMeters;
                 }),
         new AutoChargeStationBalance(drive));
   }

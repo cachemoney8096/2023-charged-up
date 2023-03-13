@@ -70,18 +70,15 @@
       }
     }
   ],
-  "maxVelocity": 4.0,
-  "maxAcceleration": 3.0,
-  "isReversed": null,
   "markers": [
     {
-      "position": 0.1745454545454487,
+      "position": 0.17,
       "names": [
         "deployIntake"
       ]
     },
     {
-      "position": 1.9781818181818254,
+      "position": 1.98,
       "names": [
         "limelight"
       ]
