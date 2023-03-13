@@ -38,6 +38,15 @@ public class JustTwoGamePieces extends SequentialCommandGroup {
               Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
               Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
+
+
+    private PathPlannerTrajectory readyToShoot =
+        PathPlanner.loadPath(
+            "ReadyToShootBlue",
+            new PathConstraints(
+                Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
+                Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
+
   private HashMap<String, Command> eventMap = new HashMap<>();
 
   public JustTwoGamePieces(
@@ -59,6 +68,16 @@ public class JustTwoGamePieces extends SequentialCommandGroup {
 
         trajInit = PathPlannerTrajectory.transformTrajectoryForAlliance(
             trajInit, DriverStation.Alliance.Red);
+
+        readyToShoot =
+        PathPlanner.loadPath(
+            "ReadyToShootRed",
+            new PathConstraints(
+                Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
+                Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
+
+        readyToShoot = PathPlannerTrajectory.transformTrajectoryForAlliance(
+            readyToShoot, DriverStation.Alliance.Red);
     }
 
     addRequirements(lift, intake, drive, tagLimelight);
@@ -130,6 +149,9 @@ public class JustTwoGamePieces extends SequentialCommandGroup {
         new InstantCommand(lift::startScore, lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)).withTimeout(0.25),
         new finishScore(lift, lights),
+        // new WaitCommand(0.5), // going to start
+        // drive.followTrajectoryCommand(
+        //     readyToShoot, false).withTimeout(2.0), // this does not accept the FollowPathWithEvents
         new InstantCommand(() -> {drive.resetYaw();})
         );
   }

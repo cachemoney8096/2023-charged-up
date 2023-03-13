@@ -96,10 +96,10 @@ public final class Cal {
     public static final double CLAMP_POSITION_THRESHOLD_DEGREES = 110.0;
 
     /** Absolute encoder position when the intake is at starting position */
-    public static final double ABSOLUTE_ENCODER_START_POS_DEG = 250.4;
+    public static final double ABSOLUTE_ENCODER_START_POS_DEG = 198.45;
 
     /** Voltage required to hold the intake in the horizontal position */
-    // Stall torque: 3.36 Nm * 75 = 252 Nm
+    // Stall torque: 3.36 Nm * 75 = 252 N-
     // Max torque: 6 kg * 9.81 (N/kg) * 0.26m = 15.3 Nm
     // Ratio: 0.73 V
     public static final double ARBITRARY_FEED_FORWARD_VOLTS = 0.7;
@@ -131,7 +131,7 @@ public final class Cal {
     public static final double UNCLAMP_TIME_SECONDS = 0.2;
 
     /** Current limits for intake sparksmax in amps */
-    public static final int INTAKE_DEPLOY_MOTOR_CURRENT_LIMIT_AMPS = 40;
+    public static final int INTAKE_DEPLOY_MOTOR_CURRENT_LIMIT_AMPS = 60;
 
     public static final int INTAKE_WHEELS_CURRENT_LIMIT_AMPS = 30;
   }
