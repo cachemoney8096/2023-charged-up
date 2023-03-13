@@ -81,7 +81,6 @@ public class RobotContainer {
     // autons
 
     autonChooser.setDefaultOption(
-        // "One plus balance", new AutoScoreAndBalance(lift, drive, lights, scoreLoc));
         "Two plus balance Blue",
         new TwoGamePiecesThatEngage(false, lift, intake, drive, lights, tagLimelight, scoreLoc));
     autonChooser.addOption(
@@ -154,17 +153,15 @@ public class RobotContainer {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  drive.throttle(0.5);
-                },
-                lift));
+                  drive.throttle(Cal.SwerveSubsystem.THROTTLE_FOR_SLOW_BUTTON);
+                }));
     driverController
         .x()
         .onFalse(
             new InstantCommand(
                 () -> {
                   drive.throttle(1.0);
-                },
-                lift));
+                }));
     driverController.y().whileTrue(new RunCommand(drive::setX, drive));
 
     driverController
@@ -212,8 +209,6 @@ public class RobotContainer {
                     },
                     lift)));
 
-    // TODO: implement autoscore command for teleop
-    // // driverController.rightBumper().onTrue(new InstantCommand(lift::prepScore, lift));
     driverController
         .leftTrigger()
         .whileTrue(
@@ -221,14 +216,15 @@ public class RobotContainer {
                 .beforeStarting(
                     new InstantCommand(
                         () -> {
-                          drive.throttle(0.55);
+                          drive.throttle(Cal.SwerveSubsystem.THROTTLE_FOR_INTAKING);
                         }))
                 .finallyDo(
                     (boolean interrupted) -> {
-                      lift.closeGrabber();
                       drive.throttle(1.0);
+                      lift.closeGrabber();
                       lift.home();
                       intake.stopIntakingGamePiece();
+                      intake.setDesiredDeployed(false);
                       intake.setDesiredClamped(false);
                     }));
     driverController.rightTrigger().onTrue(new InstantCommand(lift::startScore, lift));

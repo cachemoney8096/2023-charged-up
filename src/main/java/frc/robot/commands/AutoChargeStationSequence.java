@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Cal;
 import frc.robot.subsystems.drive.DriveSubsystem;
 
 /** Drives onto the charge station and balances */
@@ -26,7 +27,7 @@ public class AutoChargeStationSequence extends SequentialCommandGroup {
                 () -> {
                   /** Time remaining in current match period (auto or teleop) in seconds */
                   double matchTime = DriverStation.getMatchTime();
-                  if (matchTime > 0.3) {
+                  if (matchTime > Cal.AutoBalance.SET_X_TIME_LEFT_SECONDS) {
                     drive.drive(NORM_SPEED_UP_CHARGE_STATION, 0, 0, true);
                   } else {
                     drive.setX();

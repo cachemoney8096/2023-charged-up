@@ -70,6 +70,7 @@ public class JustTwoGamePieces extends SequentialCommandGroup {
             .finallyDo(
                 (boolean interrupted) -> {
                   lift.home();
+                  lift.closeGrabber();
                   intake.setDesiredDeployed(false);
                   intake.setDesiredClamped(false);
                   intake.stopIntakingGamePiece();
@@ -83,17 +84,18 @@ public class JustTwoGamePieces extends SequentialCommandGroup {
         new InstantCommand(() -> scoringLocationUtil.setScoreHeight(ScoreHeight.HIGH)),
         new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE))
-            .withTimeout(0.75),
+            .withTimeout(Cal.Lift.START_TO_PRESCORE_HIGH_SEC),
         new InstantCommand(
             () -> {
               lights.toggleCode(LightCode.READY_TO_SCORE);
             }),
         new InstantCommand(lift::startScore, lift),
-        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)).withTimeout(0.25),
+        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE))
+            .withTimeout(Cal.Lift.PRESCORE_TO_SCORE_SEC),
         new finishScore(lift, lights),
         new InstantCommand(
             () -> scoringLocationUtil.setScoreCol(red ? ScoreCol.RIGHT : ScoreCol.LEFT)),
-        new WaitCommand(0.4), // going to start
+        new WaitCommand(Cal.Lift.SCORE_TO_START_SEC), // going to start
         new FollowPathWithEvents(
             drive.followTrajectoryCommand(trajInit, true), trajInit.getMarkers(), eventMap),
         new SwerveFollowerWrapper(red, drive)
@@ -110,9 +112,10 @@ public class JustTwoGamePieces extends SequentialCommandGroup {
             }),
         new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE))
-            .withTimeout(0.75),
+            .withTimeout(Cal.Lift.START_TO_PRESCORE_HIGH_SEC),
         new InstantCommand(lift::startScore, lift),
-        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)).withTimeout(0.25),
+        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE))
+            .withTimeout(Cal.Lift.PRESCORE_TO_SCORE_SEC),
         new finishScore(lift, lights),
         new InstantCommand(
             () -> {

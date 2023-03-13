@@ -82,6 +82,12 @@ public final class Cal {
     public static final int DRIVE_CURRENT_LIMIT_AMPS = 50;
 
     public static final int STEER_CURRENT_LIMIT_AMPS = 20;
+
+    /** Drive speed multipliers for teleop intaking and scoring */
+    public static final double THROTTLE_FOR_INTAKING = 0.55,
+        THROTTLE_FOR_SCORING = 0.6,
+        THROTTLE_FOR_SLOW_BUTTON = 0.5;
+    ;
   }
 
   public static final class Intake {
@@ -241,16 +247,17 @@ public final class Cal {
     /** The time in seconds for the grabber to open in OuttakeSequence */
     public static final double OUTTAKE_GRABBER_WAIT_TIME_SECONDS = 0.2;
 
-    /**
-     * The time in seconds it takes for it to be safe to return to the starting position, from the
-     * scoring high position
-     */
-    public static final double SAFE_TO_RETURN_TO_START_SECONDS = 0.5;
-
     /** Current limits for elevator sparksmax in amps */
     public static final int ELEVATOR_CURRENT_LIMIT_AMPS = 20;
 
     public static final int ARM_CURRENT_LIMIT_AMPS = 40;
+
+    /** Various timeouts for auto lift movements */
+    public static final double START_TO_PRESCORE_HIGH_SEC = 0.75,
+        PRESCORE_TO_SCORE_SEC = 0.25,
+        SCORE_TO_START_SEC = 0.5,
+        SCORE_TO_START_FAST_SEC = 0.2;
+    ;
   }
 
   public static final class AutoBalance {
@@ -273,6 +280,9 @@ public final class Cal {
      * 0.05, for a velocity of [-1,1])
      */
     public static final double CHARGE_STATION_DEADBAND_NORM_VELOCITY = 0.1;
+
+    /** While balancing, we will setX on the drive for the last this many seconds of auto */
+    public static final double SET_X_TIME_LEFT_SECONDS = 0.3;
   }
 
   public static final int SPARK_INIT_RETRY_ATTEMPTS = 5;

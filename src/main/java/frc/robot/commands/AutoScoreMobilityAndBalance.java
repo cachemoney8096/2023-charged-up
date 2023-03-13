@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.Cal;
 import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lift.LiftPosition;
 import frc.robot.subsystems.Lights;
@@ -19,11 +20,13 @@ public class AutoScoreMobilityAndBalance extends SequentialCommandGroup {
     addCommands(
         new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
         new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE))
-            .withTimeout(0.75),
+            .withTimeout(Cal.Lift.START_TO_PRESCORE_HIGH_SEC),
         new InstantCommand(lift::startScore, lift),
-        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE)).withTimeout(0.25),
+        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE))
+            .withTimeout(Cal.Lift.PRESCORE_TO_SCORE_SEC),
         new finishScore(lift, lights),
-        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING)).withTimeout(0.5),
+        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.STARTING))
+            .withTimeout(Cal.Lift.SCORE_TO_START_SEC),
         new AutoMobilityChargeStationSequence(
             drive, DISTANCE_UP_CHARGE_STATION_METERS, DISTANCE_BACK_CHARGE_STATION_METERS));
   }

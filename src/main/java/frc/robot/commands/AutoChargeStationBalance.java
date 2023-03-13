@@ -4,6 +4,7 @@ import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Cal;
 import frc.robot.Cal.AutoBalance;
 import frc.robot.subsystems.drive.DriveSubsystem;
 
@@ -42,7 +43,7 @@ public class AutoChargeStationBalance extends CommandBase {
     double matchTime = DriverStation.getMatchTime();
 
     // stop driving (and thus set x) if there is less than one second left in auton
-    if (matchTime > 0.3) {
+    if (matchTime > Cal.AutoBalance.SET_X_TIME_LEFT_SECONDS) {
       drive.drive(deadbandedNormVelocity, NOT_MOVING_IN_Y, NOT_ROTATING, ROBOT_RELATIVE);
     } else {
       drive.setX();
