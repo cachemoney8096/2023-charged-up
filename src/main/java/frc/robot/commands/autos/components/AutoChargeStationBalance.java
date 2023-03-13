@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.autos.components;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.MathUtil;
@@ -9,7 +9,7 @@ import frc.robot.Cal.AutoBalance;
 import frc.robot.subsystems.drive.DriveSubsystem;
 
 /**
- * Command to automatically remain balanced on the charge station during autonomous, using the
+ * Command to balance on the charge station during autonomous, using the
  * gyroscope.
  */
 public class AutoChargeStationBalance extends CommandBase {

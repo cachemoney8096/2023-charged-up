@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.autos.components;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -8,14 +8,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Cal;
+import frc.robot.commands.IntakeSequence;
+import frc.robot.commands.LookForTag;
+import frc.robot.commands.SwerveFollowerWrapper;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Lift;
-import frc.robot.subsystems.Lift.LiftPosition;
 import frc.robot.subsystems.Lights;
-import frc.robot.subsystems.Lights.LightCode;
 import frc.robot.subsystems.TagLimelightV2;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.ScoringLocationUtil;
@@ -24,12 +23,11 @@ import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 import java.util.HashMap;
 
 /**
- * This does the following: Robot starts at right postion at left grid Score the game piece at the
- * high right position on the left grid Drive and retreive another game piece from the center Bring
- * it back to the left grid left side, and score at the high left position Go to charing station and
- * do the charge station balance sequence
+ * Assuming the robot is starting from cone scoring position nearest the loading zone, this auto
+ * component drives to the nearest midfield game object, picks it up, and scores it on the next
+ * nearest cone position.
  */
-public class JustTwoGamePieces extends SequentialCommandGroup {
+public class GetAndScoreOpenSide extends SequentialCommandGroup {
   private PathPlannerTrajectory trajInit =
       PathPlanner.loadPath(
           "InitScoreAndGetGamePiece",
@@ -39,8 +37,9 @@ public class JustTwoGamePieces extends SequentialCommandGroup {
 
   private HashMap<String, Command> eventMap = new HashMap<>();
 
-  public JustTwoGamePieces(
+  public GetAndScoreOpenSide(
       boolean red,
+      boolean fast,
       Lift lift,
       Intake intake,
       DriveSubsystem drive,
@@ -79,23 +78,9 @@ public class JustTwoGamePieces extends SequentialCommandGroup {
 
     /** Initialize sequential commands that run for the "15 second autonomous phase" */
     addCommands(
-        new InstantCommand(
-            () -> scoringLocationUtil.setScoreCol(red ? ScoreCol.LEFT : ScoreCol.RIGHT)),
         new InstantCommand(() -> scoringLocationUtil.setScoreHeight(ScoreHeight.HIGH)),
-        new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
-        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE))
-            .withTimeout(Cal.Lift.START_TO_PRESCORE_HIGH_SEC),
-        new InstantCommand(
-            () -> {
-              lights.toggleCode(LightCode.READY_TO_SCORE);
-            }),
-        new InstantCommand(lift::startScore, lift),
-        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE))
-            .withTimeout(Cal.Lift.PRESCORE_TO_SCORE_SEC),
-        new finishScore(lift, lights),
         new InstantCommand(
             () -> scoringLocationUtil.setScoreCol(red ? ScoreCol.RIGHT : ScoreCol.LEFT)),
-        new WaitCommand(Cal.Lift.SCORE_TO_START_SEC), // going to start
         new FollowPathWithEvents(
             drive.followTrajectoryCommand(trajInit, true), trajInit.getMarkers(), eventMap),
         new SwerveFollowerWrapper(red, drive)
@@ -106,20 +91,6 @@ public class JustTwoGamePieces extends SequentialCommandGroup {
                     drive.drive(0, 0, 0, true);
                   }
                 }),
-        new InstantCommand(
-            () -> {
-              lights.toggleCode(LightCode.READY_TO_SCORE);
-            }),
-        new InstantCommand(() -> lift.ManualPrepScoreSequence(lights), lift),
-        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.PRE_SCORE_HIGH_CONE))
-            .withTimeout(Cal.Lift.START_TO_PRESCORE_HIGH_SEC),
-        new InstantCommand(lift::startScore, lift),
-        new WaitUntilCommand(() -> lift.atPosition(LiftPosition.SCORE_HIGH_CONE))
-            .withTimeout(Cal.Lift.PRESCORE_TO_SCORE_SEC),
-        new finishScore(lift, lights),
-        new InstantCommand(
-            () -> {
-              drive.resetYaw();
-            }));
+        new ScoreThisGamePiece(fast, lift, lights));
   }
 }
