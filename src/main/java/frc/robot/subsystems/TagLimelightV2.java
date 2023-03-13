@@ -31,14 +31,13 @@ public class TagLimelightV2 extends SubsystemBase {
   public void retrieveLatestResults() {
     double lastPublishTime = latestResults.targetingResults.timestamp_LIMELIGHT_publish;
     latestResults = LimelightHelpers.getLatestResults("");
-    if (lastPublishTime != latestResults.targetingResults.timestamp_LIMELIGHT_publish)
-    {
+    if (lastPublishTime != latestResults.targetingResults.timestamp_LIMELIGHT_publish) {
       usedLatestResults = false;
     }
   }
 
   public static boolean shouldUseVision(Pose2d visionEstimate, Pose2d filteredEstimate) {
-    // TODO 
+    // TODO
     // can also use latestResults, like checking for multiple targets
     return true;
   }
@@ -50,9 +49,7 @@ public class TagLimelightV2 extends SubsystemBase {
     usedLatestResults = true;
 
     Pose2d visionEstimate =
-      red ?
-      LimelightHelpers.getBotPose2d_wpiRed("") : 
-      LimelightHelpers.getBotPose2d_wpiBlue("");
+        red ? LimelightHelpers.getBotPose2d_wpiRed("") : LimelightHelpers.getBotPose2d_wpiBlue("");
 
     if (shouldUseVision(visionEstimate, filteredEstimate)) {
       return Optional.of(visionEstimate);
