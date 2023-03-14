@@ -55,7 +55,7 @@ public final class Constants {
     public static final boolean TURNING_ENCODER_INVERTED = true;
 
     /** Multiplier for wheel diameter based on empirical on-field measurement */
-    public static final double WHEEL_DIAMETER_FUDGE_FACTOR = 0.898;
+    public static final double WHEEL_DIAMETER_FUDGE_FACTOR = 0.898 * 1.120;
 
     /** Calculations required for driving motor conversion factors and feed forward */
     public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotor.FREE_SPEED_RPM / 60,

@@ -63,10 +63,10 @@ public final class Cal {
      * Controller on module speed for rotating to target, input degrees [-180,180], output [0,1].
      */
     public static final PIDController ROTATE_TO_TARGET_PID_CONTROLLER =
-        new PIDController(0.020, 0, 0.000); // From 2022
+        new PIDController(0.015, 0, 0.000); // From 2022
 
     /** Feed forward for rotating to target, gets added to or subtracted from PID controller. */
-    public static final double ROTATE_TO_TARGET_FF = 0.0;
+    public static final double ROTATE_TO_TARGET_FF = 0.01;
 
     /** Auton path finding controllers */
     public static final PIDController PATH_X_CONTROLLER = new PIDController(9.0, 0.0, 0.0),
@@ -76,7 +76,7 @@ public final class Cal {
     public static final PIDController PATH_THETA_CONTROLLER = new PIDController(9.0, 0.0, 0.80);
 
     /** If the desired chassis rotation is below this value in [0,1], it is ignored */
-    public static final double ROTATION_DEADBAND_THRESHOLD = 0.07;
+    public static final double ROTATION_DEADBAND_THRESHOLD = 0.04;
 
     /** Current limits for swerveSubsystem sparksmax in amps */
     public static final int DRIVE_CURRENT_LIMIT_AMPS = 50;
@@ -103,7 +103,7 @@ public final class Cal {
     public static final double CLAMP_POSITION_THRESHOLD_DEGREES = 110.0;
 
     /** Absolute encoder position when the intake is at starting position */
-    public static final double ABSOLUTE_ENCODER_START_POS_DEG = 250.4;
+    public static final double ABSOLUTE_ENCODER_START_POS_DEG = 199.4;
 
     /** Voltage required to hold the intake in the horizontal position */
     // Stall torque: 3.36 Nm * 75 = 252 Nm

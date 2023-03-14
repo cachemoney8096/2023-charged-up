@@ -24,6 +24,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
@@ -84,9 +85,9 @@ public class DriveSubsystem extends SubsystemBase {
           getModulePositions());
 
   private final double modelTranslationStDevMeters = 0.1;
-  private final double modelRotationStDevDeg = 10.0;
-  private final double visionXStDevMeters = 15.0;
-  private final double visionYStDevMeters = 15.0;
+  private final double modelRotationStDevDeg = 3.0;
+  private final double visionXStDevMeters = 5.0;
+  private final double visionYStDevMeters = 5.0;
   private final double visionRotationStDevDeg = 1500.0; // basically don't use
 
   SwerveDrivePoseEstimator poseEstimator =
@@ -126,7 +127,7 @@ public class DriveSubsystem extends SubsystemBase {
     poseEstimator.update(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions());
     Optional<Pose2d> visionEstimate =
         tagLimelight.getBotPose(
-            getRedAlliance.getAsBoolean(), poseEstimator.getEstimatedPosition());
+            getRedAlliance.getAsBoolean(), getVisionPose(tagLimelight.getLatencySeconds()));
     if (visionEstimate.isPresent()) {
       double timestamp = tagLimelight.getLastTimestampSeconds();
       poseEstimator.addVisionMeasurement(visionEstimate.get(), timestamp);
@@ -168,6 +169,17 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public Pose2d getVisionPose() {
     return poseEstimator.getEstimatedPosition();
+  }
+  
+  public Pose2d getVisionPose(double latencySec) {
+    Pose2d latestPosition = poseEstimator.getEstimatedPosition();
+    ChassisSpeeds latestSpeeds = lastSetChassisSpeeds;
+    Transform2d transformBack = new Transform2d(
+      new Translation2d(
+        -latestSpeeds.vxMetersPerSecond * latencySec,
+        -latestSpeeds.vyMetersPerSecond * latencySec),
+      Rotation2d.fromRadians(-latestSpeeds.omegaRadiansPerSecond * latencySec));
+      return latestPosition.plus(transformBack);
   }
 
   /**
@@ -221,7 +233,7 @@ public class DriveSubsystem extends SubsystemBase {
     frontRight.setDesiredState(new SwerveModuleState(0, frontRightCurrRot));
     rearLeft.setDesiredState(new SwerveModuleState(0, rearLeftCurrRot));
     rearRight.setDesiredState(new SwerveModuleState(0, rearRightCurrRot));
-    targetHeadingDegrees = getHeadingDegrees();
+    // targetHeadingDegrees = getHeadingDegrees();
   }
 
   /**
@@ -338,9 +350,15 @@ public class DriveSubsystem extends SubsystemBase {
     double headingDifferenceDegrees = currentHeadingDegrees - targetHeadingDegrees;
     double offsetHeadingDegrees = MathUtil.inputModulus(headingDifferenceDegrees, -180, 180);
 
+    double pidRotation = Cal.SwerveSubsystem.ROTATE_TO_TARGET_PID_CONTROLLER.calculate(offsetHeadingDegrees, 0.0);
+    double ffRotation = Math.signum(offsetHeadingDegrees) * Cal.SwerveSubsystem.ROTATE_TO_TARGET_FF;
+
+    SmartDashboard.putNumber("pid rotation", pidRotation);
+    SmartDashboard.putNumber("ff rotation", ffRotation);
+
     double desiredRotation =
-        Cal.SwerveSubsystem.ROTATE_TO_TARGET_PID_CONTROLLER.calculate(offsetHeadingDegrees, 0.0)
-            + Math.signum(offsetHeadingDegrees) * Cal.SwerveSubsystem.ROTATE_TO_TARGET_FF;
+        pidRotation
+            - ffRotation;
 
     if (Math.abs(desiredRotation) < Cal.SwerveSubsystem.ROTATION_DEADBAND_THRESHOLD) {
       desiredRotation = 0;
@@ -414,7 +432,7 @@ public class DriveSubsystem extends SubsystemBase {
                 }),
             new PPSwerveControllerCommand(
                 traj,
-                this::getPose, // Pose supplier
+                this::getVisionPose, // Pose supplier
                 Constants.SwerveDrive.DRIVE_KINEMATICS,
                 Cal.SwerveSubsystem.PATH_X_CONTROLLER,
                 Cal.SwerveSubsystem.PATH_Y_CONTROLLER, // usually the same values as X controller

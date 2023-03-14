@@ -50,7 +50,7 @@ public class GetAndScoreOpenSide extends SequentialCommandGroup {
       // default to blue, only change for red
       trajInit =
           PathPlanner.loadPath(
-              "InitScoreAndGetGamePieceRed",
+              "ScoreTwo",
               new PathConstraints(
                   Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
                   Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
@@ -74,7 +74,10 @@ public class GetAndScoreOpenSide extends SequentialCommandGroup {
                   intake.setDesiredClamped(false);
                   intake.stopIntakingGamePiece();
                 }));
-    eventMap.put("limelight", new LookForTag(tagLimelight, drive, lights).withTimeout(2.0));
+
+    eventMap.put(
+      "retractIntake",
+      new InstantCommand(()->{}, lift, intake));
 
     /** Initialize sequential commands that run for the "15 second autonomous phase" */
     addCommands(
@@ -83,14 +86,6 @@ public class GetAndScoreOpenSide extends SequentialCommandGroup {
             () -> scoringLocationUtil.setScoreCol(red ? ScoreCol.RIGHT : ScoreCol.LEFT)),
         new FollowPathWithEvents(
             drive.followTrajectoryCommand(trajInit, true), trajInit.getMarkers(), eventMap),
-        new SwerveFollowerWrapper(red, drive)
-            .withTimeout(2.0)
-            .finallyDo(
-                (boolean interrupted) -> {
-                  if (interrupted) {
-                    drive.drive(0, 0, 0, true);
-                  }
-                }),
         new ScoreThisGamePiece(fast, lift, lights));
   }
 }

@@ -142,6 +142,20 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    SmartDashboard.putData(
+        new InstantCommand(
+            () -> {
+                drive.resetOdometry(tagLimelight.getBotPose(red));
+            }
+        ).ignoringDisable(true));
+
+    
+        operatorController.start().onTrue(new InstantCommand(
+            () -> {
+                drive.resetOdometry(tagLimelight.getBotPose(red));
+            }
+        ).ignoringDisable(true));
+
     driverController
         .b()
         .whileTrue(

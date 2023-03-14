@@ -19,7 +19,7 @@ public class TagLimelightV2 extends SubsystemBase {
 
   private Optional<Transform2d> robotToScoringLocation = Optional.empty();
 
-  private LimelightResults latestResults;
+  private LimelightResults latestResults = new LimelightResults();
   private boolean usedLatestResults = false;
 
   public TagLimelightV2(ScoringLocationUtil scoringLocUtil) {
@@ -36,10 +36,29 @@ public class TagLimelightV2 extends SubsystemBase {
     }
   }
 
-  public static boolean shouldUseVision(Pose2d visionEstimate, Pose2d filteredEstimate) {
-    // TODO
-    // can also use latestResults, like checking for multiple targets
+  public boolean shouldUseVision(Pose2d visionEstimate, Pose2d filteredEstimate) {
+    double distanceMeters = visionEstimate.getTranslation().getDistance(filteredEstimate.getTranslation());
+    int numTags = latestResults.targetingResults.targets_Fiducials.length;
+    if (numTags < 2) {
+      return false;
+    }
+    
+    System.out.println("Vision error: " + distanceMeters);
+    if (distanceMeters > 1.0) {
+      return false;
+    }
+
     return true;
+  }
+
+  public Pose2d getBotPose(boolean red) {
+    Pose2d visionEstimate =
+        red ? LimelightHelpers.getBotPose2d_wpiRed("") : LimelightHelpers.getBotPose2d_wpiBlue("");
+
+    // if (shouldUseVision(visionEstimate)) {
+      return visionEstimate;
+    // }
+    // return Optional.empty();
   }
 
   public Optional<Pose2d> getBotPose(boolean red, Pose2d filteredEstimate) {
