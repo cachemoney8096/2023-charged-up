@@ -12,6 +12,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -70,6 +71,8 @@ public class DriveSubsystem extends SubsystemBase {
   public Optional<Pose2d> targetPose = Optional.empty();
   private BooleanSupplier throttleForLift;
   public boolean generatedPath = false;
+  private MedianFilter pitchFilter = new MedianFilter(3);
+  private double latestFilteredPitchDeg = 0.0;
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry odometry =
@@ -93,8 +96,14 @@ public class DriveSubsystem extends SubsystemBase {
     gyro.configMountPose(AxisDirection.PositiveY, AxisDirection.PositiveZ);
   }
 
+  public double getFilteredPitch() {
+    return latestFilteredPitchDeg;
+  }
+
   @Override
   public void periodic() {
+    latestFilteredPitchDeg = pitchFilter.calculate(gyro.getPitch());
+
     // Update the odometry in the periodic block
     frontLeft.periodic();
     frontRight.periodic();
@@ -468,6 +477,14 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void setZeroTargetHeading() {
     targetHeadingDegrees = 0.0;
+  }
+
+  public void stopDriving() {
+    drive(0, 0, 0, true);
+  }
+
+  public Command stopDrivingCommand() {
+    return new InstantCommand(this::stopDriving, this);
   }
 
   @Override

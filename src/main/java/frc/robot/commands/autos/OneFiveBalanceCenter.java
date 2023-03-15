@@ -50,11 +50,7 @@ public class OneFiveBalanceCenter extends SequentialCommandGroup {
             () -> {
               return (drive.getPose().getX() - startXMeters) > DISTANCE_PAST_CHARGE_METERS;
             }),
-        new InstantCommand(
-            () -> {
-              drive.drive(0, 0, 0, true);
-            },
-            drive),
+        drive.stopDrivingCommand(),
         new WaitCommand(0.25),
 
         // Turn to cone, intake it
