@@ -68,20 +68,15 @@ public class DriveSubsystem extends SubsystemBase {
   private final WPI_Pigeon2 gyro = new WPI_Pigeon2(RobotMap.PIGEON_CAN_ID);
   private ChassisSpeeds lastSetChassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
   public Optional<Pose2d> targetPose = Optional.empty();
-  public PathPlannerTrajectory pathToScoreBasedOnTag;
   private BooleanSupplier throttleForLift;
+  public boolean generatedPath = false;
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry odometry =
       new SwerveDriveOdometry(
           Constants.SwerveDrive.DRIVE_KINEMATICS,
-          Rotation2d.fromDegrees(gyro.getYaw()),
-          new SwerveModulePosition[] {
-            frontLeft.getPosition(),
-            frontRight.getPosition(),
-            rearLeft.getPosition(),
-            rearRight.getPosition()
-          });
+          Rotation2d.fromDegrees(0.0),
+          getModulePositions());
 
   /** Multiplier for drive speed, does not affect trajectory following */
   private double throttleMultiplier = 1.0;
@@ -101,18 +96,20 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    odometry.update(
-        Rotation2d.fromDegrees(gyro.getYaw()),
-        new SwerveModulePosition[] {
-          frontLeft.getPosition(),
-          frontRight.getPosition(),
-          rearLeft.getPosition(),
-          rearRight.getPosition()
-        });
-    frontLeft.periodic();
-    frontRight.periodic();
-    rearLeft.periodic();
-    rearRight.periodic();
+frontLeft.periodic();
+frontRight.periodic();
+rearLeft.periodic();
+rearRight.periodic();
+odometry.update(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions());
+  }
+
+  public SwerveModulePosition[] getModulePositions() {
+    return new SwerveModulePosition[] {
+      frontLeft.getPosition(),
+      frontRight.getPosition(),
+      rearLeft.getPosition(),
+      rearRight.getPosition()
+    };
   }
 
   public void burnFlashSparks() {
@@ -137,30 +134,14 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    odometry.resetPosition(
-        Rotation2d.fromDegrees(gyro.getYaw()),
-        new SwerveModulePosition[] {
-          frontLeft.getPosition(),
-          frontRight.getPosition(),
-          rearLeft.getPosition(),
-          rearRight.getPosition()
-        },
-        pose);
+    odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions(), pose);
   }
 
   public void resetYaw() {
     gyro.reset();
     Pose2d curPose = getPose();
     Pose2d resetPose = new Pose2d(curPose.getTranslation(), Rotation2d.fromDegrees(0));
-    odometry.resetPosition(
-        Rotation2d.fromDegrees(0),
-        new SwerveModulePosition[] {
-          frontLeft.getPosition(),
-          frontRight.getPosition(),
-          rearLeft.getPosition(),
-          rearRight.getPosition()
-        },
-        resetPose);
+    odometry.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(), resetPose);
     targetHeadingDegrees = 0.0;
   }
 
@@ -196,7 +177,6 @@ public class DriveSubsystem extends SubsystemBase {
     frontRight.setDesiredState(new SwerveModuleState(0, frontRightCurrRot));
     rearLeft.setDesiredState(new SwerveModuleState(0, rearLeftCurrRot));
     rearRight.setDesiredState(new SwerveModuleState(0, rearRightCurrRot));
-    targetHeadingDegrees = getHeadingDegrees();
   }
 
   /**
@@ -313,9 +293,11 @@ public class DriveSubsystem extends SubsystemBase {
     double headingDifferenceDegrees = currentHeadingDegrees - targetHeadingDegrees;
     double offsetHeadingDegrees = MathUtil.inputModulus(headingDifferenceDegrees, -180, 180);
 
-    double desiredRotation =
-        Cal.SwerveSubsystem.ROTATE_TO_TARGET_PID_CONTROLLER.calculate(offsetHeadingDegrees, 0.0)
-            + Math.signum(offsetHeadingDegrees) * Cal.SwerveSubsystem.ROTATE_TO_TARGET_FF;
+    double pidRotation =
+        Cal.SwerveSubsystem.ROTATE_TO_TARGET_PID_CONTROLLER.calculate(offsetHeadingDegrees, 0.0);
+    double ffRotation = Math.signum(offsetHeadingDegrees) * Cal.SwerveSubsystem.ROTATE_TO_TARGET_FF;
+
+    double desiredRotation = pidRotation - ffRotation;
 
     if (Math.abs(desiredRotation) < Cal.SwerveSubsystem.ROTATION_DEADBAND_THRESHOLD) {
       desiredRotation = 0;
@@ -415,15 +397,15 @@ public class DriveSubsystem extends SubsystemBase {
     System.out.println("Flip Transform: " + flipTransform.getX() + " " + flipTransform.getY());
 
     Pose2d curPose = getPose();
-    double latencyAdjustmentSec = 0.05;
+    double latencyAdjustmentSec = 0.00;
     latencySec += latencyAdjustmentSec;
     Transform2d pastTransform =
         new Transform2d(
-                new Translation2d(
-                    lastSetChassisSpeeds.vxMetersPerSecond * latencySec,
-                    lastSetChassisSpeeds.vyMetersPerSecond * latencySec),
-                Rotation2d.fromRadians(lastSetChassisSpeeds.omegaRadiansPerSecond * latencySec))
-            .inverse();
+            new Translation2d(
+                -lastSetChassisSpeeds.vxMetersPerSecond * latencySec,
+                -lastSetChassisSpeeds.vyMetersPerSecond * latencySec),
+            Rotation2d.fromRadians(lastSetChassisSpeeds.omegaRadiansPerSecond * latencySec)
+                .unaryMinus());
     Pose2d pastPose = curPose.plus(pastTransform);
 
     final boolean useLatencyAdjustment = true;
@@ -434,9 +416,9 @@ public class DriveSubsystem extends SubsystemBase {
             : Optional.of(curPose.plus(flipTransform));
   }
 
-  public PathPlannerTrajectory poseToPath(boolean red) {
+  public Optional<PathPlannerTrajectory> poseToPath(boolean red) {
     Pose2d curPose = getPose();
-    double coastLatencySec = 0.03;
+    double coastLatencySec = 0.00;
     Transform2d coastTransform =
         new Transform2d(
             new Translation2d(
@@ -446,30 +428,29 @@ public class DriveSubsystem extends SubsystemBase {
     Pose2d futurePose = curPose.plus(coastTransform);
 
     System.out.println("Acquired target? " + targetPose.isPresent());
-    if (targetPose.isPresent()) {
-      Transform2d trajectoryTransform = targetPose.get().minus(futurePose);
-      System.out.println(
-          "Trajectory Transform: " + trajectoryTransform.getX() + " " + trajectoryTransform.getY());
+    if (!targetPose.isPresent()) {
+      return Optional.empty();
     }
+
+    Transform2d trajectoryTransform = targetPose.get().minus(futurePose);
+    System.out.println(
+        "Trajectory Transform: " + trajectoryTransform.getX() + " " + trajectoryTransform.getY());
     // TODO we should probably just get rid of this guess if there's no target pose
-    Pose2d finalPose =
-        targetPose.isPresent()
-            ? targetPose.get()
-            : futurePose.plus(
-                new Transform2d(
-                    new Translation2d(-1.5, red ? 1.15 : -1.15), Rotation2d.fromDegrees(0)));
+    Pose2d finalPose = targetPose.get();
     Transform2d finalTransform =
         new Transform2d(finalPose.getTranslation(), finalPose.getRotation());
     Rotation2d finalHeading = Rotation2d.fromDegrees(180);
     Rotation2d finalHolonomicRotation = Rotation2d.fromDegrees(0);
     PathPlannerTrajectory path =
         PathPlanner.generatePath(
-            new PathConstraints(2.0, 2.0),
+            new PathConstraints(
+                Cal.SwerveSubsystem.SLOW_LINEAR_SPEED_METERS_PER_SEC,
+                Cal.SwerveSubsystem.SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ),
             PathPoint.fromCurrentHolonomicState(futurePose, lastSetChassisSpeeds),
             new PathPoint(finalTransform.getTranslation(), finalHeading, finalHolonomicRotation)
-                .withPrevControlLength(0.25));
-    pathToScoreBasedOnTag = path;
-    return path;
+                .withPrevControlLength(0.5));
+    generatedPath = true;
+    return Optional.of(path);
   }
 
   public void toggleSkids() {
@@ -479,6 +460,14 @@ public class DriveSubsystem extends SubsystemBase {
   /** Driving inputs will get multiplied by the throttle value, so it should be in [0,1] */
   public void throttle(double throttleValue) {
     throttleMultiplier = throttleValue;
+  }
+
+  public void offsetCurrentHeading(double offsetDegrees) {
+    targetHeadingDegrees = getHeadingDegrees() + offsetDegrees;
+  }
+
+  public void setZeroTargetHeading() {
+    targetHeadingDegrees = 0.0;
   }
 
   @Override
@@ -505,24 +494,10 @@ public class DriveSubsystem extends SubsystemBase {
         },
         null);
     builder.addDoubleProperty("Gyro Yaw (deg)", gyro::getYaw, null);
+    builder.addDoubleProperty("Odometry X (m)", () -> getPose().getX(), null);
+    builder.addDoubleProperty("Odometry Y (m)", () -> getPose().getY(), null);
     builder.addDoubleProperty(
-        "Odometry X (m)",
-        () -> {
-          return getPose().getX();
-        },
-        null);
-    builder.addDoubleProperty(
-        "Odometry Y (m)",
-        () -> {
-          return getPose().getY();
-        },
-        null);
-    builder.addDoubleProperty(
-        "Odometry Yaw (deg)",
-        () -> {
-          return getPose().getRotation().getDegrees();
-        },
-        null);
+        "Odometry Yaw (deg)", () -> getPose().getRotation().getDegrees(), null);
     builder.addDoubleProperty(
         "Front Left Abs Encoder (rad)", frontLeft::getEncoderAbsPositionRad, null);
   }

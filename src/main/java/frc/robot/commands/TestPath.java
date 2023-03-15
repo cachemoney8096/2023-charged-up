@@ -17,8 +17,8 @@ public class TestPath extends SequentialCommandGroup {
       PathPlanner.loadPath(
           "TestPath",
           new PathConstraints(
-              Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
-              Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
+              Cal.SwerveSubsystem.SLOW_LINEAR_SPEED_METERS_PER_SEC,
+              Cal.SwerveSubsystem.SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
   public TestPath(boolean isFirstPath, DriveSubsystem drive) {
     addCommands(drive.followTrajectoryCommand(traj, isFirstPath));
