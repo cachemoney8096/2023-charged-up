@@ -55,6 +55,8 @@ public final class Constants {
     public static final boolean TURNING_ENCODER_INVERTED = true;
 
     /** Multiplier for wheel diameter based on empirical on-field measurement */
+    // First number: adjustment for midwest
+    // Second number: adjustment from midwest to practice field
     public static final double WHEEL_DIAMETER_FUDGE_FACTOR = 0.898 * 1.120;
 
     /** Calculations required for driving motor conversion factors and feed forward */

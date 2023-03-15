@@ -96,11 +96,11 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-frontLeft.periodic();
-frontRight.periodic();
-rearLeft.periodic();
-rearRight.periodic();
-odometry.update(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions());
+    frontLeft.periodic();
+    frontRight.periodic();
+    rearLeft.periodic();
+    rearRight.periodic();
+    odometry.update(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions());
   }
 
   public SwerveModulePosition[] getModulePositions() {

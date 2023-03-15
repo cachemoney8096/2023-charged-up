@@ -100,13 +100,13 @@ public class RobotContainer {
         "Just two red",
         new JustTwoGamePieces(true, lift, intake, drive, lights, tagLimelight, scoreLoc));
     autonChooser.addOption(
-        "One plus bump blue",
+        "1.5 balance bump blue",
         new OneFiveBalanceBump(false, false, lift, intake, drive, lights, tagLimelight, scoreLoc));
     autonChooser.addOption(
-        "One plus bump red",
+        "1.5 balance bump red",
         new OneFiveBalanceBump(true, false, lift, intake, drive, lights, tagLimelight, scoreLoc));
     autonChooser.addOption(
-        "One Five Center",
+        "1.5 balance center",
         new OneFiveBalanceCenter(lift, drive, lights, scoreLoc, intakeLimelight, intake));
 
     // Put the chooser on the dashboard
@@ -284,8 +284,12 @@ public class RobotContainer {
     operatorController
         .rightTrigger()
         .onTrue(new InstantCommand(() -> lights.toggleCode(Lights.LightCode.CUBE), lights));
-    operatorController.leftBumper().onTrue(new InstantCommand(lift::deployArmLessFar).ignoringDisable(true));
-    operatorController.rightBumper().onTrue(new InstantCommand(lift::deployArmFurther).ignoringDisable(true));
+    operatorController
+        .leftBumper()
+        .onTrue(new InstantCommand(lift::deployArmLessFar).ignoringDisable(true));
+    operatorController
+        .rightBumper()
+        .onTrue(new InstantCommand(lift::deployArmFurther).ignoringDisable(true));
 
     drive.setDefaultCommand(
         new RunCommand(
