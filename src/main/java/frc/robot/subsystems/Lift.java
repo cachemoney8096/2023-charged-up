@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
+import frc.robot.utils.AbsoluteEncoderChecker;
 import frc.robot.utils.AngleUtil;
 import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
@@ -104,6 +105,9 @@ public class Lift extends SubsystemBase {
   private boolean desiredGrabberClosed = true;
   public ScoringLocationUtil scoreLoc;
   private boolean scoringInProgress = false;
+  private AbsoluteEncoderChecker elevatorLeftAbsEncoderChecker = new AbsoluteEncoderChecker();
+  private AbsoluteEncoderChecker elevatorRightAbsEncoderChecker = new AbsoluteEncoderChecker();
+  private AbsoluteEncoderChecker armAbsoluteEncoderChecker = new AbsoluteEncoderChecker();
 
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
@@ -516,6 +520,9 @@ public class Lift extends SubsystemBase {
     //   controlPosition(desiredPosition);
     // }
     controlPosition(desiredPosition);
+    elevatorLeftAbsEncoderChecker.addReading(elevatorLeftAbsEncoder.getPosition());
+    elevatorRightAbsEncoderChecker.addReading(elevatorRightAbsEncoder.getPosition());
+    armAbsoluteEncoderChecker.addReading(armAbsoluteEncoder.getPosition());
 
     // // If the grabber is set to open and it is safe to open, open the grabber (drop). Otherwise,
     // // close it (grab).
@@ -628,6 +635,9 @@ public class Lift extends SubsystemBase {
           return scoreLoc.getScoreCol().toString();
         },
         null);
+    builder.addBooleanProperty("Last Five Elevator Left Readings were Equal", elevatorLeftAbsEncoderChecker::checkLastFive, null);
+    builder.addBooleanProperty("Last Five Elevator Right Readings were Equal", elevatorRightAbsEncoderChecker::checkLastFive, null);
+    builder.addBooleanProperty("Last Five Arm Readings were Equal", armAbsoluteEncoderChecker::checkLastFive, null);
   }
 
   /**

@@ -19,6 +19,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Cal;
 import frc.robot.Constants;
+import frc.robot.utils.AbsoluteEncoderChecker;
 import frc.robot.utils.SparkMaxUtils;
 
 public class SwerveModule implements Sendable {
@@ -27,6 +28,7 @@ public class SwerveModule implements Sendable {
 
   private final RelativeEncoder drivingEncoder;
   private final AbsoluteEncoder turningEncoder;
+  private AbsoluteEncoderChecker turningAbsoluteEncoderChecker = new AbsoluteEncoderChecker();
 
   private final SparkMaxPIDController drivingPIDController;
   private final SparkMaxPIDController turningPIDController;
@@ -229,6 +231,10 @@ public class SwerveModule implements Sendable {
     return turningEncoder.getPosition();
   }
 
+  public void periodic() {
+    turningAbsoluteEncoderChecker.addReading(turningEncoder.getPosition());
+  }
+
   public void initSendable(SendableBuilder builder) {
     builder.addDoubleProperty("Driving kP", drivingPIDController::getP, drivingPIDController::setP);
     builder.addDoubleProperty("Driving kI", drivingPIDController::getI, drivingPIDController::setI);
@@ -254,5 +260,6 @@ public class SwerveModule implements Sendable {
           return desiredState.angle.getRadians();
         },
         null);
+    builder.addBooleanProperty("Last Five Turning Readings were Equal", turningAbsoluteEncoderChecker::checkLastFive, null);
   }
 }
