@@ -150,7 +150,7 @@ public class Intake extends SubsystemBase {
   public void rezeroIntake() {
     deployMotorEncoder.setPosition(
         AngleUtil.wrapAngle(
-          deployMotorAbsoluteEncoderChecker.getMedian()
+            deployMotorAbsoluteEncoderChecker.getMedian()
                 - Cal.Intake.ABSOLUTE_ENCODER_START_POS_DEG
                 + Cal.Intake.STARTING_POSITION_DEGREES));
     deployMotorController.reset(deployMotorEncoder.getPosition());
@@ -315,6 +315,7 @@ public class Intake extends SubsystemBase {
           return desiredDeployed;
         },
         null);
-    builder.addBooleanProperty("Deploy encoder connected", deployMotorAbsoluteEncoderChecker::encoderConnected, null);
+    builder.addBooleanProperty(
+        "Deploy encoder connected", deployMotorAbsoluteEncoderChecker::encoderConnected, null);
   }
 }
