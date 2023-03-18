@@ -365,6 +365,24 @@ public class Lift extends SubsystemBase {
     elevatorController.setGoal(elevatorLeftEncoder.getPosition());
   }
 
+  public void zeroArmAtCurrentPos() {
+    Cal.Lift.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG = armAbsoluteEncoder.getPosition();
+    System.out.println("New Zero for Arm: " + Cal.Lift.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG);
+  }
+
+  public void zeroElevatorAtCurrentPos() {
+    // Set elevator encoder position from absolute encoders
+    double elevatorDutyCycleEncodersDifferenceDegrees =
+        AngleUtil.wrapAngleAroundZero(
+            (elevatorLeftAbsEncoder.getPosition() - elevatorRightAbsEncoder.getPosition()));
+    Cal.Lift.ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES =
+        (elevatorDutyCycleEncodersDifferenceDegrees
+            * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE);
+    System.out.println(
+        "New Zero for Elevator: "
+            + Cal.Lift.ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES);
+  }
+
   /**
    * if the robot has completed startScore but hasn't started finishScore, then stop the robot from
    * scoring
