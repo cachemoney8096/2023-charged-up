@@ -243,18 +243,18 @@ public class Lift extends SubsystemBase {
     return errors == 0;
   }
 
-  public void bumpArmDown() {
-    Pair<Double, Double> curPos = liftPositionMap.get(LiftPosition.GRAB_FROM_INTAKE);
+  public void deployArmLessFar() {
+    Pair<Double, Double> curPos = liftPositionMap.get(desiredPosition);
     Pair<Double, Double> newPos =
         new Pair<Double, Double>(curPos.getFirst(), curPos.getSecond() - 0.5);
-    liftPositionMap.replace(LiftPosition.GRAB_FROM_INTAKE, newPos);
+    liftPositionMap.replace(desiredPosition, newPos);
   }
 
-  public void bumpArmUp() {
-    Pair<Double, Double> curPos = liftPositionMap.get(LiftPosition.GRAB_FROM_INTAKE);
+  public void deployArmFurther() {
+    Pair<Double, Double> curPos = liftPositionMap.get(desiredPosition);
     Pair<Double, Double> newPos =
         new Pair<Double, Double>(curPos.getFirst(), curPos.getSecond() + 0.5);
-    liftPositionMap.replace(LiftPosition.GRAB_FROM_INTAKE, newPos);
+    liftPositionMap.replace(desiredPosition, newPos);
   }
 
   /**
