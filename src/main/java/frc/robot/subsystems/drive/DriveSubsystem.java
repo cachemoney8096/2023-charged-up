@@ -33,12 +33,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
+import frc.robot.subsystems.Lights;
 import frc.robot.utils.GeometryUtils;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
 public class DriveSubsystem extends SubsystemBase {
   private double targetHeadingDegrees;
+
+  private Lights lights;
 
   // Create SwerveModules
   private final SwerveModule frontLeft =
@@ -89,11 +92,12 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @param throttleForLiftFunc Function to check if we should throttle due to lift position.
    */
-  public DriveSubsystem(BooleanSupplier throttleForLiftFunc) {
+  public DriveSubsystem(BooleanSupplier throttleForLiftFunc, Lights lightsSubsystem) {
     throttleForLift = throttleForLiftFunc;
     gyro.configFactoryDefault();
     gyro.reset();
     gyro.configMountPose(AxisDirection.PositiveY, AxisDirection.PositiveZ);
+    lights = lightsSubsystem;
   }
 
   public double getFilteredPitch() {
@@ -242,6 +246,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Sets the wheels into an X formation to prevent movement. */
   public void setX() {
+    lights.setPartyMode();
     frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
     frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
