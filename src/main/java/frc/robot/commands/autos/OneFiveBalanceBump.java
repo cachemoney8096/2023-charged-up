@@ -77,6 +77,7 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
 
     final double DISTANCE_ONTO_CHARGE_STATION_METERS = 1.4;
 
+    // TODO add a 1.5 bump side that does not balance
     /** Initialize sequential commands that run for the "15 second autonomous phase" */
     addCommands(
         new ScoreThisGamePiece(fast, lift, lights),

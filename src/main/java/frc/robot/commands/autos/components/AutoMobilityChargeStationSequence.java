@@ -35,11 +35,7 @@ public class AutoMobilityChargeStationSequence extends SequentialCommandGroup {
                 () -> {
                   return (drive.getPose().getX() - startXMeters) > distanceMeters;
                 }),
-        new InstantCommand(
-            () -> {
-              drive.drive(0, 0, 0, true);
-            },
-            drive),
+        drive.stopDrivingCommand(),
         new WaitCommand(1.0),
         new RunCommand(
                 () -> {

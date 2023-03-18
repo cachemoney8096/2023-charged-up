@@ -87,14 +87,8 @@ public class GetAndScoreOpenSide extends SequentialCommandGroup {
             drive.followTrajectoryCommand(trajInit, true), trajInit.getMarkers(), eventMap),
         new InstantCommand(drive::setNoMove, drive),
         new LookForTag(tagLimelight, drive, lights).withTimeout(0.05),
-        new SwerveFollowerWrapper(red, drive)
-            .withTimeout(2.0)
-            .finallyDo(
-                (boolean interrupted) -> {
-                  if (interrupted) {
-                    drive.drive(0, 0, 0, true);
-                  }
-                }),
+        new SwerveFollowerWrapper(red, drive).withTimeout(2.0),
+        drive.stopDrivingCommand(),
         new WaitCommand(0.02),
         new ConditionalCommand(
             new ScoreThisGamePiece(fast, lift, lights),
