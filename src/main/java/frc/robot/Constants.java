@@ -22,6 +22,8 @@ public final class Constants {
   public static final int PLACEHOLDER_INT = 0;
   public static final String PLACEHOLDER_STRING = "";
 
+  public static final double FIELD_WIDTH_METERS = 8.02;
+
   /** This is the maximum pitch of the charge station in degrees. */
   public static final double MAX_PITCH_DEGREES = 15;
 
