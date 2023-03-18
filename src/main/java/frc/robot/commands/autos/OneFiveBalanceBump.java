@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Cal;
 import frc.robot.commands.IntakeSequence;
 import frc.robot.commands.SwerveToPointWrapper;
-import frc.robot.commands.autos.components.ChargeFarSide;
 import frc.robot.commands.autos.components.DriveDistance;
 import frc.robot.commands.autos.components.DriveUntilBalanced;
 import frc.robot.commands.autos.components.ScoreThisGamePiece;
@@ -32,9 +31,10 @@ import frc.robot.utils.ScoringLocationUtil;
  * nearest cone position.
  */
 public class OneFiveBalanceBump extends SequentialCommandGroup {
-  private static final double DISTANCE_AT_CONE_METERS = 5.9;
   private static final double NORM_SPEED_INTAKING = 0.3;
-  private double startXMeters = 0;
+  private double X_METERS_TO_CONE = 1.5;
+  private Pose2d desiredPose = new Pose2d (5.85, 2.5, Rotation2d.fromDegrees(0.0));
+
   private PathPlannerTrajectory firstTraj =
       PathPlanner.loadPath(
           "OneFivePlusBump",
@@ -67,16 +67,10 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
 
     addRequirements(lift, intake, drive, limelight);
 
-    final double DISTANCE_ONTO_CHARGE_STATION_METERS = 1.4;
-
     // TODO add a 1.5 bump side that does not balance
     /** Initialize sequential commands that run for the "15 second autonomous phase" */
     addCommands(
         new ScoreThisGamePiece(fast, lift, lights),
-        new InstantCommand(
-            () -> {
-              startXMeters = drive.getPose().getX();
-            }),
         drive.followTrajectoryCommand(firstTraj, true),
         // Turn to cone, intake it
         new InstantCommand(
@@ -86,7 +80,12 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 new WaitCommand(0.5),
-                new DriveDistance(drive, NORM_SPEED_INTAKING, 1.5, 0.0, false)),
+                new RunCommand(
+                    () -> {
+                      drive.rotateOrKeepHeading(0, 0, 0, true, -1);
+                    })
+                .withTimeout(0.25),
+                new DriveDistance(drive, NORM_SPEED_INTAKING, X_METERS_TO_CONE, 0.0, false)),
             new IntakeSequence(intake, lift, lights)
                 .finallyDo(
                     (boolean interrupted) -> {
@@ -96,7 +95,7 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
                       intake.setDesiredClamped(false);
                       intake.stopIntakingGamePiece();
                     })),
-        new SwerveToPointWrapper(red, drive, new Pose2d (5.85, 2.5, Rotation2d.fromDegrees(0.0)), 2.0),
+        new SwerveToPointWrapper(red, drive, desiredPose, 2.0),
         new DriveUntilBalanced(drive, false));
   }
 }

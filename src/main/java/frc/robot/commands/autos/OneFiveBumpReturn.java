@@ -6,6 +6,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Cal;
@@ -25,9 +26,8 @@ import frc.robot.utils.ScoringLocationUtil;
  * position
  */
 public class OneFiveBumpReturn extends SequentialCommandGroup {
-  private static final double DISTANCE_AT_CONE_METERS = 5.9;
   private static final double NORM_SPEED_INTAKING = 0.3;
-  private double startXMeters = 0;
+  private final double X_METERS_TO_CONE = 1.5;
   private PathPlannerTrajectory firstTraj =
       PathPlanner.loadPath(
           "OnePlusBump",
@@ -80,10 +80,6 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
     /** Initialize sequential commands that run for the "15 second autonomous phase" */
     addCommands(
         new ScoreThisGamePiece(fast, lift, lights),
-        new InstantCommand(
-            () -> {
-              startXMeters = drive.getPose().getX();
-            }),
         drive.followTrajectoryCommand(firstTraj, true),
         // Turn to cone, intake it
         new InstantCommand(
@@ -93,8 +89,13 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 new WaitCommand(0.5),
-                new DriveDistance(drive, NORM_SPEED_INTAKING, 1.5, 0.0, red),
-                new IntakeSequence(intake, lift, lights)
+                new RunCommand(
+                    () -> {
+                      drive.rotateOrKeepHeading(0, 0, 0, true, -1);
+                    })
+                .withTimeout(0.25),
+                new DriveDistance(drive, NORM_SPEED_INTAKING, X_METERS_TO_CONE, 0.0, red)),
+            new IntakeSequence(intake, lift, lights)
                     .finallyDo(
                         (boolean interrupted) -> {
                           lift.home();
@@ -103,7 +104,7 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
                           intake.setDesiredClamped(false);
                           intake.stopIntakingGamePiece();
                         })),
-            new DriveDistance(drive, NORM_SPEED_INTAKING, -1.5, 0.0, red),
-            drive.followTrajectoryCommand(secondTraj, false)));
+            new DriveDistance(drive, NORM_SPEED_INTAKING, -X_METERS_TO_CONE, 0.0, red),
+            drive.followTrajectoryCommand(secondTraj, false));
   }
 }
