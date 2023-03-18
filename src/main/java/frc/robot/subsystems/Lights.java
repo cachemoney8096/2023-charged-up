@@ -28,6 +28,7 @@ public class Lights extends SubsystemBase {
     NO_TAG, // Blinking Green
     WORKING, // Solid Red
     READY_TO_SCORE, // Blue
+    PARTY_MODE, // Rainbow
     OFF
   }
 
@@ -40,6 +41,7 @@ public class Lights extends SubsystemBase {
     lightOptionsMap.put(LightCode.WORKING, 0.61);
     lightOptionsMap.put(LightCode.READY_TO_SCORE, 0.87);
     lightOptionsMap.put(LightCode.OFF, 0.99); // 0.99 = black, is this equivalent to OFF?
+    lightOptionsMap.put(LightCode.PARTY_MODE, -0.97);
   }
 
   public void toggleCode(LightCode light) {
@@ -57,8 +59,8 @@ public class Lights extends SubsystemBase {
   }
 
   /** Party mode switches from color to color to create a rainbow of lights */
-  public void togglePartyMode() {
-    this.partyMode = !this.partyMode;
+  public void setPartyMode() {
+    setLight(LightCode.PARTY_MODE);
   }
 
   @Override
@@ -76,11 +78,6 @@ public class Lights extends SubsystemBase {
       blinkingTimer++;
     } else {
       blinkingTimer = 0;
-    }
-
-    /* if party mode should be running, then start a party */
-    if (partyMode) {
-      m_blinkin.set(-0.97);
     }
   }
 }
