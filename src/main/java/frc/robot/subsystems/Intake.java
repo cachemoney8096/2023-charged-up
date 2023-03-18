@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
+import frc.robot.utils.AbsoluteEncoderChecker;
 import frc.robot.utils.AngleUtil;
 import frc.robot.utils.SendableHelper;
 import frc.robot.utils.SparkMaxUtils;
@@ -70,6 +71,7 @@ public class Intake extends SubsystemBase {
   private boolean desiredDeployed = false;
   private boolean desireClamped = false;
   private BooleanSupplier clearOfIntake;
+  private AbsoluteEncoderChecker deployMotorAbsoluteEncoderChecker = new AbsoluteEncoderChecker();
 
   /** Creates a new Intake. */
   public Intake(BooleanSupplier clearOfIntakeZone) {
@@ -148,10 +150,9 @@ public class Intake extends SubsystemBase {
   public void rezeroIntake() {
     deployMotorEncoder.setPosition(
         AngleUtil.wrapAngle(
-            deployMotorAbsoluteEncoder.getPosition()
+            deployMotorAbsoluteEncoderChecker.getMedian()
                 - Cal.Intake.ABSOLUTE_ENCODER_START_POS_DEG
                 + Cal.Intake.STARTING_POSITION_DEGREES));
-
     deployMotorController.reset(deployMotorEncoder.getPosition());
   }
 
@@ -268,6 +269,7 @@ public class Intake extends SubsystemBase {
     }
 
     controlPosition(intakeControlPositionDegrees);
+    deployMotorAbsoluteEncoderChecker.addReading(deployMotorAbsoluteEncoder.getPosition());
 
     // Only clamp if it is safe to do so and clamping is desired
     if (desireClamped
@@ -313,5 +315,7 @@ public class Intake extends SubsystemBase {
           return desiredDeployed;
         },
         null);
+    builder.addBooleanProperty(
+        "Deploy encoder connected", deployMotorAbsoluteEncoderChecker::encoderConnected, null);
   }
 }

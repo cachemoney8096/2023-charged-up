@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
+import frc.robot.utils.AbsoluteEncoderChecker;
 import frc.robot.utils.AngleUtil;
 import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
@@ -104,6 +105,9 @@ public class Lift extends SubsystemBase {
   private boolean desiredGrabberClosed = true;
   public ScoringLocationUtil scoreLoc;
   private boolean scoringInProgress = false;
+  private AbsoluteEncoderChecker elevatorLeftAbsEncoderChecker = new AbsoluteEncoderChecker();
+  private AbsoluteEncoderChecker elevatorRightAbsEncoderChecker = new AbsoluteEncoderChecker();
+  private AbsoluteEncoderChecker armAbsoluteEncoderChecker = new AbsoluteEncoderChecker();
 
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
@@ -341,12 +345,13 @@ public class Lift extends SubsystemBase {
     // Set arm encoder position from absolute
     armEncoder.setPosition(
         AngleUtil.wrapAngle(
-            armAbsoluteEncoder.getPosition() - Cal.Lift.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG));
+            armAbsoluteEncoderChecker.getMedian() - Cal.Lift.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG));
 
     // Set elevator encoder position from absolute encoders
     double elevatorDutyCycleEncodersDifferenceDegrees =
         AngleUtil.wrapAngleAroundZero(
-            (elevatorLeftAbsEncoder.getPosition() - elevatorRightAbsEncoder.getPosition()));
+            (elevatorLeftAbsEncoderChecker.getMedian()
+                - elevatorRightAbsEncoderChecker.getMedian()));
     elevatorLeftEncoder.setPosition(
         (elevatorDutyCycleEncodersDifferenceDegrees
                 * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE)
@@ -516,6 +521,9 @@ public class Lift extends SubsystemBase {
     //   controlPosition(desiredPosition);
     // }
     controlPosition(desiredPosition);
+    elevatorLeftAbsEncoderChecker.addReading(elevatorLeftAbsEncoder.getPosition());
+    elevatorRightAbsEncoderChecker.addReading(elevatorRightAbsEncoder.getPosition());
+    armAbsoluteEncoderChecker.addReading(armAbsoluteEncoder.getPosition());
 
     // // If the grabber is set to open and it is safe to open, open the grabber (drop). Otherwise,
     // // close it (grab).
@@ -628,6 +636,12 @@ public class Lift extends SubsystemBase {
           return scoreLoc.getScoreCol().toString();
         },
         null);
+    builder.addBooleanProperty(
+        "Elevator Left encoder connected", elevatorLeftAbsEncoderChecker::encoderConnected, null);
+    builder.addBooleanProperty(
+        "Elevator Right encoder connected", elevatorRightAbsEncoderChecker::encoderConnected, null);
+    builder.addBooleanProperty(
+        "Arm encoder connected", armAbsoluteEncoderChecker::encoderConnected, null);
   }
 
   /**
