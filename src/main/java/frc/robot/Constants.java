@@ -33,19 +33,19 @@ public final class Constants {
   /**
    * Pitch angle from horizontal of the limelight in degrees (0 = straight ahead, 90 = straight up)
    */
-  public static final double INTAKE_LIMELIGHT_PITCH_DEGREES = PLACEHOLDER_DOUBLE;
+  public static final double INTAKE_LIMELIGHT_PITCH_DEGREES = -20;
 
   public static final double TAG_LIMELIGHT_PITCH_DEGREES = 20;
 
   /** Height of the limelight on the robot from the carpet in meters */
-  public static final double INTAKE_LIMELIGHT_HEIGHT_METERS = PLACEHOLDER_DOUBLE;
+  public static final double INTAKE_LIMELIGHT_HEIGHT_METERS = .254;
 
   public static final double TAG_LIMELIGHT_HEIGHT_METERS = Units.inchesToMeters(14.625);
 
   /** Height of the vision targets above the carpet */
   public static final double INTAKE_TARGET_HEIGHT_METERS = PLACEHOLDER_DOUBLE;
 
-  public static final double TAG_TARGET_HEIGHT_METERS = PLACEHOLDER_DOUBLE;
+  public static final double TAG_TARGET_HEIGHT_METERS = .165;
 
   public static final class SwerveModule {
     /**
@@ -55,7 +55,9 @@ public final class Constants {
     public static final boolean TURNING_ENCODER_INVERTED = true;
 
     /** Multiplier for wheel diameter based on empirical on-field measurement */
-    public static final double WHEEL_DIAMETER_FUDGE_FACTOR = 0.898;
+    // First number: adjustment for midwest
+    // Second number: adjustment from midwest to practice field
+    public static final double WHEEL_DIAMETER_FUDGE_FACTOR = 0.898 * 1.120;
 
     /** Calculations required for driving motor conversion factors and feed forward */
     public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotor.FREE_SPEED_RPM / 60,
@@ -94,7 +96,7 @@ public final class Constants {
      * Driving Parameters - Note that these are not the maximum capable speeds of the robot, rather
      * the allowed maximum speeds
      */
-    public static final double MAX_SPEED_METERS_PER_SECOND = 4,
+    public static final double MAX_SPEED_METERS_PER_SECOND = 4.0,
         MAX_ANGULAR_SPEED_RAD_PER_SECONDS = 2 * Math.PI; // radians per second
 
     /** Chassis configuration */

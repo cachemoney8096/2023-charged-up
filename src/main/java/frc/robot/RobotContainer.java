@@ -24,9 +24,12 @@ import frc.robot.commands.ShelfSequence;
 import frc.robot.commands.autos.AutoScoreAndBalance;
 import frc.robot.commands.autos.AutoScoreMobilityAndBalance;
 import frc.robot.commands.autos.JustTwoGamePieces;
+import frc.robot.commands.autos.OneFiveBalanceBump;
+import frc.robot.commands.autos.OneFiveBalanceCenter;
 import frc.robot.commands.autos.TwoGamePiecesThatEngage;
 import frc.robot.commands.finishScore;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.IntakeLimelight;
 import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lift.LiftPosition;
 import frc.robot.subsystems.Lights;
@@ -46,11 +49,11 @@ public class RobotContainer {
   public final Lift lift = new Lift(scoreLoc);
   private final DriveSubsystem drive = new DriveSubsystem(lift::throttleForLift);
   public final Intake intake = new Intake(lift::clearOfIntakeZone);
-  //   private final IntakeLimelight intakeLimelight =
-  //       new IntakeLimelight(
-  //           Constants.INTAKE_LIMELIGHT_PITCH_DEGREES,
-  //           Constants.INTAKE_LIMELIGHT_HEIGHT_METERS,
-  //           Constants.INTAKE_TARGET_HEIGHT_METERS);
+  private final IntakeLimelight intakeLimelight =
+      new IntakeLimelight(
+          Constants.INTAKE_LIMELIGHT_PITCH_DEGREES,
+          Constants.INTAKE_LIMELIGHT_HEIGHT_METERS,
+          Constants.INTAKE_TARGET_HEIGHT_METERS);
   public final TagLimelightV2 tagLimelight = new TagLimelightV2(scoreLoc);
   private final Lights lights = new Lights();
   public final PneumaticHub pneumaticHub = new PneumaticHub();
@@ -71,7 +74,7 @@ public class RobotContainer {
 
     Shuffleboard.getTab("Subsystems").add(drive.getName(), drive);
     Shuffleboard.getTab("Subsystems").add(intake.getName(), intake);
-    // Shuffleboard.getTab("Subsystems").add(intakeLimelight.getName(), intakeLimelight);
+    Shuffleboard.getTab("Subsystems").add(intakeLimelight.getName(), intakeLimelight);
     Shuffleboard.getTab("Subsystems").add(tagLimelight.getName(), tagLimelight);
     // Shuffleboard.getTab("Subsystems").add(lights.getName(), lights);
     Shuffleboard.getTab("Subsystems").add(lift.getName(), lift);
@@ -79,7 +82,6 @@ public class RobotContainer {
 
   public void initialize() {
     // autons
-
     autonChooser.setDefaultOption(
         "Two plus balance Blue",
         new TwoGamePiecesThatEngage(false, lift, intake, drive, lights, tagLimelight, scoreLoc));
@@ -97,6 +99,15 @@ public class RobotContainer {
     autonChooser.addOption(
         "Just two red",
         new JustTwoGamePieces(true, lift, intake, drive, lights, tagLimelight, scoreLoc));
+    autonChooser.addOption(
+        "1.5 balance bump blue",
+        new OneFiveBalanceBump(false, false, lift, intake, drive, lights, tagLimelight, scoreLoc));
+    autonChooser.addOption(
+        "1.5 balance bump red",
+        new OneFiveBalanceBump(true, false, lift, intake, drive, lights, tagLimelight, scoreLoc));
+    autonChooser.addOption(
+        "1.5 balance center",
+        new OneFiveBalanceCenter(lift, drive, lights, scoreLoc, intakeLimelight, intake));
 
     // Put the chooser on the dashboard
     SmartDashboard.putData(autonChooser);
@@ -175,7 +186,7 @@ public class RobotContainer {
 
     driverController.back().onTrue(new InstantCommand(lift::home, lift));
 
-    driverController.start().onTrue(new InstantCommand(drive::resetYaw));
+    driverController.start().onTrue(new InstantCommand(drive::resetYaw).ignoringDisable(true));
 
     driverController.leftBumper().onTrue(new ShelfSequence(lift, lights));
     driverController
@@ -224,35 +235,44 @@ public class RobotContainer {
     operatorController
         .povDown()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.LOW)));
+            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.LOW))
+                .ignoringDisable(true));
     operatorController
         .povRight()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
+            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID))
+                .ignoringDisable(true));
     operatorController
         .povLeft()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID)));
+            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID))
+                .ignoringDisable(true));
     operatorController
         .povUp()
         .onTrue(
-            new InstantCommand(
-                () -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH)));
+            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH))
+                .ignoringDisable(true));
 
     operatorController
         .x()
-        .onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.LEFT)));
+        .onTrue(
+            new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.LEFT))
+                .ignoringDisable(true));
     operatorController
         .a()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER)));
+            new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER))
+                .ignoringDisable(true));
     operatorController
         .y()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER)));
+            new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER))
+                .ignoringDisable(true));
     operatorController
         .b()
-        .onTrue(new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.RIGHT)));
+        .onTrue(
+            new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.RIGHT))
+                .ignoringDisable(true));
 
     operatorController
         .leftTrigger()
@@ -264,8 +284,12 @@ public class RobotContainer {
     operatorController
         .rightTrigger()
         .onTrue(new InstantCommand(() -> lights.toggleCode(Lights.LightCode.CUBE), lights));
-    operatorController.leftBumper().onTrue(new InstantCommand(lift::deployArmLessFar));
-    operatorController.rightBumper().onTrue(new InstantCommand(lift::deployArmFurther));
+    operatorController
+        .leftBumper()
+        .onTrue(new InstantCommand(lift::deployArmLessFar).ignoringDisable(true));
+    operatorController
+        .rightBumper()
+        .onTrue(new InstantCommand(lift::deployArmFurther).ignoringDisable(true));
 
     drive.setDefaultCommand(
         new RunCommand(

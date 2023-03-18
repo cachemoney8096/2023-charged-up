@@ -8,6 +8,7 @@ import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -15,6 +16,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.Optional;
 
 /** Limelight for the intake to identify game pieces */
 public class IntakeLimelight extends SubsystemBase {
@@ -22,6 +24,8 @@ public class IntakeLimelight extends SubsystemBase {
   private final double kCameraHeight;
   private final double kTargetHeight;
   private final double kImageCaptureLatency = 11.0;
+
+  private final double RESOLUTION_X = 960.0;
 
   // Simulation functions
   private SimDevice m_simDevice;
@@ -37,7 +41,7 @@ public class IntakeLimelight extends SubsystemBase {
   private double m_lastX = 0.0;
   private double m_lastY = 0.0;
 
-  NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+  NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-cone");
   NetworkTableEntry tx = table.getEntry("tx");
   NetworkTableEntry ty = table.getEntry("ty");
   NetworkTableEntry ta = table.getEntry("ta");
@@ -54,9 +58,9 @@ public class IntakeLimelight extends SubsystemBase {
     kCameraAngleDegrees = angleDegrees;
     kCameraHeight = heightMeters;
     kTargetHeight = targetHeightMeters;
-    setLimelightValues(ledMode.ON, camMode.VISION_PROCESSING, pipeline.PIPELINE3);
+    setLimelightValues(ledMode.OFF, camMode.VISION_PROCESSING, pipeline.PIPELINE3);
 
-    m_simDevice = SimDevice.create("Limelight");
+    m_simDevice = SimDevice.create("limelight-cone");
     if (m_simDevice != null) {
       m_targetArea = m_simDevice.createDouble("Target Area", Direction.kBidir, 0.0);
       m_skew = m_simDevice.createDouble("Skew", Direction.kBidir, 0.0);
@@ -338,6 +342,54 @@ public class IntakeLimelight extends SubsystemBase {
    */
   public Translation2d getTargetTranslation() {
     return getTargetTranslation(kTargetHeight);
+  }
+
+  public Optional<Double> getXOfSmallestY() {
+    // Format: x1 y1 x2 y2 x3 y3 . . .
+    double[] corners = table.getEntry("tcornxy").getDoubleArray(new double[0]);
+    double minY = 10000000;
+    int minYIdx = 0;
+
+    if (corners == new double[0]) {
+      return Optional.empty();
+    }
+
+    for (int i = 1; i < corners.length; i += 2) {
+      if (corners[i] < minY) {
+        minY = corners[i];
+        minYIdx = i;
+      }
+    }
+
+    return Optional.of(corners[minYIdx - 1]);
+  }
+
+  public double getAngleToConeDeg() {
+    Optional<Double> maybeXPixels = getXOfSmallestY();
+
+    if (!maybeXPixels.isPresent()) {
+      System.out.println("Didn't see cone");
+      return 0;
+    }
+
+    double xPixels = maybeXPixels.get();
+    double halfResXPixels = RESOLUTION_X / 2.0;
+    double horizFovDeg = 59.6;
+
+    double normXPixels = (1 / halfResXPixels) * ((halfResXPixels - 0.5) - xPixels);
+
+    double viewplaneWidthPixels = 2.0 * Math.tan(Units.degreesToRadians(horizFovDeg / 2));
+
+    double viewplaneXPixels = viewplaneWidthPixels / 2.0 * normXPixels;
+
+    double angleXDegrees = Units.radiansToDegrees(Math.atan2(viewplaneXPixels, 1));
+
+    double angleAdjustDegrees = -3.0; // due to limelight yaw
+    double adjustedAngleDegrees = angleXDegrees + angleAdjustDegrees;
+
+    System.out.println("Cone at " + adjustedAngleDegrees);
+
+    return adjustedAngleDegrees;
   }
 
   @Override

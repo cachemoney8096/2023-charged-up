@@ -1,14 +1,17 @@
 package frc.robot.commands;
 
+import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import java.util.Optional;
 
 public class SwerveFollowerWrapper extends CommandBase {
 
   public Command swerveFollowerCmd;
   private DriveSubsystem drive;
   boolean redAlliance;
+  boolean noTrajectory = true;
 
   public SwerveFollowerWrapper(boolean red, DriveSubsystem driveSubsystem) {
     redAlliance = red;
@@ -18,23 +21,36 @@ public class SwerveFollowerWrapper extends CommandBase {
 
   @Override
   public void initialize() {
+    Optional<PathPlannerTrajectory> maybeTrajectory = drive.poseToPath(redAlliance);
+    if (!maybeTrajectory.isPresent()) {
+      return;
+    }
+    noTrajectory = false;
     swerveFollowerCmd =
-        drive.followTrajectoryCommand(drive.poseToPath(redAlliance), false).withTimeout(3.0);
+        drive.followTrajectoryCommand(maybeTrajectory.get(), false).withTimeout(3.0);
     swerveFollowerCmd.initialize();
   }
 
   @Override
   public void execute() {
-    swerveFollowerCmd.execute();
+    if (!noTrajectory) {
+      swerveFollowerCmd.execute();
+    }
   }
 
   @Override
   public void end(boolean interrupted) {
-    swerveFollowerCmd.end(interrupted);
+    if (!noTrajectory) {
+      swerveFollowerCmd.end(interrupted);
+    }
   }
 
   @Override
   public boolean isFinished() {
-    return swerveFollowerCmd.isFinished();
+    if (!noTrajectory) {
+      return swerveFollowerCmd.isFinished();
+    } else {
+      return true;
+    }
   }
 }
