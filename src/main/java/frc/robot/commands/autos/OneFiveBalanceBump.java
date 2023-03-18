@@ -3,7 +3,6 @@ package frc.robot.commands.autos;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -33,7 +32,7 @@ import frc.robot.utils.ScoringLocationUtil;
 public class OneFiveBalanceBump extends SequentialCommandGroup {
   private static final double NORM_SPEED_INTAKING = 0.3;
   private double X_METERS_TO_CONE = 1.5;
-  private Pose2d desiredPose = new Pose2d (5.85, 2.5, Rotation2d.fromDegrees(0.0));
+  private Pose2d desiredPose = new Pose2d(5.85, 2.5, Rotation2d.fromDegrees(0.0));
 
   private PathPlannerTrajectory firstTraj =
       PathPlanner.loadPath(
@@ -77,14 +76,14 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
             () -> {
               drive.offsetCurrentHeading(limelight.getAngleToConeDeg());
             }),
+        new RunCommand(
+                () -> {
+                  drive.rotateOrKeepHeading(0, 0, 0, true, -1);
+                })
+            .withTimeout(0.25),
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 new WaitCommand(0.5),
-                new RunCommand(
-                    () -> {
-                      drive.rotateOrKeepHeading(0, 0, 0, true, -1);
-                    })
-                .withTimeout(0.25),
                 new DriveDistance(drive, NORM_SPEED_INTAKING, X_METERS_TO_CONE, 0.0, false)),
             new IntakeSequence(intake, lift, lights)
                 .finallyDo(

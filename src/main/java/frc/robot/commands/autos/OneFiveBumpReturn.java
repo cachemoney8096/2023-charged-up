@@ -86,25 +86,25 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
             () -> {
               drive.offsetCurrentHeading(limelight.getAngleToConeDeg());
             }),
+        new RunCommand(
+                () -> {
+                  drive.rotateOrKeepHeading(0, 0, 0, true, -1);
+                })
+            .withTimeout(0.25),
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 new WaitCommand(0.5),
-                new RunCommand(
-                    () -> {
-                      drive.rotateOrKeepHeading(0, 0, 0, true, -1);
-                    })
-                .withTimeout(0.25),
                 new DriveDistance(drive, NORM_SPEED_INTAKING, X_METERS_TO_CONE, 0.0, red)),
             new IntakeSequence(intake, lift, lights)
-                    .finallyDo(
-                        (boolean interrupted) -> {
-                          lift.home();
-                          lift.closeGrabber();
-                          intake.setDesiredDeployed(false);
-                          intake.setDesiredClamped(false);
-                          intake.stopIntakingGamePiece();
-                        })),
-            new DriveDistance(drive, NORM_SPEED_INTAKING, -X_METERS_TO_CONE, 0.0, red),
-            drive.followTrajectoryCommand(secondTraj, false));
+                .finallyDo(
+                    (boolean interrupted) -> {
+                      lift.home();
+                      lift.closeGrabber();
+                      intake.setDesiredDeployed(false);
+                      intake.setDesiredClamped(false);
+                      intake.stopIntakingGamePiece();
+                    })),
+        new DriveDistance(drive, NORM_SPEED_INTAKING, -X_METERS_TO_CONE, 0.0, red),
+        drive.followTrajectoryCommand(secondTraj, false));
   }
 }
