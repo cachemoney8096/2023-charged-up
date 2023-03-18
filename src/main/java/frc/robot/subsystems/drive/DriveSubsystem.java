@@ -94,12 +94,12 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @param throttleForLiftFunc Function to check if we should throttle due to lift position.
    */
-  public DriveSubsystem(BooleanSupplier throttleForLiftFunc, Lights lights) {
+  public DriveSubsystem(BooleanSupplier throttleForLiftFunc, Lights lightsSubsystem) {
     throttleForLift = throttleForLiftFunc;
     gyro.configFactoryDefault();
     gyro.reset();
     gyro.configMountPose(AxisDirection.PositiveY, AxisDirection.PositiveZ);
-    this.lights = lights;
+    lights = lightsSubsystem;
   }
 
   @Override
