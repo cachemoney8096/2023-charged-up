@@ -101,10 +101,10 @@ public class RobotContainer {
         new JustTwoGamePieces(true, lift, intake, drive, lights, tagLimelight, scoreLoc));
     autonChooser.addOption(
         "1.5 balance bump blue",
-        new OneFiveBalanceBump(false, false, lift, intake, drive, lights, tagLimelight, scoreLoc));
+        new OneFiveBalanceBump(false, false, lift, intake, drive, lights, intakeLimelight, scoreLoc));
     autonChooser.addOption(
         "1.5 balance bump red",
-        new OneFiveBalanceBump(true, false, lift, intake, drive, lights, tagLimelight, scoreLoc));
+        new OneFiveBalanceBump(true, false, lift, intake, drive, lights, intakeLimelight, scoreLoc));
     autonChooser.addOption(
         "1.5 balance center",
         new OneFiveBalanceCenter(lift, drive, lights, scoreLoc, intakeLimelight, intake));
