@@ -507,6 +507,35 @@ public class DriveSubsystem extends SubsystemBase {
     return new InstantCommand(this::stopDriving, this);
   }
 
+  public void zeroFrontLeftAtCurrentPos() {
+    Cal.SwerveSubsystem.SWERVE_FRONT_LEFT_ANGULAR_OFFSET_RAD = frontLeft.getEncoderAbsPositionRad();
+    System.out.println(
+        "New Zero for Front Left Swerve: "
+            + Cal.SwerveSubsystem.SWERVE_FRONT_LEFT_ANGULAR_OFFSET_RAD);
+  }
+
+  public void zeroFrontRightAtCurrentPos() {
+    Cal.SwerveSubsystem.SWERVE_FRONT_RIGHT_ANGULAR_OFFSET_RAD =
+        frontRight.getEncoderAbsPositionRad();
+    System.out.println(
+        "New Zero for Front Right Swerve: "
+            + Cal.SwerveSubsystem.SWERVE_FRONT_RIGHT_ANGULAR_OFFSET_RAD);
+  }
+
+  public void zeroRearLeftAtCurrentPos() {
+    Cal.SwerveSubsystem.SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD = rearLeft.getEncoderAbsPositionRad();
+    System.out.println(
+        "New Zero for Rear Left Swerve: "
+            + Cal.SwerveSubsystem.SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD);
+  }
+
+  public void zeroRearRightAtCurrentPos() {
+    Cal.SwerveSubsystem.SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD = rearRight.getEncoderAbsPositionRad();
+    System.out.println(
+        "New Zero for Rear Right Swerve: "
+            + Cal.SwerveSubsystem.SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD);
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);

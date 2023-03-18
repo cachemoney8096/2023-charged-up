@@ -156,6 +156,11 @@ public class Intake extends SubsystemBase {
     deployMotorController.reset(deployMotorEncoder.getPosition());
   }
 
+  public void zeroIntakeAtCurrentPos() {
+    Cal.Intake.ABSOLUTE_ENCODER_START_POS_DEG = deployMotorAbsoluteEncoder.getPosition();
+    System.out.println("New Zero for Deploy Motor: " + Cal.Intake.ABSOLUTE_ENCODER_START_POS_DEG);
+  }
+
   /**
    * Burns the current settings to sparks so they keep current settings on reboot. Should be done
    * after all settings are set.

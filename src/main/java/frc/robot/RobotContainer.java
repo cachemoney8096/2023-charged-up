@@ -112,6 +112,31 @@ public class RobotContainer {
     // Put the chooser on the dashboard
     SmartDashboard.putData(autonChooser);
 
+    // Put the buttons for zeroing the mechanisms on the dashboard
+    SmartDashboard.putData(
+        "Zero Intake Based on Current Pos",
+        new InstantCommand(intake::zeroIntakeAtCurrentPos, intake).ignoringDisable(true));
+
+    SmartDashboard.putData(
+        "Zero Arm Based on Current Pos",
+        new InstantCommand(lift::zeroArmAtCurrentPos, lift).ignoringDisable(true));
+    SmartDashboard.putData(
+        "Zero Elevator Based on Current Pos",
+        new InstantCommand(lift::zeroElevatorAtCurrentPos, lift).ignoringDisable(true));
+
+    SmartDashboard.putData(
+        "Zero Front Left Based on Current Pos",
+        new InstantCommand(drive::zeroFrontLeftAtCurrentPos, drive).ignoringDisable(true));
+    SmartDashboard.putData(
+        "Zero Front Right Based on Current Pos",
+        new InstantCommand(drive::zeroFrontRightAtCurrentPos, drive).ignoringDisable(true));
+    SmartDashboard.putData(
+        "Zero Rear Left Based on Current Pos",
+        new InstantCommand(drive::zeroRearLeftAtCurrentPos, drive).ignoringDisable(true));
+    SmartDashboard.putData(
+        "Zero Rear Right Based on Current Pos",
+        new InstantCommand(drive::zeroRearRightAtCurrentPos, drive).ignoringDisable(true));
+
     // Encoder offset stuff
     intake.initialize();
     lift.initialize();

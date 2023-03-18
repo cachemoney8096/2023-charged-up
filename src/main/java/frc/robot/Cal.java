@@ -47,11 +47,11 @@ public final class Cal {
      * Angular offset of the modules relative to the zeroing fixture in radians. Ideally should be
      * relative to the ficture but they are actually slightly different.
      */
-    public static final double SWERVE_FRONT_LEFT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 1.036;
+    public static double SWERVE_FRONT_LEFT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 1.036;
 
-    public static final double SWERVE_FRONT_RIGHT_ANGULAR_OFFSET_RAD = (1.0 * Math.PI) + 1.005;
-    public static final double SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 0.987;
-    public static final double SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 0.9075;
+    public static double SWERVE_FRONT_RIGHT_ANGULAR_OFFSET_RAD = (1.0 * Math.PI) + 1.005;
+    public static double SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 0.987;
+    public static double SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 0.9075;
 
     /**
      * Angular offsets of the modules relative to the chassis in radians. The modules form an O when
@@ -111,7 +111,7 @@ public final class Cal {
     public static final double CLAMP_POSITION_THRESHOLD_DEGREES = 110.0;
 
     /** Absolute encoder position when the intake is at starting position */
-    public static final double ABSOLUTE_ENCODER_START_POS_DEG = 199.4;
+    public static double ABSOLUTE_ENCODER_START_POS_DEG = 199.4;
 
     /** Voltage required to hold the intake in the horizontal position */
     // Stall torque: 3.36 Nm * 75 = 252 Nm
@@ -161,12 +161,12 @@ public final class Cal {
     /** Absolute encoder position when the arm is at 0 degrees */
     // 30.0 is the kickstand offset from 180 aka vertically up
     // so 120 is the encoder value on the kickstand
-    public static final double ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG = 120.0 + 30.0 + 180.0;
+    public static double ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG = 120.0 + 30.0 + 180.0;
 
     /**
      * Position reading from the absolute encoders when the elevator is at the start (zero) position
      */
-    public static final double ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES = -11.8;
+    public static double ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES = -11.8;
 
     /** Voltage required to hold the arm in the horizontal position */
     // Stall torque: 3.36 Nm * 75 = 252 Nm
