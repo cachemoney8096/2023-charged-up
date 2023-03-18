@@ -260,6 +260,6 @@ public class SwerveModule implements Sendable {
           return desiredState.angle.getRadians();
         },
         null);
-    builder.addBooleanProperty("Last Five Turning Readings were Equal", turningAbsoluteEncoderChecker::checkLastFive, null);
+    builder.addBooleanProperty("Turning encoder connected", turningAbsoluteEncoderChecker::encoderConnected, null);
   }
 }

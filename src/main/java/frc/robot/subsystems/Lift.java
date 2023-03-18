@@ -343,10 +343,18 @@ public class Lift extends SubsystemBase {
 
   public void rezeroLift() {
     // Set arm encoder position from absolute
-    armEncoder.setPosition(armAbsoluteEncoderChecker.getMedian());
+    armEncoder.setPosition(
+        AngleUtil.wrapAngle(
+          armAbsoluteEncoderChecker.getMedian() - Cal.Lift.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG));
 
     // Set elevator encoder position from absolute encoders
-    elevatorLeftEncoder.setPosition(elevatorLeftAbsEncoderChecker.getMedian());
+    double elevatorDutyCycleEncodersDifferenceDegrees =
+        AngleUtil.wrapAngleAroundZero(
+            (elevatorLeftAbsEncoderChecker.getMedian() - elevatorRightAbsEncoderChecker.getMedian()));
+    elevatorLeftEncoder.setPosition(
+        (elevatorDutyCycleEncodersDifferenceDegrees
+                * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE)
+            - Cal.Lift.ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES);
 
     armController.setTolerance(Cal.Lift.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG);
     armController.reset(armEncoder.getPosition());
@@ -627,9 +635,9 @@ public class Lift extends SubsystemBase {
           return scoreLoc.getScoreCol().toString();
         },
         null);
-    builder.addBooleanProperty("Last Five Elevator Left Readings were Equal", elevatorLeftAbsEncoderChecker::checkLastFive, null);
-    builder.addBooleanProperty("Last Five Elevator Right Readings were Equal", elevatorRightAbsEncoderChecker::checkLastFive, null);
-    builder.addBooleanProperty("Last Five Arm Readings were Equal", armAbsoluteEncoderChecker::checkLastFive, null);
+    builder.addBooleanProperty("Elevator Left encoder connected", elevatorLeftAbsEncoderChecker::encoderConnected, null);
+    builder.addBooleanProperty("Elevator Right encoder connected", elevatorRightAbsEncoderChecker::encoderConnected, null);
+    builder.addBooleanProperty("Arm encoder connected", armAbsoluteEncoderChecker::encoderConnected, null);
   }
 
   /**

@@ -7,6 +7,7 @@ public class AbsoluteEncoderChecker {
     private double[] lastFive;
     private int index;
     private MedianFilter medianFilter;
+    private double lastCalculatedMedian;
 
     public AbsoluteEncoderChecker() {
         this.lastFive = new double[5];
@@ -20,29 +21,21 @@ public class AbsoluteEncoderChecker {
         if (index == 5) {
             index = 0;
         }
+        lastCalculatedMedian = medianFilter.calculate(lastReading);
     }
 
-    /** @return true if all of the last five absolute encoder readings were equal, false if otherwise*/
-    public boolean checkLastFive() {
+    /** @return true if any of the five readings are different, otherwise returns false*/
+    public boolean encoderConnected() {
         for (int i = 1; i < lastFive.length; i ++) {
             if (lastFive[i] != lastFive[0]) {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     /** @return the median of the five current values */
     public double getMedian() {
-        // resets so only the most up-to-date values are checked
-        medianFilter.reset();
-
-        // adds each of the first four readings to the medianFilter window
-        for (int i = 0; i < lastFive.length-1; i ++) {
-            medianFilter.calculate(lastFive[i]);
-        }
-
-        // returns the median of the window after adding the last reading
-        return medianFilter.calculate(lastFive[lastFive.length-1]);
+        return lastCalculatedMedian;
     }
 }

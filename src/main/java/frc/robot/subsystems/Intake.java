@@ -148,7 +148,11 @@ public class Intake extends SubsystemBase {
   }
 
   public void rezeroIntake() {
-    deployMotorEncoder.setPosition(deployMotorAbsoluteEncoderChecker.getMedian());
+    deployMotorEncoder.setPosition(
+        AngleUtil.wrapAngle(
+          deployMotorAbsoluteEncoderChecker.getMedian()
+                - Cal.Intake.ABSOLUTE_ENCODER_START_POS_DEG
+                + Cal.Intake.STARTING_POSITION_DEGREES));
     deployMotorController.reset(deployMotorEncoder.getPosition());
   }
 
@@ -311,6 +315,6 @@ public class Intake extends SubsystemBase {
           return desiredDeployed;
         },
         null);
-    builder.addBooleanProperty("Last Five Deploy Motor Readings were Equal", deployMotorAbsoluteEncoderChecker::checkLastFive, null);
+    builder.addBooleanProperty("Deploy encoder connected", deployMotorAbsoluteEncoderChecker::encoderConnected, null);
   }
 }
