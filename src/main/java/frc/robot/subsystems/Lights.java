@@ -18,9 +18,6 @@ public class Lights extends SubsystemBase {
   /** If we are currently blinking, then True would mean the color is currently showing */
   private boolean blinkingColorOn = false;
 
-  /** true if party mode is currently on */
-  private boolean partyMode = false;
-
   public enum LightCode {
     CONE, // Solid Yellow
     CUBE, // Solid Purple
