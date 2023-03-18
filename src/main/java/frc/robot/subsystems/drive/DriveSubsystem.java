@@ -40,6 +40,8 @@ import java.util.function.BooleanSupplier;
 public class DriveSubsystem extends SubsystemBase {
   private double targetHeadingDegrees;
 
+  private Lights lights;
+
   // Create SwerveModules
   private final SwerveModule frontLeft =
       new SwerveModule(
@@ -87,18 +89,17 @@ public class DriveSubsystem extends SubsystemBase {
   /** Multiplier for drive speed, does not affect trajectory following */
   private double throttleMultiplier = 1.0;
 
-  private Lights lights = new Lights();
-
   /**
    * Creates a new DriveSubsystem.
    *
    * @param throttleForLiftFunc Function to check if we should throttle due to lift position.
    */
-  public DriveSubsystem(BooleanSupplier throttleForLiftFunc) {
+  public DriveSubsystem(BooleanSupplier throttleForLiftFunc, Lights lights) {
     throttleForLift = throttleForLiftFunc;
     gyro.configFactoryDefault();
     gyro.reset();
     gyro.configMountPose(AxisDirection.PositiveY, AxisDirection.PositiveZ);
+    this.lights = lights;
   }
 
   @Override

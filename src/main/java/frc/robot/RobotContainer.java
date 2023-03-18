@@ -44,7 +44,8 @@ import frc.robot.utils.ScoringLocationUtil;
 public class RobotContainer {
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
   public final Lift lift = new Lift(scoreLoc);
-  private final DriveSubsystem drive = new DriveSubsystem(lift::throttleForLift);
+  private final Lights lights = new Lights();
+  private final DriveSubsystem drive = new DriveSubsystem(lift::throttleForLift, lights);
   public final Intake intake = new Intake(lift::clearOfIntakeZone);
   //   private final IntakeLimelight intakeLimelight =
   //       new IntakeLimelight(
@@ -52,7 +53,6 @@ public class RobotContainer {
   //           Constants.INTAKE_LIMELIGHT_HEIGHT_METERS,
   //           Constants.INTAKE_TARGET_HEIGHT_METERS);
   public final TagLimelightV2 tagLimelight = new TagLimelightV2(scoreLoc);
-  private final Lights lights = new Lights();
   public final PneumaticHub pneumaticHub = new PneumaticHub();
 
   // A chooser for autonomous commands
