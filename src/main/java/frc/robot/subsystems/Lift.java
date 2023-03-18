@@ -379,8 +379,7 @@ public class Lift extends SubsystemBase {
         (elevatorDutyCycleEncodersDifferenceDegrees
             * Constants.Lift.ELEVATOR_MOTOR_ENCODER_DIFFERENCES_SCALAR_INCHES_PER_DEGREE);
     System.out.println(
-        "New Zero for Elevator: "
-            + Cal.Lift.ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES);
+        "New Zero for Elevator: " + Cal.Lift.ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES);
   }
 
   /**
