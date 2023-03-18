@@ -27,7 +27,7 @@ import frc.robot.utils.ScoringLocationUtil;
  */
 public class OneFiveBumpReturn extends SequentialCommandGroup {
   private static final double NORM_SPEED_INTAKING = 0.3;
-  private final double X_METERS_TO_CONE = 1.5;
+  private final double X_METERS_TO_CONE = 1.0;
   private PathPlannerTrajectory firstTraj =
       PathPlanner.loadPath(
           "OnePlusBump",

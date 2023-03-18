@@ -31,7 +31,7 @@ import frc.robot.utils.ScoringLocationUtil;
  */
 public class OneFiveBalanceBump extends SequentialCommandGroup {
   private static final double NORM_SPEED_INTAKING = 0.3;
-  private double X_METERS_TO_CONE = 1.5;
+  private double X_METERS_TO_CONE = 1.0;
   private Pose2d desiredPose = new Pose2d(5.85, 2.5, Rotation2d.fromDegrees(0.0));
 
   private PathPlannerTrajectory firstTraj =
