@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
+import frc.robot.subsystems.Lights;
 import frc.robot.utils.GeometryUtils;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
@@ -85,6 +86,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Multiplier for drive speed, does not affect trajectory following */
   private double throttleMultiplier = 1.0;
+
+  private Lights lights = new Lights();
 
   /**
    * Creates a new DriveSubsystem.
@@ -249,6 +252,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Sets the wheels into an X formation to prevent movement. */
   public void setX() {
+    lights.togglePartyMode();
     frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
     frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
