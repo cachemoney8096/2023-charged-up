@@ -1,13 +1,17 @@
 package frc.robot.utils;
 
+import edu.wpi.first.math.filter.MedianFilter;
+
 /** Checks Absolute Encoders for Noise */
 public class AbsoluteEncoderChecker {
     private double[] lastFive;
     private int index;
+    private MedianFilter medianFilter;
 
     public AbsoluteEncoderChecker() {
         this.lastFive = new double[5];
         this.index = 0;
+        this.medianFilter = new MedianFilter(5);
     }
 
     public void addReading(double lastReading) {
@@ -26,5 +30,19 @@ public class AbsoluteEncoderChecker {
             }
         }
         return true;
+    }
+
+    /** @return the median of the five current values */
+    public double getMedian() {
+        // resets so only the most up-to-date values are checked
+        medianFilter.reset();
+
+        // adds each of the first four readings to the medianFilter window
+        for (int i = 0; i < lastFive.length-1; i ++) {
+            medianFilter.calculate(lastFive[i]);
+        }
+
+        // returns the median of the window after adding the last reading
+        return medianFilter.calculate(lastFive[lastFive.length-1]);
     }
 }

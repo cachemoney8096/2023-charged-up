@@ -148,12 +148,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void rezeroIntake() {
-    deployMotorEncoder.setPosition(
-        AngleUtil.wrapAngle(
-            deployMotorAbsoluteEncoder.getPosition()
-                - Cal.Intake.ABSOLUTE_ENCODER_START_POS_DEG
-                + Cal.Intake.STARTING_POSITION_DEGREES));
-
+    deployMotorEncoder.setPosition(deployMotorAbsoluteEncoderChecker.getMedian());
     deployMotorController.reset(deployMotorEncoder.getPosition());
   }
 
