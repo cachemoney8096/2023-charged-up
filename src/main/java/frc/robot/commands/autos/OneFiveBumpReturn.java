@@ -6,11 +6,11 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Cal;
 import frc.robot.commands.IntakeSequence;
+import frc.robot.commands.autos.components.DriveDistance;
 import frc.robot.commands.autos.components.ScoreThisGamePiece;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
@@ -21,27 +21,27 @@ import frc.robot.utils.ScoringLocationUtil;
 
 /**
  * Assuming the robot is starting from cone scoring position nearest the loading zone, this auto
- * component drives to the nearest midfield game object, picks it up, and scores it on the next
- * nearest cone position.
+ * component drives to the nearest midfield game object, picks it up, and returns to starting
+ * position
  */
-public class OneFivePlusBump extends SequentialCommandGroup {
+public class OneFiveBumpReturn extends SequentialCommandGroup {
   private static final double DISTANCE_AT_CONE_METERS = 5.9;
   private static final double NORM_SPEED_INTAKING = 0.3;
   private double startXMeters = 0;
   private PathPlannerTrajectory firstTraj =
       PathPlanner.loadPath(
-          "OnePlusBumpFirstHalf",
+          "OnePlusBump",
           new PathConstraints(
               Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
               Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
   private PathPlannerTrajectory secondTraj =
       PathPlanner.loadPath(
-          "OnePlusBumpSecondHalf",
+          "OnePlusBumpReturn",
           new PathConstraints(
               Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
               Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
-  public OneFivePlusBump(
+  public OneFiveBumpReturn(
       boolean red,
       boolean fast,
       Lift lift,
@@ -54,14 +54,14 @@ public class OneFivePlusBump extends SequentialCommandGroup {
       // default to blue, only change for red
       firstTraj =
           PathPlanner.loadPath(
-              "OnePlusBumpFirstHalfRed",
+              "OnePlusBumpRed",
               new PathConstraints(
                   Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
                   Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
       secondTraj =
           PathPlanner.loadPath(
-              "OnePlusBumpSecondHalfRed",
+              "OnePlusBumpReturnRed",
               new PathConstraints(
                   Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
                   Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
@@ -93,21 +93,17 @@ public class OneFivePlusBump extends SequentialCommandGroup {
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 new WaitCommand(0.5),
-                new RunCommand(
-                        () -> {
-                          drive.rotateOrKeepHeading(NORM_SPEED_INTAKING, 0, 0, false, -1);
-                        })
-                    .until(
-                        () -> (drive.getPose().getX() - startXMeters) > DISTANCE_AT_CONE_METERS)),
-            new IntakeSequence(intake, lift, lights)
-                .finallyDo(
-                    (boolean interrupted) -> {
-                      lift.home();
-                      lift.closeGrabber();
-                      intake.setDesiredDeployed(false);
-                      intake.setDesiredClamped(false);
-                      intake.stopIntakingGamePiece();
-                    })),
-        drive.followTrajectoryCommand(secondTraj, false));
+                new DriveDistance(drive, NORM_SPEED_INTAKING, 1.5, 0.0, red),
+                new IntakeSequence(intake, lift, lights)
+                    .finallyDo(
+                        (boolean interrupted) -> {
+                          lift.home();
+                          lift.closeGrabber();
+                          intake.setDesiredDeployed(false);
+                          intake.setDesiredClamped(false);
+                          intake.stopIntakingGamePiece();
+                        })),
+            new DriveDistance(drive, NORM_SPEED_INTAKING, -1.5, 0.0, red),
+            drive.followTrajectoryCommand(secondTraj, false)));
   }
 }

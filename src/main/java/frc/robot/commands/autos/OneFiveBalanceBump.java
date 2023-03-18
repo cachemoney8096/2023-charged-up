@@ -16,6 +16,8 @@ import frc.robot.Cal;
 import frc.robot.commands.IntakeSequence;
 import frc.robot.commands.SwerveToPointWrapper;
 import frc.robot.commands.autos.components.ChargeFarSide;
+import frc.robot.commands.autos.components.DriveDistance;
+import frc.robot.commands.autos.components.DriveUntilBalanced;
 import frc.robot.commands.autos.components.ScoreThisGamePiece;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
@@ -35,7 +37,7 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
   private double startXMeters = 0;
   private PathPlannerTrajectory firstTraj =
       PathPlanner.loadPath(
-          "OneFivePlusBumpFirstHalf",
+          "OneFivePlusBump",
           new PathConstraints(
               Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
               Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
@@ -53,7 +55,7 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
       // default to blue, only change for red
       firstTraj =
           PathPlanner.loadPath(
-              "OneFivePlusBumpFirstHalfRed",
+              "OneFivePlusBumpRed",
               new PathConstraints(
                   Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
                   Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
@@ -84,12 +86,7 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 new WaitCommand(0.5),
-                new RunCommand(
-                        () -> {
-                          drive.rotateOrKeepHeading(NORM_SPEED_INTAKING, 0, 0, false, -1);
-                        })
-                    .until(
-                        () -> (drive.getPose().getX() - startXMeters) > DISTANCE_AT_CONE_METERS)),
+                new DriveDistance(drive, NORM_SPEED_INTAKING, 1.5, 0.0, false)),
             new IntakeSequence(intake, lift, lights)
                 .finallyDo(
                     (boolean interrupted) -> {
@@ -100,6 +97,6 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
                       intake.stopIntakingGamePiece();
                     })),
         new SwerveToPointWrapper(red, drive, new Pose2d (5.85, 2.5, Rotation2d.fromDegrees(0.0)), 2.0),
-        new ChargeFarSide(drive, DISTANCE_ONTO_CHARGE_STATION_METERS));
+        new DriveUntilBalanced(drive, false));
   }
 }

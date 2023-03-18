@@ -26,6 +26,7 @@ import frc.robot.commands.autos.AutoScoreMobilityAndBalance;
 import frc.robot.commands.autos.JustTwoGamePieces;
 import frc.robot.commands.autos.OneFiveBalanceBump;
 import frc.robot.commands.autos.OneFiveBalanceCenter;
+import frc.robot.commands.autos.OneFiveBumpReturn;
 import frc.robot.commands.autos.TwoGamePiecesThatEngage;
 import frc.robot.commands.finishScore;
 import frc.robot.subsystems.Intake;
@@ -101,10 +102,20 @@ public class RobotContainer {
         new JustTwoGamePieces(true, lift, intake, drive, lights, tagLimelight, scoreLoc));
     autonChooser.addOption(
         "1.5 balance bump blue",
-        new OneFiveBalanceBump(false, false, lift, intake, drive, lights, intakeLimelight, scoreLoc));
+        new OneFiveBalanceBump(
+            false, false, lift, intake, drive, lights, intakeLimelight, scoreLoc));
     autonChooser.addOption(
         "1.5 balance bump red",
-        new OneFiveBalanceBump(true, false, lift, intake, drive, lights, intakeLimelight, scoreLoc));
+        new OneFiveBalanceBump(
+            true, false, lift, intake, drive, lights, intakeLimelight, scoreLoc));
+    autonChooser.addOption(
+        "1.5 return bump blue",
+        new OneFiveBumpReturn(
+            false, false, lift, intake, drive, lights, intakeLimelight, scoreLoc));
+    autonChooser.addOption(
+        "1.5 return bump red",
+        new OneFiveBumpReturn(
+            true, false, lift, intake, drive, lights, intakeLimelight, scoreLoc));
     autonChooser.addOption(
         "1.5 balance center",
         new OneFiveBalanceCenter(lift, drive, lights, scoreLoc, intakeLimelight, intake));
