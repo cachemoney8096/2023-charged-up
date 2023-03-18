@@ -425,6 +425,26 @@ public class DriveSubsystem extends SubsystemBase {
             : Optional.of(curPose.plus(flipTransform));
   }
 
+  public PathPlannerTrajectory pathToPoint(Pose2d finalPose) {
+    Pose2d curPose = getPose();
+    Transform2d trajectoryTransform = targetPose.get().minus(curPose);
+    System.out.println(
+        "Trajectory Transform: " + trajectoryTransform.getX() + " " + trajectoryTransform.getY());
+    Transform2d finalTransform =
+        new Transform2d(finalPose.getTranslation(), finalPose.getRotation());
+    Rotation2d finalHeading = Rotation2d.fromDegrees(180);
+    Rotation2d finalHolonomicRotation = Rotation2d.fromDegrees(0);
+    PathPlannerTrajectory path =
+        PathPlanner.generatePath(
+            new PathConstraints(
+                Cal.SwerveSubsystem.SLOW_LINEAR_SPEED_METERS_PER_SEC,
+                Cal.SwerveSubsystem.SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ),
+            PathPoint.fromCurrentHolonomicState(curPose, lastSetChassisSpeeds),
+            new PathPoint(finalTransform.getTranslation(), finalHeading, finalHolonomicRotation)
+                .withPrevControlLength(0.01));
+    return path;
+  }
+
   public Optional<PathPlannerTrajectory> poseToPath(boolean red) {
     Pose2d curPose = getPose();
     double coastLatencySec = 0.00;
