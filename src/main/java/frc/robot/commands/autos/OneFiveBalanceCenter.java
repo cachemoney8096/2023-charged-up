@@ -5,9 +5,10 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.IntakeSequence;
-import frc.robot.commands.autos.components.AutoChargeStationBalance;
+import frc.robot.commands.autos.components.DriveDistance;
+import frc.robot.commands.autos.components.DriveFullyOver;
+import frc.robot.commands.autos.components.DriveUntilBalanced;
 import frc.robot.commands.autos.components.ScoreThisGamePiece;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
@@ -35,22 +36,7 @@ public class OneFiveBalanceCenter extends SequentialCommandGroup {
       Intake intake) {
     addCommands(
         new ScoreThisGamePiece(false, lift, lights),
-        new InstantCommand(
-            () -> {
-              startXMeters = drive.getPose().getX();
-            }),
-
-        // Drive just over charge station
-        new InstantCommand(
-            () -> {
-              drive.drive(NORM_SPEED_UP_CHARGE_STATION, 0, 0, true);
-            },
-            drive),
-        new WaitUntilCommand(
-            () -> {
-              return (drive.getPose().getX() - startXMeters) > DISTANCE_PAST_CHARGE_METERS;
-            }),
-        drive.stopDrivingCommand(),
+        new DriveFullyOver(drive, true),
         new WaitCommand(0.25),
 
         // Turn to cone, intake it
@@ -62,12 +48,7 @@ public class OneFiveBalanceCenter extends SequentialCommandGroup {
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 new WaitCommand(0.5),
-                new RunCommand(
-                        () -> {
-                          drive.rotateOrKeepHeading(NORM_SPEED_INTAKING, 0, 0, false, -1);
-                        })
-                    .until(
-                        () -> (drive.getPose().getX() - startXMeters) > DISTANCE_AT_CONE_METERS)),
+                new DriveDistance(drive, NORM_SPEED_INTAKING, DISTANCE_AT_CONE_METERS, 0, false)),
             new IntakeSequence(intake, lift, lights)
                 .finallyDo(
                     (boolean interrupted) -> {
@@ -79,11 +60,7 @@ public class OneFiveBalanceCenter extends SequentialCommandGroup {
                     })),
 
         // Drive back
-        new RunCommand(
-                () -> {
-                  drive.rotateOrKeepHeading(-NORM_SPEED_INTAKING, 0, 0, false, -1);
-                })
-            .until(() -> (drive.getPose().getX() - startXMeters) < DISTANCE_PAST_CHARGE_METERS),
+        new DriveDistance(drive, -NORM_SPEED_INTAKING, DISTANCE_PAST_CHARGE_METERS, 0, false),
 
         // Turn towards charge station and drive on
         new InstantCommand(drive::setZeroTargetHeading),
@@ -92,16 +69,6 @@ public class OneFiveBalanceCenter extends SequentialCommandGroup {
                   drive.rotateOrKeepHeading(0, 0, 0, true, -1);
                 })
             .withTimeout(0.25),
-        new InstantCommand(
-            () -> {
-              drive.drive(NORM_SPEED_BACK_CHARGE_STATION, 0, 0, true);
-            }),
-        new WaitUntilCommand(
-            () -> {
-              return (drive.getPose().getX() - startXMeters) < DISTANCE_BACK_CHARGE_STATION_METERS;
-            }),
-
-        // And balance!
-        new AutoChargeStationBalance(drive));
+        new DriveUntilBalanced(drive, false));
   }
 }
