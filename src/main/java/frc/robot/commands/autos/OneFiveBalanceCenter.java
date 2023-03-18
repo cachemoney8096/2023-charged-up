@@ -19,13 +19,8 @@ import frc.robot.utils.ScoringLocationUtil;
 
 /** Scores a game piece, drives over the charge station, then back on and balances */
 public class OneFiveBalanceCenter extends SequentialCommandGroup {
-  private static final double DISTANCE_PAST_CHARGE_METERS = 4.75;
-  private static final double DISTANCE_AT_CONE_METERS = 5.9;
-  private static final double DISTANCE_BACK_CHARGE_STATION_METERS = 3.15;
-  private static final double NORM_SPEED_UP_CHARGE_STATION = 0.5;
-  private static final double NORM_SPEED_BACK_CHARGE_STATION = -0.4;
+  private static final double DISTANCE_TO_CONE_METERS = 1.5;
   private static final double NORM_SPEED_INTAKING = 0.3;
-  private double startXMeters = 0;
 
   public OneFiveBalanceCenter(
       Lift lift,
@@ -48,7 +43,7 @@ public class OneFiveBalanceCenter extends SequentialCommandGroup {
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 new WaitCommand(0.5),
-                new DriveDistance(drive, NORM_SPEED_INTAKING, DISTANCE_AT_CONE_METERS, 0, false)),
+                new DriveDistance(drive, NORM_SPEED_INTAKING, DISTANCE_TO_CONE_METERS, 0, false)),
             new IntakeSequence(intake, lift, lights)
                 .finallyDo(
                     (boolean interrupted) -> {
@@ -60,7 +55,7 @@ public class OneFiveBalanceCenter extends SequentialCommandGroup {
                     })),
 
         // Drive back
-        new DriveDistance(drive, -NORM_SPEED_INTAKING, DISTANCE_PAST_CHARGE_METERS, 0, false),
+        new DriveDistance(drive, -NORM_SPEED_INTAKING, -DISTANCE_TO_CONE_METERS, 0, false),
 
         // Turn towards charge station and drive on
         new InstantCommand(drive::setZeroTargetHeading),
