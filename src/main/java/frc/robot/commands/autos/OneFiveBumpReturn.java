@@ -3,8 +3,6 @@ package frc.robot.commands.autos;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
@@ -13,9 +11,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Cal;
 import frc.robot.commands.IntakeSequence;
-import frc.robot.commands.SwerveToPointWrapper;
 import frc.robot.commands.autos.components.DriveDistance;
-import frc.robot.commands.autos.components.DriveUntilBalanced;
 import frc.robot.commands.autos.components.ScoreThisGamePiece;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
@@ -26,22 +22,26 @@ import frc.robot.utils.ScoringLocationUtil;
 
 /**
  * Assuming the robot is starting from cone scoring position nearest the loading zone, this auto
- * component drives to the nearest midfield game object, picks it up, and scores it on the next
- * nearest cone position.
+ * component drives to the nearest midfield game object, picks it up, and returns to starting
+ * position
  */
-public class OneFiveBalanceBump extends SequentialCommandGroup {
+public class OneFiveBumpReturn extends SequentialCommandGroup {
   private static final double NORM_SPEED_INTAKING = 0.3;
-  private double X_METERS_TO_CONE = 1.5;
-  private Pose2d desiredPose = new Pose2d(5.85, 2.5, Rotation2d.fromDegrees(0.0));
-
+  private final double X_METERS_TO_CONE = 1.5;
   private PathPlannerTrajectory firstTraj =
       PathPlanner.loadPath(
-          "OneFivePlusBump",
+          "OnePlusBump",
+          new PathConstraints(
+              Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
+              Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
+  private PathPlannerTrajectory secondTraj =
+      PathPlanner.loadPath(
+          "OnePlusBumpReturn",
           new PathConstraints(
               Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
               Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
-  public OneFiveBalanceBump(
+  public OneFiveBumpReturn(
       boolean red,
       boolean fast,
       Lift lift,
@@ -54,7 +54,14 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
       // default to blue, only change for red
       firstTraj =
           PathPlanner.loadPath(
-              "OneFivePlusBumpRed",
+              "OnePlusBumpRed",
+              new PathConstraints(
+                  Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
+                  Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
+
+      secondTraj =
+          PathPlanner.loadPath(
+              "OnePlusBumpReturnRed",
               new PathConstraints(
                   Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
                   Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
@@ -62,11 +69,14 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
       firstTraj =
           PathPlannerTrajectory.transformTrajectoryForAlliance(
               firstTraj, DriverStation.Alliance.Red);
+
+      secondTraj =
+          PathPlannerTrajectory.transformTrajectoryForAlliance(
+              secondTraj, DriverStation.Alliance.Red);
     }
 
     addRequirements(lift, intake, drive, limelight);
 
-    // TODO add a 1.5 bump side that does not balance
     /** Initialize sequential commands that run for the "15 second autonomous phase" */
     addCommands(
         new ScoreThisGamePiece(fast, lift, lights),
@@ -84,7 +94,7 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 new WaitCommand(0.5),
-                new DriveDistance(drive, NORM_SPEED_INTAKING, X_METERS_TO_CONE, 0.0, false)),
+                new DriveDistance(drive, NORM_SPEED_INTAKING, X_METERS_TO_CONE, 0.0, red)),
             new IntakeSequence(intake, lift, lights)
                 .finallyDo(
                     (boolean interrupted) -> {
@@ -94,7 +104,7 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
                       intake.setDesiredClamped(false);
                       intake.stopIntakingGamePiece();
                     })),
-        new SwerveToPointWrapper(red, drive, desiredPose, 2.0),
-        new DriveUntilBalanced(drive, false));
+        new DriveDistance(drive, NORM_SPEED_INTAKING, -X_METERS_TO_CONE, 0.0, red),
+        drive.followTrajectoryCommand(secondTraj, false));
   }
 }
