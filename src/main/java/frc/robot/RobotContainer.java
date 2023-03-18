@@ -264,8 +264,8 @@ public class RobotContainer {
     operatorController
         .rightTrigger()
         .onTrue(new InstantCommand(() -> lights.toggleCode(Lights.LightCode.CUBE), lights));
-    operatorController.leftBumper().onTrue(new InstantCommand(lift::bumpArmDown));
-    operatorController.rightBumper().onTrue(new InstantCommand(lift::bumpArmUp));
+    operatorController.leftBumper().onTrue(new InstantCommand(lift::deployArmLessFar));
+    operatorController.rightBumper().onTrue(new InstantCommand(lift::deployArmFurther));
 
     drive.setDefaultCommand(
         new RunCommand(
