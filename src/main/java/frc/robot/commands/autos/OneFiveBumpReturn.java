@@ -30,13 +30,13 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
   private final double X_METERS_TO_CONE = 1.0;
   private PathPlannerTrajectory firstTraj =
       PathPlanner.loadPath(
-          "OnePlusBump",
+          "OneFivePlusBump",
           new PathConstraints(
               Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
               Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
   private PathPlannerTrajectory secondTraj =
       PathPlanner.loadPath(
-          "OnePlusBumpReturn",
+          "OneFivePlusBumpReturn",
           new PathConstraints(
               Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
               Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
@@ -54,14 +54,14 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
       // default to blue, only change for red
       firstTraj =
           PathPlanner.loadPath(
-              "OnePlusBumpRed",
+              "OneFivePlusBumpRed",
               new PathConstraints(
                   Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
                   Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
       secondTraj =
           PathPlanner.loadPath(
-              "OnePlusBumpReturnRed",
+              "OneFivePlusBumpReturnRed",
               new PathConstraints(
                   Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
                   Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));

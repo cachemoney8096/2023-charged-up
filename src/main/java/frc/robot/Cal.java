@@ -103,39 +103,42 @@ public final class Cal {
     public static final double EJECTION_POWER = -1.0;
 
     /** Intake positions in degrees */
-    public static final double STARTING_POSITION_DEGREES = 75.0,
-        DEPLOYED_POSITION_DEGREES = 180.0,
-        RETRACTED_POSITION_DEGREES = 65.0;
+    public static final double STARTING_POSITION_DEGREES = 90.0,
+        DEPLOYED_POSITION_DEGREES = 160.0,
+        RETRACTED_POSITION_DEGREES = 84.0;
 
     /** Past this position, the intake is free to clamp */
     public static final double CLAMP_POSITION_THRESHOLD_DEGREES = 110.0;
 
     /** Absolute encoder position when the intake is at starting position */
-    public static double ABSOLUTE_ENCODER_START_POS_DEG = 199.4;
+    public static double ABSOLUTE_ENCODER_START_POS_DEG = 28.8;
+
+    public static final double ABSOLUTE_ENCODER_ZERO_OFFSET_DEG = 
+        STARTING_POSITION_DEGREES - ABSOLUTE_ENCODER_START_POS_DEG;
 
     /** Voltage required to hold the intake in the horizontal position */
     // Stall torque: 3.36 Nm * 100 = 336 Nm
     // Max torque: 6 kg * 9.81 (N/kg) * 0.26m = 29.43 Nm
     // Ratio: 1.05 V
-    public static final double ARBITRARY_FEED_FORWARD_VOLTS = 1.05;
+    public static final double ARBITRARY_FEED_FORWARD_VOLTS = 0.8;
 
     /** Parameters for intake controller */
     public static final double
         // angular accel = Torque / Inertia. 3.36 Nm * 100 / (6 * 0.5^2) kg-m^2 * (360 deg / 2pi
         // rad) = 12840 deg/s^2
-        DEPLOY_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = 500.0,
+        DEPLOY_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = 300.0,
         // 5880 rpm / (60 sec/min) * (360 deg/rev) / 100 = 352.8
-        DEPLOY_MAX_VELOCITY_DEG_PER_SECOND = 250.0,
+        DEPLOY_MAX_VELOCITY_DEG_PER_SECOND = 150.0,
         // Functional not logical
-        DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG = 10.0;
+        DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG = 2.0;
 
     /** Input deg, output Volts */
-    public static final double DEPLOY_MOTOR_P = 0.7, DEPLOY_MOTOR_I = 0.0, DEPLOY_MOTOR_D = 0.0;
+    public static final double DEPLOY_MOTOR_P = 0.05, DEPLOY_MOTOR_I = 0.0, DEPLOY_MOTOR_D = 0.0;
 
     /** Input deg/s, output volts. From recalc */
     public static final SimpleMotorFeedforward DEPLOY_FEEDFORWARD =
         new SimpleMotorFeedforward(
-            0.0, 1.95 * (2.0 * Math.PI) / 360.0, 0.09 * (2.0 * Math.PI) / 360.0);
+            0.0, 2.0 * (2.0 * Math.PI) / 360.0, 0.09 * (2.0 * Math.PI) / 360.0);
 
     /** Sets the min and max positions that the intake deploy motor will be allowed to reach. */
     public static final float

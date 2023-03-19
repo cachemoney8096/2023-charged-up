@@ -93,7 +93,8 @@ public class RobotContainer {
     autonChooser.setDefaultOption(
         "Two plus balance Blue",
         new TwoGamePiecesThatEngage(false, lift, intake, drive, lights, tagLimelight, scoreLoc));
-    autonChooser.addOption(
+    autonChooser.addOption("Nothing", new RunCommand(() -> {}, drive, intake));
+        autonChooser.addOption(
         "Two plus balance Red",
         new TwoGamePiecesThatEngage(true, lift, intake, drive, lights, tagLimelight, scoreLoc));
     autonChooser.addOption(
@@ -202,7 +203,7 @@ public class RobotContainer {
                       lift.home();
                     }));
     // driverController.a().onTrue(new InstantCommand(lift::cancelScore, lift));
-    driverController.a().whileTrue(new RunCommand(()->{intake.setDesiredDeployed(true);}));
+    driverController.a().whileTrue(new RunCommand(()->{intake.setDesiredDeployed(true);}, intake));
     // driverController
     //     .x()
     //     .onTrue(
