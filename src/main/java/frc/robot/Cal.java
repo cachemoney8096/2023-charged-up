@@ -223,7 +223,8 @@ public final class Cal {
                 ));
 
     public static final double ELEVATOR_LOW_POSITION_INCHES = 0.0,
-        ELEVATOR_HIGH_POSITION_INCHES = 22.0;
+        // ELEVATOR_HIGH_POSITION_INCHES = 22.0;
+        ELEVATOR_HIGH_POSITION_INCHES = 0.0;
 
     /** Sets the min and max positions that the elevator and arm motors will be allowed to reach */
     public static final float ELEVATOR_POSITIVE_LIMIT_INCHES = 22.0f,
