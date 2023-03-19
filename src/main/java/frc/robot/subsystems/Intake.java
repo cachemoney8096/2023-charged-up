@@ -118,7 +118,8 @@ public class Intake extends SubsystemBase {
                 deployMotorEncoder, Constants.Intake.DEPLOY_MOTOR_GEAR_RATIO));
     errors +=
         SparkMaxUtils.check(
-            SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(deployMotorAbsoluteEncoder, 1.0));
+            SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(
+                deployMotorAbsoluteEncoder, Constants.Intake.DEPLOY_ABS_ENCODER_GEAR_RATIO));
 
     errors +=
         SparkMaxUtils.check(
