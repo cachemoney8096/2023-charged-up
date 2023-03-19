@@ -201,7 +201,8 @@ public class RobotContainer {
                     (boolean interrupted) -> {
                       lift.home();
                     }));
-    driverController.a().onTrue(new InstantCommand(lift::cancelScore, lift));
+    // driverController.a().onTrue(new InstantCommand(lift::cancelScore, lift));
+    driverController.a().whileTrue(new RunCommand(()->{intake.setDesiredDeployed(true);}));
     // driverController
     //     .x()
     //     .onTrue(
