@@ -10,18 +10,16 @@ public class SwerveFollowerWrapper extends CommandBase {
 
   public Command swerveFollowerCmd;
   private DriveSubsystem drive;
-  boolean redAlliance;
   boolean noTrajectory = true;
 
-  public SwerveFollowerWrapper(boolean red, DriveSubsystem driveSubsystem) {
-    redAlliance = red;
+  public SwerveFollowerWrapper(DriveSubsystem driveSubsystem) {
     drive = driveSubsystem;
     addRequirements(drive);
   }
 
   @Override
   public void initialize() {
-    Optional<PathPlannerTrajectory> maybeTrajectory = drive.poseToPath(redAlliance);
+    Optional<PathPlannerTrajectory> maybeTrajectory = drive.poseToPath();
     if (!maybeTrajectory.isPresent()) {
       return;
     }

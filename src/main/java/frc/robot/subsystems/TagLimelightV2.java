@@ -90,7 +90,8 @@ public class TagLimelightV2 extends SubsystemBase {
       robotToScoringLocation = Optional.empty();
       return Optional.empty();
     }
-    if (LimelightHelpers.getFiducialID("") != 6.0 && LimelightHelpers.getFiducialID("") != 3.0) {
+    if (!validScoringTag(LimelightHelpers.getFiducialID(""))) {
+    // if (LimelightHelpers.getFiducialID("") != 6.0 && LimelightHelpers.getFiducialID("") != 3.0) {
       robotToScoringLocation = Optional.empty();
       return Optional.empty();
     }

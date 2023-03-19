@@ -450,7 +450,7 @@ public class DriveSubsystem extends SubsystemBase {
     return path;
   }
 
-  public Optional<PathPlannerTrajectory> poseToPath(boolean red) {
+  public Optional<PathPlannerTrajectory> poseToPath() {
     Pose2d curPose = getPose();
     double coastLatencySec = 0.00;
     Transform2d coastTransform =

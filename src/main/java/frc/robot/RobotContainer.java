@@ -28,6 +28,7 @@ import frc.robot.commands.autos.OneFiveBalanceBump;
 import frc.robot.commands.autos.OneFiveBalanceCenter;
 import frc.robot.commands.autos.OneFiveBumpReturn;
 import frc.robot.commands.autos.TwoGamePiecesThatEngage;
+import frc.robot.commands.TeleopDriveToTag;
 import frc.robot.commands.finishScore;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
@@ -195,21 +196,22 @@ public class RobotContainer {
                       lift.home();
                     }));
     driverController.a().onTrue(new InstantCommand(lift::cancelScore, lift));
-    driverController
-        .x()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  drive.throttle(Cal.SwerveSubsystem.THROTTLE_FOR_SLOW_BUTTON);
-                }));
-    driverController
-        .x()
-        .onFalse(
-            new InstantCommand(
-                () -> {
-                  drive.throttle(1.0);
-                }));
-    driverController.y().whileTrue(new RunCommand(drive::setX, drive));
+    // driverController
+    //     .x()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               drive.throttle(Cal.SwerveSubsystem.THROTTLE_FOR_SLOW_BUTTON);
+    //             }));
+    // driverController
+    //     .x()
+    //     .onFalse(
+    //         new InstantCommand(
+    //             () -> {
+    //               drive.throttle(1.0);
+    //             }));
+    driverController.x().whileTrue(new RunCommand(drive::setX, drive));
+    driverController.y().whileTrue(new TeleopDriveToTag(tagLimelight, drive, lights));
 
     driverController
         .rightBumper()
