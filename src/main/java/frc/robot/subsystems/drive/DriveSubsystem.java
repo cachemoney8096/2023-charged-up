@@ -24,6 +24,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
@@ -35,6 +36,7 @@ import frc.robot.Constants;
 import frc.robot.RobotMap;
 import frc.robot.subsystems.Lights;
 import frc.robot.utils.GeometryUtils;
+
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
@@ -86,18 +88,23 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Multiplier for drive speed, does not affect trajectory following */
   private double throttleMultiplier = 1.0;
+  private BooleanSupplier isTimedMatch;
 
   /**
    * Creates a new DriveSubsystem.
    *
    * @param throttleForLiftFunc Function to check if we should throttle due to lift position.
    */
-  public DriveSubsystem(BooleanSupplier throttleForLiftFunc, Lights lightsSubsystem) {
+  public DriveSubsystem(
+    BooleanSupplier throttleForLiftFunc,
+    Lights lightsSubsystem,
+    BooleanSupplier isTimedMatchFunc) {
     throttleForLift = throttleForLiftFunc;
     gyro.configFactoryDefault();
     gyro.reset();
     gyro.configMountPose(AxisDirection.PositiveY, AxisDirection.PositiveZ);
     lights = lightsSubsystem;
+    isTimedMatch = isTimedMatchFunc;
   }
 
   public double getFilteredPitch() {
@@ -201,6 +208,13 @@ public class DriveSubsystem extends SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+    if (isTimedMatch.getAsBoolean() &&
+        DriverStation.isTeleop() &&
+        DriverStation.getMatchTime() < 0.3) {
+      setX();
+      return;
+    }
+
     // x, y, and rot are all being deadbanded from 0.1 to 0.0, so checking if
     // they're equal to 0
     // does account for controller deadzones.

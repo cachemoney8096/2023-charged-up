@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -79,6 +80,10 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
+
+    if (DriverStation.getMatchTime() > 1.0) {
+      m_robotContainer.timedMatch = true;
+    }
   }
 
   /** This function is called periodically during autonomous. */
@@ -93,6 +98,10 @@ public class Robot extends TimedRobot {
     // this line or comment it out.
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
+    }
+
+    if (DriverStation.getMatchTime() > 1.0) {
+      m_robotContainer.timedMatch = true;
     }
   }
 

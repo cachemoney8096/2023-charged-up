@@ -47,10 +47,16 @@ import frc.robot.utils.ScoringLocationUtil;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+  // If true, this is a match with real timings
+  public boolean timedMatch = false;
+
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
   public final Lift lift = new Lift(scoreLoc);
   private final Lights lights = new Lights();
-  private final DriveSubsystem drive = new DriveSubsystem(lift::throttleForLift, lights);
+  private final DriveSubsystem drive = new DriveSubsystem(
+    lift::throttleForLift,
+    lights,
+    () -> timedMatch);
   public final Intake intake = new Intake(lift::clearOfIntakeZone);
   private final IntakeLimelight intakeLimelight =
       new IntakeLimelight(
