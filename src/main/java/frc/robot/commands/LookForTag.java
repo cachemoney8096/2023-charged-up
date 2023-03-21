@@ -24,7 +24,7 @@ public class LookForTag extends CommandBase {
 
   @Override
   public void initialize() {
-    lights.toggleCode(LightCode.NO_TAG);
+    lights.setLight(LightCode.NO_TAG);
   }
 
   @Override
@@ -38,7 +38,7 @@ public class LookForTag extends CommandBase {
       double latencySeconds = tagLimelight.getLatencySeconds();
       targetLocked = true;
       drive.setLimelightTargetFromTransform(robotToScoringLocation.get(), latencySeconds);
-      lights.toggleCode(LightCode.WORKING);
+      lights.setLight(LightCode.WORKING);
     }
   }
 

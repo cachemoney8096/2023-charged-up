@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
@@ -72,6 +73,8 @@ public class Intake extends SubsystemBase {
   private boolean desireClamped = false;
   private BooleanSupplier clearOfIntake;
   private AbsoluteEncoderChecker deployMotorAbsoluteEncoderChecker = new AbsoluteEncoderChecker();
+  private double lastControlledTime = Timer.getFPGATimestamp();
+  private double lastControlledVelocity = 0.0;
 
   /** Creates a new Intake. */
   public Intake(BooleanSupplier clearOfIntakeZone) {
@@ -91,10 +94,10 @@ public class Intake extends SubsystemBase {
     errors += SparkMaxUtils.check(intakeRight.restoreFactoryDefaults());
     errors += SparkMaxUtils.check(intakeRight.follow(intakeLeft, true));
 
-    intakeLeft.setInverted(false);
+    intakeLeft.setInverted(true);
 
-    errors += SparkMaxUtils.check(deployMotor.setIdleMode(IdleMode.kCoast));
-    errors += SparkMaxUtils.check(deployMotor.setIdleMode(IdleMode.kCoast));
+    errors += SparkMaxUtils.check(intakeLeft.setIdleMode(IdleMode.kCoast));
+    errors += SparkMaxUtils.check(intakeRight.setIdleMode(IdleMode.kCoast));
 
     errors +=
         SparkMaxUtils.check(
@@ -118,7 +121,8 @@ public class Intake extends SubsystemBase {
                 deployMotorEncoder, Constants.Intake.DEPLOY_MOTOR_GEAR_RATIO));
     errors +=
         SparkMaxUtils.check(
-            SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(deployMotorAbsoluteEncoder, 1.0));
+            SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(
+                deployMotorAbsoluteEncoder, Constants.Intake.DEPLOY_ABS_ENCODER_GEAR_RATIO));
 
     errors +=
         SparkMaxUtils.check(
@@ -143,6 +147,10 @@ public class Intake extends SubsystemBase {
     return errors == 0;
   }
 
+  public double getOffsetAbsPositionDeg() {
+    return deployMotorAbsoluteEncoder.getPosition() + Cal.Intake.ABSOLUTE_ENCODER_ZERO_OFFSET_DEG;
+  }
+
   public void initialize() {
     rezeroIntake();
   }
@@ -153,11 +161,11 @@ public class Intake extends SubsystemBase {
             deployMotorAbsoluteEncoderChecker.getMedian()
                 - Cal.Intake.ABSOLUTE_ENCODER_START_POS_DEG
                 + Cal.Intake.STARTING_POSITION_DEGREES));
-    deployMotorController.reset(deployMotorEncoder.getPosition());
+    deployMotorController.reset(getOffsetAbsPositionDeg());
   }
 
   public void zeroIntakeAtCurrentPos() {
-    Cal.Intake.ABSOLUTE_ENCODER_START_POS_DEG = deployMotorAbsoluteEncoder.getPosition();
+    Cal.Intake.ABSOLUTE_ENCODER_START_POS_DEG = getOffsetAbsPositionDeg();
     System.out.println("New Zero for Deploy Motor: " + Cal.Intake.ABSOLUTE_ENCODER_START_POS_DEG);
   }
 
@@ -175,16 +183,47 @@ public class Intake extends SubsystemBase {
   }
 
   /** Sends the deploy motor voltage, needs to be called every cycle */
-  private void controlPosition(double positionDeg) {
-    if (positionDeg != intakeMostRecentGoalDegrees) {
-      deployMotorController.setGoal(positionDeg);
-      intakeMostRecentGoalDegrees = positionDeg;
+  private void controlPosition(double controlPositionDeg) {
+    // if (positionDeg != intakeMostRecentGoalDegrees) {
+    //   deployMotorController.setGoal(positionDeg);
+    //   intakeMostRecentGoalDegrees = positionDeg;
+    // }
+    // TODO: should we always set the goal or no?
+    deployMotorController.setGoal(controlPositionDeg);
+
+    double currentPositionDeg = getOffsetAbsPositionDeg();
+
+    double desiredAccelDegPerSecSq =
+        (deployMotorController.getSetpoint().velocity - lastControlledVelocity)
+            / (Timer.getFPGATimestamp() - lastControlledTime);
+
+    double demandVoltsA = deployMotorController.calculate(getOffsetAbsPositionDeg());
+    double demandVoltsB =
+        Cal.Intake.DEPLOY_FEEDFORWARD.calculate(
+            deployMotorController.getSetpoint().velocity, desiredAccelDegPerSecSq);
+    double demandVoltsC = Cal.Intake.ARBITRARY_FEED_FORWARD_VOLTS * getCosineIntakeAngle();
+
+    SmartDashboard.putNumber("Intake Volts PID", demandVoltsA);
+    SmartDashboard.putNumber("Intake Volts FF", demandVoltsB);
+    SmartDashboard.putNumber("Intake Volts Gravity", demandVoltsC);
+    lastControlledTime = Timer.getFPGATimestamp();
+    lastControlledVelocity = deployMotorController.getSetpoint().velocity;
+
+    // TODO fix this hacky stuff
+    final double POSITION_NO_POWER = 150.0;
+    if (controlPositionDeg > POSITION_NO_POWER && currentPositionDeg > POSITION_NO_POWER) {
+      deployMotor.setVoltage(0.0);
+      return;
     }
-    double demandVolts = deployMotorController.calculate(deployMotorEncoder.getPosition());
-    demandVolts +=
-        Cal.Intake.DEPLOY_FEEDFORWARD.calculate(deployMotorController.getSetpoint().velocity);
-    demandVolts += Cal.Intake.ARBITRARY_FEED_FORWARD_VOLTS * getCosineIntakeAngle();
-    deployMotor.setVoltage(demandVolts);
+
+    final double POSITION_HOLD_INTAKE_IN = 100.0;
+    if (controlPositionDeg < POSITION_HOLD_INTAKE_IN
+        && currentPositionDeg < POSITION_HOLD_INTAKE_IN) {
+      deployMotor.setVoltage(-2.0);
+      return;
+    }
+
+    deployMotor.setVoltage(demandVoltsA + demandVoltsB + demandVoltsC);
   }
 
   /** Deploys the intake out. */
@@ -214,7 +253,7 @@ public class Intake extends SubsystemBase {
   private double getCosineIntakeAngle() {
     return Math.cos(
         Units.degreesToRadians(
-            deployMotorEncoder.getPosition() - Constants.Intake.POSITION_WHEN_HORIZONTAL_DEGREES));
+            getOffsetAbsPositionDeg() - Constants.Intake.POSITION_WHEN_HORIZONTAL_DEGREES));
   }
 
   /** If the intake has achieved its desired position, return true */
@@ -224,7 +263,7 @@ public class Intake extends SubsystemBase {
         desiredDeployed
             ? Cal.Intake.DEPLOYED_POSITION_DEGREES
             : Cal.Intake.RETRACTED_POSITION_DEGREES;
-    return (Math.abs(desiredPositionDegrees - deployMotorEncoder.getPosition())
+    return (Math.abs(desiredPositionDegrees - getOffsetAbsPositionDeg())
         < Cal.Intake.DEPLOY_ALLOWED_CLOSED_LOOP_ERROR_DEG);
   }
 
@@ -277,8 +316,7 @@ public class Intake extends SubsystemBase {
     deployMotorAbsoluteEncoderChecker.addReading(deployMotorAbsoluteEncoder.getPosition());
 
     // Only clamp if it is safe to do so and clamping is desired
-    if (desireClamped
-        && deployMotorEncoder.getPosition() > Cal.Intake.CLAMP_POSITION_THRESHOLD_DEGREES) {
+    if (desireClamped && getOffsetAbsPositionDeg() > Cal.Intake.CLAMP_POSITION_THRESHOLD_DEGREES) {
       clampIntake();
     } else {
       unclampIntake();
@@ -297,14 +335,16 @@ public class Intake extends SubsystemBase {
     builder.addDoubleProperty(
         "Intake Desired Position (Degrees)", () -> intakeControlPositionDegrees, null);
     builder.addDoubleProperty(
-        "Intake Current Position (Degrees)",
+        "Intake Rel Enc Position (Degrees)",
         deployMotorEncoder::getPosition,
         deployMotorEncoder::setPosition);
     builder.addDoubleProperty(
         "Intake Abs Position (deg)", deployMotorAbsoluteEncoder::getPosition, null);
+    builder.addDoubleProperty(
+        "Intake Abs Offset Position (deg)", this::getOffsetAbsPositionDeg, null);
 
     builder.addDoubleProperty(
-        "Intake Deploy Velocity (deg/s)", deployMotorEncoder::getVelocity, null);
+        "Intake Abs Deploy Velocity (deg/s)", deployMotorAbsoluteEncoder::getVelocity, null);
     builder.addBooleanProperty("See Game Piece", this::seeGamePiece, null);
     builder.addBooleanProperty(
         "Desire clamped",

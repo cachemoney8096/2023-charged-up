@@ -153,10 +153,12 @@ public final class Constants {
   }
 
   public static final class Intake {
-    public static final double DEPLOY_MOTOR_GEAR_RATIO = 75.0;
+    public static final double DEPLOY_MOTOR_GEAR_RATIO = 100.0;
+
+    public static final double DEPLOY_ABS_ENCODER_GEAR_RATIO = 32.0 / 24.0;
 
     /** Intake position when the intake is horizontal and pointing up / forward */
     // TODO adjust based on intake CoM instead of intake arm angle
-    public static final double POSITION_WHEN_HORIZONTAL_DEGREES = 0;
+    public static final double POSITION_WHEN_HORIZONTAL_DEGREES = -10.0;
   }
 }

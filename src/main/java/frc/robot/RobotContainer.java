@@ -23,9 +23,10 @@ import frc.robot.commands.OuttakeSequence;
 import frc.robot.commands.ShelfSequence;
 import frc.robot.commands.autos.AutoScoreAndBalance;
 import frc.robot.commands.autos.AutoScoreMobilityAndBalance;
-import frc.robot.commands.autos.JustTwoGamePieces;
 import frc.robot.commands.autos.OneFiveBalanceBump;
 import frc.robot.commands.autos.OneFiveBalanceCenter;
+import frc.robot.commands.autos.OneFiveBumpReturn;
+import frc.robot.commands.autos.TwoFiveOpenSide;
 import frc.robot.commands.autos.TwoGamePiecesThatEngage;
 import frc.robot.commands.finishScore;
 import frc.robot.subsystems.Intake;
@@ -45,9 +46,14 @@ import frc.robot.utils.ScoringLocationUtil;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+  // If true, this is a match with real timings
+  public boolean timedMatch = false;
+
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
   public final Lift lift = new Lift(scoreLoc);
-  private final DriveSubsystem drive = new DriveSubsystem(lift::throttleForLift);
+  private final Lights lights = new Lights();
+  private final DriveSubsystem drive =
+      new DriveSubsystem(lift::throttleForLift, lights, () -> timedMatch);
   public final Intake intake = new Intake(lift::clearOfIntakeZone);
   private final IntakeLimelight intakeLimelight =
       new IntakeLimelight(
@@ -55,7 +61,6 @@ public class RobotContainer {
           Constants.INTAKE_LIMELIGHT_HEIGHT_METERS,
           Constants.INTAKE_TARGET_HEIGHT_METERS);
   public final TagLimelightV2 tagLimelight = new TagLimelightV2(scoreLoc);
-  private final Lights lights = new Lights();
   public final PneumaticHub pneumaticHub = new PneumaticHub();
 
   // A chooser for autonomous commands
@@ -85,6 +90,7 @@ public class RobotContainer {
     autonChooser.setDefaultOption(
         "Two plus balance Blue",
         new TwoGamePiecesThatEngage(false, lift, intake, drive, lights, tagLimelight, scoreLoc));
+    autonChooser.addOption("Nothing", new RunCommand(() -> {}, drive, intake));
     autonChooser.addOption(
         "Two plus balance Red",
         new TwoGamePiecesThatEngage(true, lift, intake, drive, lights, tagLimelight, scoreLoc));
@@ -94,17 +100,26 @@ public class RobotContainer {
         "One plus mobility plus balance",
         new AutoScoreMobilityAndBalance(lift, drive, lights, scoreLoc));
     autonChooser.addOption(
-        "Just two blue",
-        new JustTwoGamePieces(false, lift, intake, drive, lights, tagLimelight, scoreLoc));
+        "2.5 Open blue",
+        new TwoFiveOpenSide(false, lift, intake, drive, lights, tagLimelight, scoreLoc));
     autonChooser.addOption(
-        "Just two red",
-        new JustTwoGamePieces(true, lift, intake, drive, lights, tagLimelight, scoreLoc));
+        "2.5 Open red",
+        new TwoFiveOpenSide(true, lift, intake, drive, lights, tagLimelight, scoreLoc));
     autonChooser.addOption(
         "1.5 balance bump blue",
-        new OneFiveBalanceBump(false, false, lift, intake, drive, lights, tagLimelight, scoreLoc));
+        new OneFiveBalanceBump(
+            false, false, lift, intake, drive, lights, intakeLimelight, scoreLoc));
     autonChooser.addOption(
         "1.5 balance bump red",
-        new OneFiveBalanceBump(true, false, lift, intake, drive, lights, tagLimelight, scoreLoc));
+        new OneFiveBalanceBump(
+            true, false, lift, intake, drive, lights, intakeLimelight, scoreLoc));
+    autonChooser.addOption(
+        "1.5 return bump blue",
+        new OneFiveBumpReturn(
+            false, false, lift, intake, drive, lights, intakeLimelight, scoreLoc));
+    autonChooser.addOption(
+        "1.5 return bump red",
+        new OneFiveBumpReturn(true, false, lift, intake, drive, lights, intakeLimelight, scoreLoc));
     autonChooser.addOption(
         "1.5 balance center",
         new OneFiveBalanceCenter(lift, drive, lights, scoreLoc, intakeLimelight, intake));

@@ -24,6 +24,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
@@ -33,12 +34,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
+import frc.robot.subsystems.Lights;
 import frc.robot.utils.GeometryUtils;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
 public class DriveSubsystem extends SubsystemBase {
   private double targetHeadingDegrees;
+
+  private Lights lights;
 
   // Create SwerveModules
   private final SwerveModule frontLeft =
@@ -71,7 +75,7 @@ public class DriveSubsystem extends SubsystemBase {
   public Optional<Pose2d> targetPose = Optional.empty();
   private BooleanSupplier throttleForLift;
   public boolean generatedPath = false;
-  private MedianFilter pitchFilter = new MedianFilter(3);
+  private MedianFilter pitchFilter = new MedianFilter(5);
   private double latestFilteredPitchDeg = 0.0;
 
   // Odometry class for tracking robot pose
@@ -84,20 +88,27 @@ public class DriveSubsystem extends SubsystemBase {
   /** Multiplier for drive speed, does not affect trajectory following */
   private double throttleMultiplier = 1.0;
 
+  private BooleanSupplier isTimedMatch;
+
   /**
    * Creates a new DriveSubsystem.
    *
    * @param throttleForLiftFunc Function to check if we should throttle due to lift position.
    */
-  public DriveSubsystem(BooleanSupplier throttleForLiftFunc) {
+  public DriveSubsystem(
+      BooleanSupplier throttleForLiftFunc,
+      Lights lightsSubsystem,
+      BooleanSupplier isTimedMatchFunc) {
     throttleForLift = throttleForLiftFunc;
     gyro.configFactoryDefault();
     gyro.reset();
     gyro.configMountPose(AxisDirection.PositiveY, AxisDirection.PositiveZ);
+    lights = lightsSubsystem;
+    isTimedMatch = isTimedMatchFunc;
   }
 
   public double getFilteredPitch() {
-    return latestFilteredPitchDeg;
+    return latestFilteredPitchDeg - Cal.SwerveSubsystem.IMU_PITCH_BIAS_DEG;
   }
 
   @Override
@@ -197,6 +208,13 @@ public class DriveSubsystem extends SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+    if (isTimedMatch.getAsBoolean()
+        && DriverStation.isTeleop()
+        && DriverStation.getMatchTime() < 0.3) {
+      setX();
+      return;
+    }
+
     // x, y, and rot are all being deadbanded from 0.1 to 0.0, so checking if
     // they're equal to 0
     // does account for controller deadzones.
@@ -242,6 +260,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Sets the wheels into an X formation to prevent movement. */
   public void setX() {
+    lights.setPartyMode();
     frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
     frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
@@ -427,11 +446,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   public PathPlannerTrajectory pathToPoint(Pose2d finalPose) {
     Pose2d curPose = getPose();
-    Transform2d trajectoryTransform = targetPose.get().minus(curPose);
-    System.out.println(
-        "Trajectory Transform: " + trajectoryTransform.getX() + " " + trajectoryTransform.getY());
     Transform2d finalTransform =
         new Transform2d(finalPose.getTranslation(), finalPose.getRotation());
+    System.out.println(
+        "Trajectory Transform: " + finalTransform.getX() + " " + finalTransform.getY());
     Rotation2d finalHeading = Rotation2d.fromDegrees(180);
     Rotation2d finalHolonomicRotation = Rotation2d.fromDegrees(0);
     PathPlannerTrajectory path =
@@ -445,7 +463,7 @@ public class DriveSubsystem extends SubsystemBase {
     return path;
   }
 
-  public Optional<PathPlannerTrajectory> poseToPath(boolean red) {
+  public Optional<PathPlannerTrajectory> poseToPath() {
     Pose2d curPose = getPose();
     double coastLatencySec = 0.00;
     Transform2d coastTransform =
@@ -547,6 +565,7 @@ public class DriveSubsystem extends SubsystemBase {
     addChild("Front Left", frontLeft);
     addChild("Rear Right", rearRight);
     addChild("Rear Left", rearLeft);
+    builder.addDoubleProperty("Filtered pitch deg", this::getFilteredPitch, null);
     builder.addDoubleProperty(
         "Throttle multiplier",
         () -> {
