@@ -31,7 +31,7 @@ import frc.robot.utils.ScoringLocationUtil;
  */
 public class OneFiveBalanceBump extends SequentialCommandGroup {
   private static final double NORM_SPEED_INTAKING = 0.3;
-  private double X_METERS_TO_CONE = 1.0;
+  private double X_METERS_TO_CONE = 1.35;
   private Pose2d desiredPose = new Pose2d(5.85, 2.5, Rotation2d.fromDegrees(0.0));
 
   private PathPlannerTrajectory firstTraj =
@@ -56,8 +56,8 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
           PathPlanner.loadPath(
               "OneFivePlusBumpRed",
               new PathConstraints(
-                  Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
-                  Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
+                  Cal.SwerveSubsystem.SLOW_LINEAR_SPEED_METERS_PER_SEC,
+                  Cal.SwerveSubsystem.SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
       firstTraj =
           PathPlannerTrajectory.transformTrajectoryForAlliance(
@@ -80,10 +80,10 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
                 () -> {
                   drive.rotateOrKeepHeading(0, 0, 0, true, -1);
                 })
-            .withTimeout(0.25),
+            .withTimeout(0.3),
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
-                new WaitCommand(0.5),
+                new WaitCommand(0.5), // TODO is this even needed?
                 new DriveDistance(drive, NORM_SPEED_INTAKING, X_METERS_TO_CONE, 0.0, false)),
             new IntakeSequence(intake, lift, lights)
                 .finallyDo(

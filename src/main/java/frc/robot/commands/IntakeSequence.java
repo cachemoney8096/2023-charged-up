@@ -39,15 +39,18 @@ public class IntakeSequence extends SequentialCommandGroup {
         // object and the lift is in position
         new ParallelCommandGroup(
 
-            // run intake
-            new InstantCommand(intake::intakeGamePiece, intake),
-
             // trigger the lift to move to the intake position. This does not need a timeout because
             // it is running in the parallel group, which is controlled by readyToIntake()
-            new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.GRAB_FROM_INTAKE), lift)),
+            new InstantCommand(() -> lift.setDesiredPosition(LiftPosition.GRAB_FROM_INTAKE), lift),
 
-        // triggers the grabber to open when it is safe
-        new InstantCommand(lift::openGrabber, lift),
+            // triggers the grabber to open when it is safe
+            new InstantCommand(lift::openGrabber)
+            ),
+
+        new WaitCommand(0.2),
+
+        // run intake
+        new InstantCommand(intake::intakeGamePiece, intake),
 
         // wait until the lift is in position and the intake sees a game piece
         new WaitUntilCommand(

@@ -84,6 +84,9 @@ public class Robot extends TimedRobot {
     if (DriverStation.getMatchTime() > 1.0) {
       m_robotContainer.timedMatch = true;
     }
+    else {
+      m_robotContainer.timedMatch = false;
+    }
   }
 
   /** This function is called periodically during autonomous. */
@@ -102,6 +105,9 @@ public class Robot extends TimedRobot {
 
     if (DriverStation.getMatchTime() > 1.0) {
       m_robotContainer.timedMatch = true;
+    }
+    else {
+      m_robotContainer.timedMatch = false;
     }
   }
 

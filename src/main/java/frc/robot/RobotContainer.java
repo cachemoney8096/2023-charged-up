@@ -23,7 +23,7 @@ import frc.robot.commands.OuttakeSequence;
 import frc.robot.commands.ShelfSequence;
 import frc.robot.commands.autos.AutoScoreAndBalance;
 import frc.robot.commands.autos.AutoScoreMobilityAndBalance;
-import frc.robot.commands.autos.JustTwoGamePieces;
+import frc.robot.commands.autos.TwoFiveOpenSide;
 import frc.robot.commands.autos.OneFiveBalanceBump;
 import frc.robot.commands.autos.OneFiveBalanceCenter;
 import frc.robot.commands.autos.OneFiveBumpReturn;
@@ -103,11 +103,11 @@ public class RobotContainer {
         "One plus mobility plus balance",
         new AutoScoreMobilityAndBalance(lift, drive, lights, scoreLoc));
     autonChooser.addOption(
-        "Just two blue",
-        new JustTwoGamePieces(false, lift, intake, drive, lights, tagLimelight, scoreLoc));
+        "2.5 Open blue",
+        new TwoFiveOpenSide(false, lift, intake, drive, lights, tagLimelight, scoreLoc));
     autonChooser.addOption(
-        "Just two red",
-        new JustTwoGamePieces(true, lift, intake, drive, lights, tagLimelight, scoreLoc));
+        "2.5 Open red",
+        new TwoFiveOpenSide(true, lift, intake, drive, lights, tagLimelight, scoreLoc));
     autonChooser.addOption(
         "1.5 balance bump blue",
         new OneFiveBalanceBump(
@@ -202,8 +202,7 @@ public class RobotContainer {
                     (boolean interrupted) -> {
                       lift.home();
                     }));
-    // driverController.a().onTrue(new InstantCommand(lift::cancelScore, lift));
-    driverController.a().whileTrue(new RunCommand(()->{intake.setDesiredDeployed(true);}, intake));
+    driverController.a().onTrue(new InstantCommand(lift::cancelScore, lift));
     // driverController
     //     .x()
     //     .onTrue(

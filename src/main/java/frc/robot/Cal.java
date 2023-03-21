@@ -95,7 +95,8 @@ public final class Cal {
     public static final double THROTTLE_FOR_INTAKING = 0.55,
         THROTTLE_FOR_SCORING = 0.6,
         THROTTLE_FOR_SLOW_BUTTON = 0.5;
-    ;
+    
+    public static final double IMU_PITCH_BIAS_DEG = 1.3;
   }
 
   public static final class Intake {

@@ -27,7 +27,7 @@ import frc.robot.utils.ScoringLocationUtil;
  */
 public class OneFiveBumpReturn extends SequentialCommandGroup {
   private static final double NORM_SPEED_INTAKING = 0.3;
-  private final double X_METERS_TO_CONE = 1.0;
+  private final double X_METERS_TO_CONE = 1.35;
   private PathPlannerTrajectory firstTraj =
       PathPlanner.loadPath(
           "OneFivePlusBump",
@@ -56,15 +56,15 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
           PathPlanner.loadPath(
               "OneFivePlusBumpRed",
               new PathConstraints(
-                  Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
-                  Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
+                  Cal.SwerveSubsystem.SLOW_LINEAR_SPEED_METERS_PER_SEC,
+                  Cal.SwerveSubsystem.SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
       secondTraj =
           PathPlanner.loadPath(
               "OneFivePlusBumpReturnRed",
               new PathConstraints(
-                  Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
-                  Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
+                  Cal.SwerveSubsystem.SLOW_LINEAR_SPEED_METERS_PER_SEC,
+                  Cal.SwerveSubsystem.SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
       firstTraj =
           PathPlannerTrajectory.transformTrajectoryForAlliance(
@@ -90,10 +90,10 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
                 () -> {
                   drive.rotateOrKeepHeading(0, 0, 0, true, -1);
                 })
-            .withTimeout(0.25),
+            .withTimeout(0.3),
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
-                new WaitCommand(0.5),
+                new WaitCommand(0.5), // TODO is this even needed?
                 new DriveDistance(drive, NORM_SPEED_INTAKING, X_METERS_TO_CONE, 0.0, red)),
             new IntakeSequence(intake, lift, lights)
                 .finallyDo(

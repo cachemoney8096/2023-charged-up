@@ -76,7 +76,7 @@ public class DriveSubsystem extends SubsystemBase {
   public Optional<Pose2d> targetPose = Optional.empty();
   private BooleanSupplier throttleForLift;
   public boolean generatedPath = false;
-  private MedianFilter pitchFilter = new MedianFilter(3);
+  private MedianFilter pitchFilter = new MedianFilter(5);
   private double latestFilteredPitchDeg = 0.0;
 
   // Odometry class for tracking robot pose
@@ -108,7 +108,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public double getFilteredPitch() {
-    return latestFilteredPitchDeg;
+    return latestFilteredPitchDeg - Cal.SwerveSubsystem.IMU_PITCH_BIAS_DEG;
   }
 
   @Override
@@ -446,11 +446,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   public PathPlannerTrajectory pathToPoint(Pose2d finalPose) {
     Pose2d curPose = getPose();
-    Transform2d trajectoryTransform = targetPose.get().minus(curPose);
-    System.out.println(
-        "Trajectory Transform: " + trajectoryTransform.getX() + " " + trajectoryTransform.getY());
     Transform2d finalTransform =
-        new Transform2d(finalPose.getTranslation(), finalPose.getRotation());
+    new Transform2d(finalPose.getTranslation(), finalPose.getRotation());
+    System.out.println(
+        "Trajectory Transform: " + finalTransform.getX() + " " + finalTransform.getY());
     Rotation2d finalHeading = Rotation2d.fromDegrees(180);
     Rotation2d finalHolonomicRotation = Rotation2d.fromDegrees(0);
     PathPlannerTrajectory path =
@@ -566,6 +565,10 @@ public class DriveSubsystem extends SubsystemBase {
     addChild("Front Left", frontLeft);
     addChild("Rear Right", rearRight);
     addChild("Rear Left", rearLeft);
+    builder.addDoubleProperty(
+        "Filtered pitch deg",
+        this::getFilteredPitch,
+        null);
     builder.addDoubleProperty(
         "Throttle multiplier",
         () -> {
