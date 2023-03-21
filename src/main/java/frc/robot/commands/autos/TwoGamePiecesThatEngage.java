@@ -65,7 +65,7 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
         new ScoreThisGamePiece(true, lift, lights),
         new GetAndScoreOpenSide(
             red, true, lift, intake, drive, lights, tagLimelight, scoringLocationUtil),
-        drive.followTrajectoryCommand(trajCharge, false).withTimeout(2.0),
+        drive.followTrajectoryCommand(trajCharge, true).withTimeout(2.0),
         new AutoChargeStationSequence(drive, DISTANCE_UP_CHARGE_STATION_METERS));
   }
 }
