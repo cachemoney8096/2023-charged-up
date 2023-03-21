@@ -326,8 +326,8 @@ public class Lift extends SubsystemBase {
   /** Returns true if the game piece sensor sees a game piece */
   public boolean seeGamePiece() {
     // Sensor is false if there's a game piece
-    return !gamePieceSensor.get();
-    // return false;
+    // return !gamePieceSensor.get();
+    return false;
   }
 
   /** Returns the cosine of the arm angle in degrees off of the horizontal. */

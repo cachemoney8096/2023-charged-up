@@ -15,7 +15,7 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 public class AutoChargeStationSequence extends SequentialCommandGroup {
 
   private double startXMeters = 0.0;
-  private static final double NORM_SPEED_UP_CHARGE_STATION = 0.4;
+  private static final double NORM_SPEED_UP_CHARGE_STATION = 0.5;
 
   public AutoChargeStationSequence(DriveSubsystem drive, double distanceMeters) {
     addCommands(

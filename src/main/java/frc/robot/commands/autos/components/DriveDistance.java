@@ -37,7 +37,8 @@ public class DriveDistance extends SequentialCommandGroup {
         new RunCommand(
                 () -> {
                   drive.drive(speeds.getX(), speeds.getY(), 0.0, fieldRelative);
-                })
+                },
+                drive)
             .until(
                 () -> {
                   Pose2d curPose = drive.getPose();
@@ -45,6 +46,7 @@ public class DriveDistance extends SequentialCommandGroup {
                   // This does not ensure that the movement is in the intended direction
                   // but it does ensure that we don't drive durther than we intended
                   return movement.getNorm() > distanceToTravel;
-                }));
+                }),
+        drive.stopDrivingCommand());
   }
 }

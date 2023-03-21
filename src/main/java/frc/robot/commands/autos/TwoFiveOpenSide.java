@@ -3,11 +3,13 @@ package frc.robot.commands.autos;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.FollowPathWithEvents;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Cal;
-import frc.robot.commands.autos.components.AutoChargeStationSequence;
+import frc.robot.commands.IntakeSequence;
 import frc.robot.commands.autos.components.GetAndScoreOpenSide;
 import frc.robot.commands.autos.components.ScoreThisGamePiece;
 import frc.robot.subsystems.Intake;
@@ -18,23 +20,23 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreCol;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
+import java.util.HashMap;
 
 /**
  * This auto assumes a start at the cone scoring position nearest the loading zone. It scores a
- * cone, grabs another, and scores that one too. Finally, it gets on the charge station and tries to
- * balance.
+ * cone, grabs another, scores that one too, then goes for a third.
  */
-public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
-  private PathPlannerTrajectory trajCharge =
+public class TwoFiveOpenSide extends SequentialCommandGroup {
+  private PathPlannerTrajectory headstart =
       PathPlanner.loadPath(
-          "ScoringLocToChargeStation",
+          "HeadStart",
           new PathConstraints(
               Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
               Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
-  private static final double DISTANCE_UP_CHARGE_STATION_METERS = 1.95;
+  private HashMap<String, Command> eventMap = new HashMap<>();
 
-  public TwoGamePiecesThatEngage(
+  public TwoFiveOpenSide(
       boolean red,
       Lift lift,
       Intake intake,
@@ -42,30 +44,45 @@ public class TwoGamePiecesThatEngage extends SequentialCommandGroup {
       Lights lights,
       TagLimelightV2 tagLimelight,
       ScoringLocationUtil scoringLocationUtil) {
+
     if (red) {
-      trajCharge =
+      headstart =
           PathPlanner.loadPath(
-              "ScoringLocToChargeStationRed",
+              "HeadStartRed",
               new PathConstraints(
                   Cal.SwerveSubsystem.MAX_LINEAR_SPEED_METERS_PER_SEC,
                   Cal.SwerveSubsystem.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
-      trajCharge =
+      headstart =
           PathPlannerTrajectory.transformTrajectoryForAlliance(
-              trajCharge, DriverStation.Alliance.Red);
+              headstart, DriverStation.Alliance.Red);
     }
 
-    addRequirements(lift, intake, drive, tagLimelight);
+    /** Events include: deploy and retract intake */
+    eventMap.put(
+        "deployIntake",
+        new IntakeSequence(intake, lift, lights)
+            .finallyDo(
+                (boolean interrupted) -> {
+                  lift.home();
+                  lift.closeGrabber();
+                  intake.setDesiredDeployed(false);
+                  intake.setDesiredClamped(false);
+                  intake.stopIntakingGamePiece();
+                }));
+    eventMap.put("retractIntake", new InstantCommand(() -> {}, lift, intake));
 
+    addRequirements(lift, intake, drive, tagLimelight);
     /** Initialize sequential commands that run for the "15 second autonomous phase" */
     addCommands(
         new InstantCommand(
             () -> scoringLocationUtil.setScoreCol(red ? ScoreCol.LEFT : ScoreCol.RIGHT)),
         new InstantCommand(() -> scoringLocationUtil.setScoreHeight(ScoreHeight.HIGH)),
-        new ScoreThisGamePiece(true, lift, lights),
+        new ScoreThisGamePiece(false, lift, lights),
         new GetAndScoreOpenSide(
-            red, true, lift, intake, drive, lights, tagLimelight, scoringLocationUtil),
-        drive.followTrajectoryCommand(trajCharge, true).withTimeout(2.0),
-        new AutoChargeStationSequence(drive, DISTANCE_UP_CHARGE_STATION_METERS));
+            red, false, lift, intake, drive, lights, tagLimelight, scoringLocationUtil),
+        new FollowPathWithEvents(
+                drive.followTrajectoryCommand(headstart, true), headstart.getMarkers(), eventMap)
+            .withTimeout(4.0));
   }
 }
