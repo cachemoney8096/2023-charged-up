@@ -12,11 +12,16 @@ public class SwerveToPointWrapper extends CommandBase {
   public Command swerveFollowerCmd;
   private DriveSubsystem drive;
   private Pose2d finalPose;
+  private double finalSpeedMetersPerSec;
   boolean redAlliance;
   double timeoutSec;
 
   public SwerveToPointWrapper(
-      boolean red, DriveSubsystem driveSubsystem, Pose2d desiredPose, double timeoutSeconds) {
+      boolean red,
+      DriveSubsystem driveSubsystem,
+      Pose2d desiredPose,
+      double timeoutSeconds,
+      double endSpeedMps) {
     if (!red) {
       finalPose = desiredPose;
     } else {
@@ -27,6 +32,7 @@ public class SwerveToPointWrapper extends CommandBase {
               desiredPose.getRotation());
     }
     timeoutSec = timeoutSeconds;
+    finalSpeedMetersPerSec = endSpeedMps;
     redAlliance = red;
     drive = driveSubsystem;
     addRequirements(drive);
@@ -34,7 +40,7 @@ public class SwerveToPointWrapper extends CommandBase {
 
   @Override
   public void initialize() {
-    PathPlannerTrajectory trajectory = drive.pathToPoint(finalPose);
+    PathPlannerTrajectory trajectory = drive.pathToPoint(finalPose, finalSpeedMetersPerSec);
     swerveFollowerCmd = drive.followTrajectoryCommand(trajectory, false).withTimeout(timeoutSec);
     swerveFollowerCmd.initialize();
   }

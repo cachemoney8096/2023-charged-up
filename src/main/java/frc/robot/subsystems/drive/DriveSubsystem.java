@@ -416,6 +416,21 @@ public class DriveSubsystem extends SubsystemBase {
         .withName("Follow trajectory");
   }
 
+  public Pose2d getPastPose(double latencySec) {
+    Pose2d curPose = getPose();
+    double latencyAdjustmentSec = 0.00;
+    latencySec += latencyAdjustmentSec;
+    Transform2d pastTransform =
+        new Transform2d(
+            new Translation2d(
+                -lastSetChassisSpeeds.vxMetersPerSecond * latencySec,
+                -lastSetChassisSpeeds.vyMetersPerSecond * latencySec),
+            Rotation2d.fromRadians(lastSetChassisSpeeds.omegaRadiansPerSecond * latencySec)
+                .unaryMinus());
+    Pose2d pastPose = curPose.plus(pastTransform);
+    return pastPose;
+  }
+
   public void setLimelightTargetFromTransform(Transform2d transform, double latencySec) {
     // Transform is to get the limelight to the correct location, not to get the robot
     // Here we correct for that
@@ -444,21 +459,25 @@ public class DriveSubsystem extends SubsystemBase {
             : Optional.of(curPose.plus(flipTransform));
   }
 
-  public PathPlannerTrajectory pathToPoint(Pose2d finalPose) {
+  public PathPlannerTrajectory pathToPoint(Pose2d finalPose, double finalSpeedMetersPerSec) {
     Pose2d curPose = getPose();
     Transform2d finalTransform =
         new Transform2d(finalPose.getTranslation(), finalPose.getRotation());
     System.out.println(
         "Trajectory Transform: " + finalTransform.getX() + " " + finalTransform.getY());
     Rotation2d finalHeading = Rotation2d.fromDegrees(180);
-    Rotation2d finalHolonomicRotation = Rotation2d.fromDegrees(0);
+    Rotation2d finalHolonomicRotation = finalPose.getRotation();
     PathPlannerTrajectory path =
         PathPlanner.generatePath(
             new PathConstraints(
                 Cal.SwerveSubsystem.SLOW_LINEAR_SPEED_METERS_PER_SEC,
                 Cal.SwerveSubsystem.SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ),
             PathPoint.fromCurrentHolonomicState(curPose, lastSetChassisSpeeds),
-            new PathPoint(finalTransform.getTranslation(), finalHeading, finalHolonomicRotation)
+            new PathPoint(
+                    finalTransform.getTranslation(),
+                    finalHeading,
+                    finalHolonomicRotation,
+                    finalSpeedMetersPerSec)
                 .withPrevControlLength(0.01));
     return path;
   }
