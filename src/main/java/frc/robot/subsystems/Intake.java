@@ -210,7 +210,7 @@ public class Intake extends SubsystemBase {
     lastControlledVelocity = deployMotorController.getSetpoint().velocity;
 
     // TODO fix this hacky stuff
-    final double POSITION_NO_POWER = 150.0;
+    final double POSITION_NO_POWER = 185.0;
     if (controlPositionDeg > POSITION_NO_POWER && currentPositionDeg > POSITION_NO_POWER) {
       deployMotor.setVoltage(0.0);
       return;
