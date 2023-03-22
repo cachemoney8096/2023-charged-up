@@ -105,7 +105,7 @@ public final class Cal {
 
     /** Intake positions in degrees */
     public static final double STARTING_POSITION_DEGREES = 90.0,
-        DEPLOYED_POSITION_DEGREES = 160.0,
+        DEPLOYED_POSITION_DEGREES = 185.0,
         RETRACTED_POSITION_DEGREES = 84.0;
 
     /** Past this position, the intake is free to clamp */

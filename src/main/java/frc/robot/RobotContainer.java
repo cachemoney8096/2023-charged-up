@@ -228,12 +228,15 @@ public class RobotContainer {
 
     driverController.start().onTrue(new InstantCommand(drive::resetYaw).ignoringDisable(true));
 
-    driverController.leftBumper().onTrue(new ShelfSequence(lift, lights));
+    driverController.leftBumper().onTrue(
+        new InstantCommand(() -> drive.throttle(0.45))
+        .andThen(new ShelfSequence(lift, lights)));
     driverController
         .leftBumper()
         .onFalse(
             new SequentialCommandGroup(
                 new InstantCommand(lift::closeGrabber),
+                new InstantCommand(() -> drive.throttle(1.0)),
                 new WaitCommand(0.2),
                 new InstantCommand(
                     () -> {
@@ -339,7 +342,8 @@ public class RobotContainer {
                         MathUtil.applyDeadband(-driverController.getRightX(), 0.1),
                         JoystickUtil.squareAxis(
                             MathUtil.applyDeadband(-driverController.getLeftX(), 0.05)),
-                        !driverController.getHID().getLeftBumper(),
+                        // !driverController.getHID().getLeftBumper(),
+                        true,
                         driverController.getHID().getPOV()),
                 drive)
             .withName("Manual Drive"));
