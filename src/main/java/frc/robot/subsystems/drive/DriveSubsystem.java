@@ -591,6 +591,7 @@ public class DriveSubsystem extends SubsystemBase {
           return throttleMultiplier;
         },
         null);
+    builder.addBooleanProperty("Throttle for lift", () -> throttleForLift.getAsBoolean(), null);
     builder.addDoubleProperty(
         "Target Heading (deg)",
         () -> {

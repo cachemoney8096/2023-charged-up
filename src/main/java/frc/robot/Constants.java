@@ -98,7 +98,7 @@ public final class Constants {
      * Driving Parameters - Note that these are not the maximum capable speeds of the robot, rather
      * the allowed maximum speeds
      */
-    public static final double MAX_SPEED_METERS_PER_SECOND = 4.0,
+    public static final double MAX_SPEED_METERS_PER_SECOND = 4.3,
         MAX_ANGULAR_SPEED_RAD_PER_SECONDS = 2 * Math.PI; // radians per second
 
     /** Chassis configuration */

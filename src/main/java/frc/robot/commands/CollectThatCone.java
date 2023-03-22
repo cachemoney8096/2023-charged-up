@@ -29,9 +29,7 @@ public class CollectThatCone extends SequentialCommandGroup {
 
   /** How long to wait before beginning to drive */
   private static double waitTime(double distanceToConeMeters) {
-    return distanceToConeMeters > 1.5 ?
-      0.03 :
-      0.5;
+    return distanceToConeMeters > 1.5 ? 0.03 : 0.5;
   }
 
   private static Pose2d getPoseInFrontOfCone(DriveSubsystem drive, ConeDetection cone) {
@@ -60,11 +58,16 @@ public class CollectThatCone extends SequentialCommandGroup {
             .until(() -> coneDetection.isPresent()),
         new ParallelRaceGroup(
             new SequentialCommandGroup(
-                    new ProxyCommand(() -> new WaitCommand(waitTime(coneDetection.get().distanceMeters))),
+                    new ProxyCommand(
+                        () -> new WaitCommand(waitTime(coneDetection.get().distanceMeters))),
                     new SwerveToPointWrapper(false, drive, inFrontOfCone, 2.0, SPEED_AT_CONE_MPS),
                     new DriveDistance(
                         drive, NORM_SPEED_INTAKING, DISTANCE_IN_FRONT_OF_CONE_METERS, 0.0, false))
-                .asProxy().finallyDo((boolean interrupted) -> { drive.stopDriving(); }),
+                .asProxy()
+                .finallyDo(
+                    (boolean interrupted) -> {
+                      drive.stopDriving();
+                    }),
             new IntakeSequence(intake, lift, lights)
                 .finallyDo(
                     (boolean interrupted) -> {

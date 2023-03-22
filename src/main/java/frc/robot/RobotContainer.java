@@ -28,6 +28,7 @@ import frc.robot.commands.autos.OneFiveBalanceCenter;
 import frc.robot.commands.autos.OneFiveBumpReturn;
 import frc.robot.commands.autos.TwoFiveOpenSide;
 import frc.robot.commands.autos.TwoGamePiecesThatEngage;
+import frc.robot.commands.autos.components.ScoreThisGamePiece;
 import frc.robot.commands.finishScore;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
@@ -91,6 +92,7 @@ public class RobotContainer {
         "Two plus balance Blue",
         new TwoGamePiecesThatEngage(false, lift, intake, drive, lights, tagLimelight, scoreLoc));
     autonChooser.addOption("Nothing", new RunCommand(() -> {}, drive, intake));
+    autonChooser.addOption("Just Score One", new ScoreThisGamePiece(false, lift, lights));
     autonChooser.addOption(
         "Two plus balance Red",
         new TwoGamePiecesThatEngage(true, lift, intake, drive, lights, tagLimelight, scoreLoc));
