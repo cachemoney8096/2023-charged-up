@@ -77,6 +77,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autonomousCommand = new SequentialCommandGroup(
+      // TODO: look into this issue
       new InstantCommand(() -> {m_robotContainer.lift.closeGrabber();}),
       m_robotContainer.getAutonomousCommand()
     );
