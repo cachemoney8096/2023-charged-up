@@ -231,14 +231,16 @@ public class RobotContainer {
     driverController.start().onTrue(new InstantCommand(drive::resetYaw).ignoringDisable(true));
 
     driverController.leftBumper().onTrue(
-        new InstantCommand(() -> drive.throttle(0.45))
-        .andThen(new ShelfSequence(lift, lights)));
+        // new InstantCommand(() -> drive.throttle(0.45))
+        // .andThen(
+            new ShelfSequence(lift, lights));
+        // ));
     driverController
         .leftBumper()
         .onFalse(
             new SequentialCommandGroup(
                 new InstantCommand(lift::closeGrabber),
-                new InstantCommand(() -> drive.throttle(1.0)),
+                // new InstantCommand(() -> drive.throttle(1.0)),
                 new WaitCommand(0.2),
                 new InstantCommand(
                     () -> {
