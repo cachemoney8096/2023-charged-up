@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.CollectThatCone;
 import frc.robot.commands.IntakeSequence;
 import frc.robot.commands.OuttakeSequence;
 import frc.robot.commands.ShelfSequence;
@@ -118,10 +119,10 @@ public class RobotContainer {
     autonChooser.addOption(
         "1.5 return bump blue",
         new OneFiveBumpReturn(
-            false, false, lift, intake, drive, lights, intakeLimelight, scoreLoc));
+            false, false, lift, intake, drive, lights, intakeLimelight, tagLimelight, scoreLoc));
     autonChooser.addOption(
         "1.5 return bump red",
-        new OneFiveBumpReturn(true, false, lift, intake, drive, lights, intakeLimelight, scoreLoc));
+        new OneFiveBumpReturn(true, false, lift, intake, drive, lights, intakeLimelight, tagLimelight, scoreLoc));
     autonChooser.addOption(
         "1.5 balance center",
         new OneFiveBalanceCenter(lift, drive, lights, scoreLoc, intakeLimelight, intake));

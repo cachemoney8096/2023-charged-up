@@ -1,5 +1,6 @@
 package frc.robot.commands.autos;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -22,7 +23,7 @@ import frc.robot.utils.ScoringLocationUtil;
  */
 public class OneFiveBalanceCenter extends SequentialCommandGroup {
   private static final double DISTANCE_TO_CONE_METERS = 1.5;
-  private static final double NORM_SPEED_INTAKING = 0.3;
+  private static final double NORM_SPEED_INTAKING = 0.4;
   private static final double DISTANCE_BACK_METERS = -1.7;
   private static final double NORM_SPEED_BACK = 0.6;
 

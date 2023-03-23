@@ -434,7 +434,6 @@ public class IntakeLimelight extends SubsystemBase {
     double angleXDegrees = Units.radiansToDegrees(Math.atan2(viewplaneXPixels, 1));
     double angleAdjustDegrees = -3.0; // due to limelight yaw
     double adjustedAngleDegrees = angleXDegrees + angleAdjustDegrees;
-    System.out.println("Cone at " + adjustedAngleDegrees);
     return Optional.of(new ConeDetection(getLatency(), coneDistanceMeters, adjustedAngleDegrees));
   }
 

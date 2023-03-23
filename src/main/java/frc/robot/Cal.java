@@ -36,6 +36,10 @@ public final class Cal {
         MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ = 3.0;
 
     /** For the purposes of trajectory constraints */
+    public static final double MEDIUM_LINEAR_SPEED_METERS_PER_SEC = 2.5,
+        MEDIUM_LINEAR_ACCELERATION_METERS_PER_SEC_SQ = 2.5;
+
+    /** For the purposes of trajectory constraints */
     public static final double SLOW_LINEAR_SPEED_METERS_PER_SEC = 2.0,
         SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ = 2.0;
 

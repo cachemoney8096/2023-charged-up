@@ -470,8 +470,8 @@ public class DriveSubsystem extends SubsystemBase {
     PathPlannerTrajectory path =
         PathPlanner.generatePath(
             new PathConstraints(
-                Cal.SwerveSubsystem.SLOW_LINEAR_SPEED_METERS_PER_SEC,
-                Cal.SwerveSubsystem.SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ),
+                Cal.SwerveSubsystem.MEDIUM_LINEAR_SPEED_METERS_PER_SEC,
+                Cal.SwerveSubsystem.MEDIUM_LINEAR_ACCELERATION_METERS_PER_SEC_SQ),
             PathPoint.fromCurrentHolonomicState(curPose, lastSetChassisSpeeds),
             new PathPoint(
                     finalTransform.getTranslation(),

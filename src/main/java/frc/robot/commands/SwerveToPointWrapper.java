@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import java.util.function.Supplier;
+
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -11,35 +13,36 @@ public class SwerveToPointWrapper extends CommandBase {
 
   public Command swerveFollowerCmd;
   private DriveSubsystem drive;
-  private Pose2d finalPose;
+  private Supplier<Pose2d> desiredPoseSupplier;
   private double finalSpeedMetersPerSec;
-  boolean redAlliance;
+  boolean flipForRed;
   double timeoutSec;
 
   public SwerveToPointWrapper(
       boolean red,
       DriveSubsystem driveSubsystem,
-      Pose2d desiredPose,
+      Supplier<Pose2d> finalPoseSupplier,
       double timeoutSeconds,
       double endSpeedMps) {
-    if (!red) {
-      finalPose = desiredPose;
-    } else {
-      finalPose =
-          new Pose2d(
-              desiredPose.getX(),
-              Constants.FIELD_WIDTH_METERS - desiredPose.getY(),
-              desiredPose.getRotation());
-    }
+    flipForRed = red;
+    desiredPoseSupplier = finalPoseSupplier;
     timeoutSec = timeoutSeconds;
     finalSpeedMetersPerSec = endSpeedMps;
-    redAlliance = red;
     drive = driveSubsystem;
     addRequirements(drive);
   }
 
   @Override
   public void initialize() {
+    Pose2d finalPose = desiredPoseSupplier.get();
+    if (flipForRed) {
+      finalPose =
+          new Pose2d(
+            finalPose.getX(),
+              Constants.FIELD_WIDTH_METERS - finalPose.getY(),
+              finalPose.getRotation());
+    }
+
     PathPlannerTrajectory trajectory = drive.pathToPoint(finalPose, finalSpeedMetersPerSec);
     swerveFollowerCmd = drive.followTrajectoryCommand(trajectory, false).withTimeout(timeoutSec);
     swerveFollowerCmd.initialize();

@@ -4,6 +4,7 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -11,21 +12,25 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Cal;
 import frc.robot.commands.IntakeSequence;
+import frc.robot.commands.LookForTag;
+import frc.robot.commands.SwerveFollowerWrapper;
 import frc.robot.commands.autos.components.DriveDistance;
 import frc.robot.commands.autos.components.ScoreThisGamePiece;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
 import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lights;
+import frc.robot.subsystems.TagLimelightV2;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.ScoringLocationUtil;
+import frc.robot.utils.ScoringLocationUtil.ScoreCol;
 
 /**
  * Assuming the robot is starting from cone scoring position furthest from the loading zone, this
  * auto drives to the nearest midfield game object, picks it up, and returns.
  */
 public class OneFiveBumpReturn extends SequentialCommandGroup {
-  private static final double NORM_SPEED_INTAKING = 0.3;
+  private static final double NORM_SPEED_INTAKING = 0.4;
   private final double X_METERS_TO_CONE = 1.35;
   private PathPlannerTrajectory firstTraj =
       PathPlanner.loadPath(
@@ -48,6 +53,7 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
       DriveSubsystem drive,
       Lights lights,
       IntakeLimelight limelight,
+      TagLimelightV2 tagLimelight,
       ScoringLocationUtil scoringLocationUtil) {
     if (red) {
       // default to blue, only change for red
@@ -85,14 +91,13 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
             () -> {
               drive.offsetCurrentHeading(limelight.getAngleToConeDeg());
             }),
-        new RunCommand(
-                () -> {
-                  drive.rotateOrKeepHeading(0, 0, 0, true, -1);
-                })
-            .withTimeout(0.3),
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
-                new WaitCommand(0.5), // TODO is this even needed?
+                new RunCommand(
+                        () -> {
+                          drive.rotateOrKeepHeading(0, 0, 0, true, -1);
+                        })
+                    .withTimeout(0.3),
                 new DriveDistance(drive, NORM_SPEED_INTAKING, X_METERS_TO_CONE, 0.0, red)),
             new IntakeSequence(intake, lift, lights)
                 .finallyDo(
@@ -104,6 +109,28 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
                       intake.stopIntakingGamePiece();
                     })),
         new DriveDistance(drive, NORM_SPEED_INTAKING, -X_METERS_TO_CONE, 0.0, red),
-        drive.followTrajectoryCommand(secondTraj, false));
+        drive.followTrajectoryCommand(secondTraj, false)
+        ,
+        new InstantCommand(
+            () -> scoringLocationUtil.setScoreCol(red ? ScoreCol.LEFT : ScoreCol.RIGHT)),
+        new LookForTag(tagLimelight, drive, lights).withTimeout(0.05),
+        new SwerveFollowerWrapper(drive).withTimeout(2.75),
+        drive.stopDrivingCommand(),
+        new WaitCommand(0.02),
+        new ConditionalCommand(
+            new ScoreThisGamePiece(fast, lift, lights),
+            new InstantCommand(),
+            () -> {
+              double yawDeg = drive.getHeadingDegrees();
+              boolean shouldScoreByYaw = Math.abs(yawDeg) < 5.0;
+              if (!shouldScoreByYaw) {
+                System.out.println("Not squared up, don't score");
+              }
+              if (!drive.generatedPath) {
+                System.out.println("Didn't drive to target");
+              }
+              return shouldScoreByYaw && drive.generatedPath;
+            })
+        );
   }
 }

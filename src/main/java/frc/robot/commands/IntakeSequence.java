@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -16,7 +17,7 @@ import frc.robot.subsystems.Lights.LightCode;
 public class IntakeSequence extends SequentialCommandGroup {
 
   public IntakeSequence(Intake intake, Lift lift, Lights lights) {
-    addRequirements(intake, lift, lights);
+    addRequirements(intake, lift);
 
     addCommands(
         new InstantCommand(

@@ -92,7 +92,7 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
                       intake.setDesiredClamped(false);
                       intake.stopIntakingGamePiece();
                     })),
-        new SwerveToPointWrapper(red, drive, desiredPose, 2.0, 2.0),
+        new SwerveToPointWrapper(red, drive, () -> desiredPose, 2.0, 2.0),
         new DriveUntilBalanced(drive, false));
   }
 }
