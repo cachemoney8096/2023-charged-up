@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.CollectThatCone;
 import frc.robot.commands.IntakeSequence;
 import frc.robot.commands.OuttakeSequence;
 import frc.robot.commands.ShelfSequence;
@@ -122,7 +121,8 @@ public class RobotContainer {
             false, false, lift, intake, drive, lights, intakeLimelight, tagLimelight, scoreLoc));
     autonChooser.addOption(
         "1.5 return bump red",
-        new OneFiveBumpReturn(true, false, lift, intake, drive, lights, intakeLimelight, tagLimelight, scoreLoc));
+        new OneFiveBumpReturn(
+            true, false, lift, intake, drive, lights, intakeLimelight, tagLimelight, scoreLoc));
     autonChooser.addOption(
         "1.5 balance center",
         new OneFiveBalanceCenter(lift, drive, lights, scoreLoc, intakeLimelight, intake));
@@ -231,17 +231,12 @@ public class RobotContainer {
 
     driverController.start().onTrue(new InstantCommand(drive::resetYaw).ignoringDisable(true));
 
-    driverController.leftBumper().onTrue(
-        // new InstantCommand(() -> drive.throttle(0.45))
-        // .andThen(
-            new ShelfSequence(lift, lights));
-        // ));
+    driverController.leftBumper().onTrue(new ShelfSequence(lift, lights));
     driverController
         .leftBumper()
         .onFalse(
             new SequentialCommandGroup(
                 new InstantCommand(lift::closeGrabber),
-                // new InstantCommand(() -> drive.throttle(1.0)),
                 new WaitCommand(0.2),
                 new InstantCommand(
                     () -> {
@@ -347,7 +342,6 @@ public class RobotContainer {
                         MathUtil.applyDeadband(-driverController.getRightX(), 0.1),
                         JoystickUtil.squareAxis(
                             MathUtil.applyDeadband(-driverController.getLeftX(), 0.05)),
-                        // !driverController.getHID().getLeftBumper(),
                         true,
                         driverController.getHID().getPOV()),
                 drive)

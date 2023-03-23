@@ -76,11 +76,14 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = new SequentialCommandGroup(
-      // TODO: look into this issue
-      new InstantCommand(() -> {m_robotContainer.lift.closeGrabber();}),
-      m_robotContainer.getAutonomousCommand()
-    );
+    m_autonomousCommand =
+        new SequentialCommandGroup(
+            // TODO: look into this issue
+            new InstantCommand(
+                () -> {
+                  m_robotContainer.lift.closeGrabber();
+                }),
+            m_robotContainer.getAutonomousCommand());
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {

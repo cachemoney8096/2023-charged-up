@@ -109,8 +109,7 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
                       intake.stopIntakingGamePiece();
                     })),
         new DriveDistance(drive, NORM_SPEED_INTAKING, -X_METERS_TO_CONE, 0.0, red),
-        drive.followTrajectoryCommand(secondTraj, false)
-        ,
+        drive.followTrajectoryCommand(secondTraj, false),
         new InstantCommand(
             () -> scoringLocationUtil.setScoreCol(red ? ScoreCol.LEFT : ScoreCol.RIGHT)),
         new LookForTag(tagLimelight, drive, lights).withTimeout(0.05),
@@ -130,7 +129,6 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
                 System.out.println("Didn't drive to target");
               }
               return shouldScoreByYaw && drive.generatedPath;
-            })
-        );
+            }));
   }
 }
