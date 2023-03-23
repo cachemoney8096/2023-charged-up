@@ -23,8 +23,8 @@ import frc.robot.utils.ScoringLocationUtil;
 public class OneFiveBalanceCenter extends SequentialCommandGroup {
   private static final double DISTANCE_TO_CONE_METERS = 1.5;
   private static final double NORM_SPEED_INTAKING = 0.4;
-  private static final double DISTANCE_BACK_METERS = -1.7;
-  private static final double NORM_SPEED_BACK = 0.6;
+  private static final double DISTANCE_BACK_METERS = -1.5;
+  private static final double NORM_SPEED_BACK = 0.5;
 
   public OneFiveBalanceCenter(
       Lift lift,
@@ -50,6 +50,7 @@ public class OneFiveBalanceCenter extends SequentialCommandGroup {
                           drive.rotateOrKeepHeading(0, 0, 0, true, -1);
                         })
                     .withTimeout(0.3),
+                new WaitCommand(0.5),
                 new DriveDistance(drive, NORM_SPEED_INTAKING, DISTANCE_TO_CONE_METERS, 0, false)),
             new IntakeSequence(intake, lift, lights)
                 .finallyDo(

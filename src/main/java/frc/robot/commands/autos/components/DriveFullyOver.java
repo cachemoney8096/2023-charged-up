@@ -7,6 +7,8 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 public class DriveFullyOver extends SequentialCommandGroup {
 
   private static final double NORM_SPEED_OVER_CHARGE_STATION = 0.5;
+  
+  private static final double SLOWER_SPEED_OVER_CHARGE_STATION = 0.3;
   private static final double FILTERED_PITCH_THRESHOLD_DEG = 15.0;
   private static final double CLOSE_TO_ZERO_PITCH_THRESHOLD_DEG = 6.0;
   boolean pitchHasBeenBig = false;
@@ -14,6 +16,8 @@ public class DriveFullyOver extends SequentialCommandGroup {
   public DriveFullyOver(DriveSubsystem drive, boolean forwards) {
     double normDriveSpeed =
         forwards ? NORM_SPEED_OVER_CHARGE_STATION : -NORM_SPEED_OVER_CHARGE_STATION;
+        double normDriveSpeedSlower =
+        forwards ? SLOWER_SPEED_OVER_CHARGE_STATION : -SLOWER_SPEED_OVER_CHARGE_STATION;
 
     addCommands(
         // Drive until we've pitched a good amount and then we pass zero
@@ -36,10 +40,10 @@ public class DriveFullyOver extends SequentialCommandGroup {
         // Then drive a bit more
         new RunCommand(
                 () -> {
-                  drive.drive(normDriveSpeed, 0, 0, true);
+                  drive.drive(normDriveSpeedSlower, 0, 0, true);
                 },
                 drive)
-            .withTimeout(0.3),
+            .withTimeout(0.5),
         drive.stopDrivingCommand());
   }
 }
