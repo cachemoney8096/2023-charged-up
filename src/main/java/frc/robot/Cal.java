@@ -55,7 +55,7 @@ public final class Cal {
 
     public static double SWERVE_FRONT_RIGHT_ANGULAR_OFFSET_RAD = (1.0 * Math.PI) + 1.005;
     public static double SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 0.987;
-    public static double SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 0.9075;
+    public static double SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 4.033;
 
     /**
      * Angular offsets of the modules relative to the chassis in radians. The modules form an O when

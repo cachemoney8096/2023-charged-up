@@ -37,13 +37,13 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
           "OneFivePlusBump",
           new PathConstraints(
               Cal.SwerveSubsystem.SLOW_LINEAR_SPEED_METERS_PER_SEC,
-              Cal.SwerveSubsystem.SLOW_LINEAR_SPEED_METERS_PER_SEC));
+              Cal.SwerveSubsystem.SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
   private PathPlannerTrajectory secondTraj =
       PathPlanner.loadPath(
           "OneFivePlusBumpReturn",
           new PathConstraints(
-              Cal.SwerveSubsystem.SLOW_LINEAR_SPEED_METERS_PER_SEC,
-              Cal.SwerveSubsystem.SLOW_LINEAR_SPEED_METERS_PER_SEC));
+              1.5,
+              Cal.SwerveSubsystem.SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
   public OneFiveBumpReturn(
       boolean red,
@@ -68,7 +68,7 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
           PathPlanner.loadPath(
               "OneFivePlusBumpReturnRed",
               new PathConstraints(
-                  Cal.SwerveSubsystem.SLOW_LINEAR_SPEED_METERS_PER_SEC,
+                  1.5,
                   Cal.SwerveSubsystem.SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
       firstTraj =
@@ -108,27 +108,33 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
                       intake.setDesiredClamped(false);
                       intake.stopIntakingGamePiece();
                     })),
-        new DriveDistance(drive, NORM_SPEED_INTAKING, -X_METERS_TO_CONE, 0.0, red),
-        drive.followTrajectoryCommand(secondTraj, false),
+        // new DriveDistance(drive, NORM_SPEED_I NTAKING, -X_METERS_TO_CONE, 0.0, red),
         new InstantCommand(
             () -> scoringLocationUtil.setScoreCol(red ? ScoreCol.LEFT : ScoreCol.RIGHT)),
+        drive.followTrajectoryCommand(secondTraj, false),
+        new InstantCommand(drive::setNoMove, drive),
         new LookForTag(tagLimelight, drive, lights).withTimeout(0.05),
-        new SwerveFollowerWrapper(drive).withTimeout(2.75),
-        drive.stopDrivingCommand(),
-        new WaitCommand(0.02),
-        new ConditionalCommand(
-            new ScoreThisGamePiece(fast, lift, lights),
-            new InstantCommand(),
-            () -> {
-              double yawDeg = drive.getHeadingDegrees();
-              boolean shouldScoreByYaw = Math.abs(yawDeg) < 5.0;
-              if (!shouldScoreByYaw) {
-                System.out.println("Not squared up, don't score");
-              }
-              if (!drive.generatedPath) {
-                System.out.println("Didn't drive to target");
-              }
-              return shouldScoreByYaw && drive.generatedPath;
-            }));
+        new SwerveFollowerWrapper(drive).finallyDo(
+          (boolean interrupted) -> {
+            System.out.println("Driving to tag interrupted? " + interrupted);
+          }
+        ),
+        drive.stopDrivingCommand()
+        // new WaitCommand(0.02),
+        // new ConditionalCommand(
+        //     new ScoreThisGamePiece(fast, lift, lights),
+        //     new InstantCommand(),
+        //     () -> {
+        //       double yawDeg = drive.getHeadingDegrees();
+        //       boolean shouldScoreByYaw = Math.abs(yawDeg) < 5.0;
+        //       if (!shouldScoreByYaw) {
+        //         System.out.println("Not squared up, don't score");
+        //       }
+        //       if (!drive.generatedPath) {
+        //         System.out.println("Didn't drive to target");
+        //       }
+        //       return shouldScoreByYaw && drive.generatedPath;
+        //     })
+      );
   }
 }
