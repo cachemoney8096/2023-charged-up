@@ -24,16 +24,16 @@
     },
     {
       "anchorPoint": {
-        "x": 6.84,
-        "y": 4.39
+        "x": 6.76,
+        "y": 4.47
       },
       "prevControl": {
-        "x": 6.1133139007354504,
-        "y": 4.39
+        "x": 6.03331390073545,
+        "y": 4.47
       },
       "nextControl": {
-        "x": 6.1133139007354504,
-        "y": 4.39
+        "x": 6.03331390073545,
+        "y": 4.47
       },
       "holonomicAngle": 0,
       "isReversal": true,
@@ -72,7 +72,7 @@
   ],
   "markers": [
     {
-      "position": 0.17,
+      "position": 0.07,
       "names": [
         "deployIntake"
       ]
