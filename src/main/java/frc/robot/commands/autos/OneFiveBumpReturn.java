@@ -97,7 +97,7 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
                         () -> {
                           drive.rotateOrKeepHeading(0, 0, 0, true, -1);
                         })
-                    .withTimeout(0.3),
+                    .withTimeout(0.6),
                 new DriveDistance(drive, NORM_SPEED_INTAKING, X_METERS_TO_CONE, 0.0, red)),
             new IntakeSequence(intake, lift, lights)
                 .finallyDo(
