@@ -24,15 +24,40 @@
     },
     {
       "anchorPoint": {
-        "x": 6.94,
+        "x": 6.5,
         "y": 4.64
       },
       "prevControl": {
-        "x": 6.213313900735451,
+        "x": 5.738295670010628,
         "y": 4.64
       },
       "nextControl": {
-        "x": 6.213313900735451,
+        "x": 6.716997780756529,
+        "y": 4.64
+      },
+      "holonomicAngle": 0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": true,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 7.1,
+        "y": 4.64
+      },
+      "prevControl": {
+        "x": 6.808114271321875,
+        "y": 4.64
+      },
+      "nextControl": {
+        "x": 6.808114271321875,
         "y": 4.64
       },
       "holonomicAngle": 0,
@@ -78,15 +103,9 @@
       ]
     },
     {
-      "position": 1.01,
+      "position": 2.02,
       "names": [
         "retractIntake"
-      ]
-    },
-    {
-      "position": 1.98,
-      "names": [
-        "limelight"
       ]
     }
   ]
