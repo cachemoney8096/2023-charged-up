@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
@@ -89,5 +90,17 @@ public class IntakeSequence extends SequentialCommandGroup {
               intake.setDesiredDeployed(false);
             },
             intake));
+  }
+
+  public static Command interruptibleIntakeSequence(Intake intake, Lift lift, Lights lights) {
+    return new IntakeSequence(intake, lift, lights)
+    .finallyDo(
+        (boolean interrupted) -> {
+          lift.home();
+          lift.closeGrabber();
+          intake.setDesiredDeployed(false);
+          intake.setDesiredClamped(false);
+          intake.stopIntakingGamePiece();
+        });
   }
 }
