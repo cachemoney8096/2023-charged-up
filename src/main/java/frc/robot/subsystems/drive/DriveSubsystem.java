@@ -154,15 +154,23 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions(), pose);
+    // Just update the translation, not the yaw
+    Pose2d resetPose = new Pose2d(pose.getTranslation(), Rotation2d.fromDegrees(gyro.getYaw()));
+    odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions(), resetPose);
+  }
+
+  public void resetYawToAngle(double yawDeg) {
+    double curYawDeg = gyro.getYaw();
+    double offsetToTargetDeg = targetHeadingDegrees - curYawDeg;
+    gyro.setYaw(yawDeg);
+    Pose2d curPose = getPose();
+    Pose2d resetPose = new Pose2d(curPose.getTranslation(), Rotation2d.fromDegrees(yawDeg));
+    odometry.resetPosition(Rotation2d.fromDegrees(yawDeg), getModulePositions(), resetPose);
+    targetHeadingDegrees = yawDeg + offsetToTargetDeg;
   }
 
   public void resetYaw() {
-    gyro.reset();
-    Pose2d curPose = getPose();
-    Pose2d resetPose = new Pose2d(curPose.getTranslation(), Rotation2d.fromDegrees(0));
-    odometry.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(), resetPose);
-    targetHeadingDegrees = 0.0;
+    resetYawToAngle(0.0);
   }
 
   /**
@@ -542,6 +550,14 @@ public class DriveSubsystem extends SubsystemBase {
 
   public Command stopDrivingCommand() {
     return new InstantCommand(this::stopDriving, this);
+  }
+
+  public Command turnInPlace(double timeoutSec) {
+    return new RunCommand(
+      () -> {
+        rotateOrKeepHeading(0, 0, 0, true, -1);
+      })
+  .withTimeout(timeoutSec);
   }
 
   public void zeroFrontLeftAtCurrentPos() {

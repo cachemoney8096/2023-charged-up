@@ -66,15 +66,7 @@ public class GetAndScoreOpenSide extends SequentialCommandGroup {
     /** Events include: open intake and close intake before and after obtaining game piece */
     eventMap.put(
         "deployIntake",
-        new IntakeSequence(intake, lift, lights)
-            .finallyDo(
-                (boolean interrupted) -> {
-                  lift.home();
-                  lift.closeGrabber();
-                  intake.setDesiredDeployed(false);
-                  intake.setDesiredClamped(false);
-                  intake.stopIntakingGamePiece();
-                }));
+        IntakeSequence.interruptibleIntakeSequence(intake, lift, lights));
 
     eventMap.put("retractIntake", new InstantCommand(() -> {}, lift, intake));
 

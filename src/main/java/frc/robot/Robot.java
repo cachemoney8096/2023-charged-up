@@ -111,6 +111,9 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
 
+    // Never heading lock at start of teleop
+    m_robotContainer.drive.offsetCurrentHeading(0.0);
+
     if (DriverStation.getMatchTime() > 1.0) {
       m_robotContainer.timedMatch = true;
     } else {

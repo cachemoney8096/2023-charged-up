@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.Optional;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.Timer;
@@ -53,7 +55,7 @@ public class RobotContainer {
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
   public final Lift lift = new Lift(scoreLoc);
   private final Lights lights = new Lights();
-  private final DriveSubsystem drive =
+  public final DriveSubsystem drive =
       new DriveSubsystem(lift::throttleForLift, lights, () -> timedMatch);
   public final Intake intake = new Intake(lift::clearOfIntakeZone);
   private final IntakeLimelight intakeLimelight =
@@ -154,7 +156,26 @@ public class RobotContainer {
     SmartDashboard.putData(
         "Zero Rear Right Based on Current Pos",
         new InstantCommand(drive::zeroRearRightAtCurrentPos, drive).ignoringDisable(true));
-
+    SmartDashboard.putData(
+        "Cone Yaw (red bump)",
+        new InstantCommand(() -> {intakeLimelight.resetYawToCone(true, true, drive);}).ignoringDisable(true));
+    SmartDashboard.putData(
+        "Cone Yaw (blue bump)",
+        new InstantCommand(() -> {intakeLimelight.resetYawToCone(false, true, drive);}).ignoringDisable(true));
+    SmartDashboard.putData(
+        "Cone Yaw (red open)",
+        new InstantCommand(() -> {intakeLimelight.resetYawToCone(true, false, drive);}).ignoringDisable(true));
+    SmartDashboard.putData(
+        "Cone Yaw (blue open)",
+        new InstantCommand(() -> {intakeLimelight.resetYawToCone(false, false, drive);}).ignoringDisable(true));
+    SmartDashboard.putData(
+        "Post cone yaw to dashboard",
+        new InstantCommand(() -> {
+            Optional<Double> maybeConeAngleDeg = intakeLimelight.getAngleToConeDeg();
+            double coneAngleDeg = maybeConeAngleDeg.isPresent() ? maybeConeAngleDeg.get() : 0.0;
+            SmartDashboard.putNumber("Cone yaw (deg)", coneAngleDeg);
+        }).ignoringDisable(true));
+    
     // Encoder offset stuff
     intake.initialize();
     lift.initialize();
@@ -247,7 +268,7 @@ public class RobotContainer {
     driverController
         .leftTrigger()
         .whileTrue(
-            new IntakeSequence(intake, lift, lights)
+            IntakeSequence.interruptibleIntakeSequence(intake, lift, lights)
                 .beforeStarting(
                     new InstantCommand(
                         () -> {
@@ -256,11 +277,6 @@ public class RobotContainer {
                 .finallyDo(
                     (boolean interrupted) -> {
                       drive.throttle(1.0);
-                      lift.closeGrabber();
-                      lift.home();
-                      intake.stopIntakingGamePiece();
-                      intake.setDesiredDeployed(false);
-                      intake.setDesiredClamped(false);
                     }));
     driverController.rightTrigger().onTrue(new InstantCommand(lift::startScore, lift));
     driverController

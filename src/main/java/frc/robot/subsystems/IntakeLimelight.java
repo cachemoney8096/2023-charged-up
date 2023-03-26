@@ -16,6 +16,8 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.drive.DriveSubsystem;
+
 import java.util.Optional;
 
 /** Limelight for the intake to identify game pieces */
@@ -437,13 +439,29 @@ public class IntakeLimelight extends SubsystemBase {
     return Optional.of(new ConeDetection(getLatency(), coneDistanceMeters, adjustedAngleDegrees));
   }
 
-  public double getAngleToConeDeg() {
+  public void resetYawToCone(boolean red, boolean bump, DriveSubsystem drive) {
+    // Defaults are for blue side, flip for red
+    final double BUMP_CONE_EXPECTED_DEG = 4.5;
+    final double OPEN_CONE_EXPECTED_DEG = -4.5;
+    double coneExpectedDeg = bump ? BUMP_CONE_EXPECTED_DEG : OPEN_CONE_EXPECTED_DEG;
+    coneExpectedDeg = red ? -coneExpectedDeg : coneExpectedDeg;
+
+    Optional<Double> coneAngleDeg = getAngleToConeDeg();
+    if (coneAngleDeg.isEmpty()) {
+      System.out.println("Cone Yaw Offset Failed");
+      return;
+    }
+
+    drive.resetYawToAngle(coneExpectedDeg - coneAngleDeg.get());
+  }
+
+  public Optional<Double> getAngleToConeDeg() {
     double[] corners = table.getEntry("tcornxy").getDoubleArray(new double[0]);
     Optional<Double> maybeXPixels = getXOfSmallestY(corners);
 
     if (!maybeXPixels.isPresent()) {
       System.out.println("Didn't see cone");
-      return 0;
+      return Optional.empty();
     }
 
     double xPixels = maybeXPixels.get();
@@ -463,7 +481,7 @@ public class IntakeLimelight extends SubsystemBase {
 
     System.out.println("Cone at " + adjustedAngleDegrees);
 
-    return adjustedAngleDegrees;
+    return Optional.of(adjustedAngleDegrees);
   }
 
   @Override
