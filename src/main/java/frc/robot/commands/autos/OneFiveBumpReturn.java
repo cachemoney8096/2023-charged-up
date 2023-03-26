@@ -1,5 +1,7 @@
 package frc.robot.commands.autos;
 
+import java.util.Optional;
+
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -90,25 +92,14 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
         // Turn to cone, intake it
         new InstantCommand(
             () -> {
-              drive.offsetCurrentHeading(limelight.getAngleToConeDeg());
+              Optional<Double> coneAngleDeg = limelight.getAngleToConeDeg();
+              drive.offsetCurrentHeading(coneAngleDeg.isPresent() ? coneAngleDeg.get() : 0.0);
             }),
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
-                new RunCommand(
-                        () -> {
-                          drive.rotateOrKeepHeading(0, 0, 0, true, -1);
-                        })
-                    .withTimeout(0.6),
+              drive.turnInPlace(0.6),
                 new DriveDistance(drive, NORM_SPEED_INTAKING, X_METERS_TO_CONE, 0.0, red)),
-            new IntakeSequence(intake, lift, lights)
-                .finallyDo(
-                    (boolean interrupted) -> {
-                      lift.home();
-                      lift.closeGrabber();
-                      intake.setDesiredDeployed(false);
-                      intake.setDesiredClamped(false);
-                      intake.stopIntakingGamePiece();
-                    })),
+                IntakeSequence.interruptibleIntakeSequence(intake, lift, lights)),
         // new DriveDistance(drive, NORM_SPEED_I NTAKING, -X_METERS_TO_CONE, 0.0, red),
         new InstantCommand(
             () -> scoringLocationUtil.setScoreCol(red ? ScoreCol.LEFT : ScoreCol.RIGHT)),

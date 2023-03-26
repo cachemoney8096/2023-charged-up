@@ -1,5 +1,7 @@
 package frc.robot.commands.autos;
 
+import java.util.Optional;
+
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -72,26 +74,15 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
         // Turn to cone, intake it
         new InstantCommand(
             () -> {
-              drive.offsetCurrentHeading(limelight.getAngleToConeDeg());
+              Optional<Double> coneAngleDeg = limelight.getAngleToConeDeg();
+              drive.offsetCurrentHeading(coneAngleDeg.isPresent() ? coneAngleDeg.get() : 0.0);
             }),
-        new RunCommand(
-                () -> {
-                  drive.rotateOrKeepHeading(0, 0, 0, true, -1);
-                })
-            .withTimeout(0.3),
+        drive.turnInPlace(0.3),
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 new WaitCommand(0.5), // TODO is this even needed?
                 new DriveDistance(drive, NORM_SPEED_INTAKING, X_METERS_TO_CONE, 0.0, false)),
-            new IntakeSequence(intake, lift, lights)
-                .finallyDo(
-                    (boolean interrupted) -> {
-                      lift.home();
-                      lift.closeGrabber();
-                      intake.setDesiredDeployed(false);
-                      intake.setDesiredClamped(false);
-                      intake.stopIntakingGamePiece();
-                    })),
+              IntakeSequence.interruptibleIntakeSequence(intake, lift, lights)),
         new SwerveToPointWrapper(red, drive, () -> desiredPose, 2.0, 2.0),
         new DriveUntilBalanced(drive, false));
   }
