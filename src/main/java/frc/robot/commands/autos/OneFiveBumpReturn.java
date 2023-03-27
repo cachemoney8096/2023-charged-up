@@ -69,8 +69,8 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
           PathPlanner.loadPath(
               "OneFivePlusBumpReturnRed",
               new PathConstraints(
-                Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
-                Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
+                  Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
+                  Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
       firstTraj =
           PathPlannerTrajectory.transformTrajectoryForAlliance(
@@ -115,21 +115,18 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
         drive.followTrajectoryCommand(secondTraj, false),
         new InstantCommand(drive::setNoMove, drive),
         new LookForTag(tagLimelight, drive, lights).withTimeout(0.05),
-        new SwerveFollowerWrapper(drive).finallyDo(
-          (boolean interrupted) -> {
-            System.out.println("Driving to tag interrupted? " + interrupted);
-          }
-        ),
+        new SwerveFollowerWrapper(drive)
+            .finallyDo(
+                (boolean interrupted) -> {
+                  System.out.println("Driving to tag interrupted? " + interrupted);
+                }),
         drive.stopDrivingCommand(),
         new ConditionalCommand(
-          // Score the game piece
-          new SequentialCommandGroup(
-            new WaitCommand(0.02),
-            new ScoreThisGamePiece(fast, lift, lights)
-          ),
-          // Do nothing
-          new InstantCommand(),
-          () -> TRY_TO_SCORE)
-      );
+            // Score the game piece
+            new SequentialCommandGroup(
+                new WaitCommand(0.02), new ScoreThisGamePiece(fast, lift, lights)),
+            // Do nothing
+            new InstantCommand(),
+            () -> TRY_TO_SCORE));
   }
 }
