@@ -30,7 +30,8 @@ import frc.robot.utils.ScoringLocationUtil.ScoreCol;
  * auto drives to the nearest midfield game object, picks it up, and returns.
  */
 public class OneFiveBumpReturn extends SequentialCommandGroup {
-  private static final double NORM_SPEED_INTAKING = 0.4;
+  private final boolean TRY_TO_SCORE = false;
+  private static final double NORM_SPEED_INTAKING = 0.3;
   private final double X_METERS_TO_CONE = 1.35;
   private PathPlannerTrajectory firstTraj =
       PathPlanner.loadPath(
@@ -42,8 +43,8 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
       PathPlanner.loadPath(
           "OneFivePlusBumpReturn",
           new PathConstraints(
-              1.5,
-              Cal.SwerveSubsystem.SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
+              Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
+              Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
   public OneFiveBumpReturn(
       boolean red,
@@ -68,8 +69,8 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
           PathPlanner.loadPath(
               "OneFivePlusBumpReturnRed",
               new PathConstraints(
-                  1.5,
-                  Cal.SwerveSubsystem.SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
+                Cal.SwerveSubsystem.VERY_SLOW_LINEAR_SPEED_METERS_PER_SEC,
+                Cal.SwerveSubsystem.VERY_SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
       firstTraj =
           PathPlannerTrajectory.transformTrajectoryForAlliance(
@@ -119,22 +120,16 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
             System.out.println("Driving to tag interrupted? " + interrupted);
           }
         ),
-        drive.stopDrivingCommand()
-        // new WaitCommand(0.02),
-        // new ConditionalCommand(
-        //     new ScoreThisGamePiece(fast, lift, lights),
-        //     new InstantCommand(),
-        //     () -> {
-        //       double yawDeg = drive.getHeadingDegrees();
-        //       boolean shouldScoreByYaw = Math.abs(yawDeg) < 5.0;
-        //       if (!shouldScoreByYaw) {
-        //         System.out.println("Not squared up, don't score");
-        //       }
-        //       if (!drive.generatedPath) {
-        //         System.out.println("Didn't drive to target");
-        //       }
-        //       return shouldScoreByYaw && drive.generatedPath;
-        //     })
+        drive.stopDrivingCommand(),
+        new ConditionalCommand(
+          // Score the game piece
+          new SequentialCommandGroup(
+            new WaitCommand(0.02),
+            new ScoreThisGamePiece(fast, lift, lights)
+          ),
+          // Do nothing
+          new InstantCommand(),
+          () -> TRY_TO_SCORE)
       );
   }
 }

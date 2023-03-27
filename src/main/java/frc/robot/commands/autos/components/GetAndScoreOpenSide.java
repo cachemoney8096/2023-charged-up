@@ -91,19 +91,5 @@ public class GetAndScoreOpenSide extends SequentialCommandGroup {
         drive.stopDrivingCommand(),
         new WaitCommand(0.02),
         new ScoreThisGamePiece(fast, lift, lights));
-        // new ConditionalCommand(
-        //     new ScoreThisGamePiece(fast, lift, lights),
-        //     new InstantCommand(),
-        //     () -> {
-        //       double yawDeg = drive.getHeadingDegrees();
-        //       boolean shouldScoreByYaw = Math.abs(yawDeg) < 5.0;
-        //       if (!shouldScoreByYaw) {
-        //         System.out.println("Not squared up, don't score");
-        //       }
-        //       if (!drive.generatedPath) {
-        //         System.out.println("Didn't drive to target");
-        //       }
-        //       return shouldScoreByYaw && drive.generatedPath;
-        //     }));
   }
 }
