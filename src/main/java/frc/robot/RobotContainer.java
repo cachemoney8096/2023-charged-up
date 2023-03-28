@@ -28,6 +28,7 @@ import frc.robot.commands.autos.OneFiveBalanceCenter;
 import frc.robot.commands.autos.OneFiveBumpReturn;
 import frc.robot.commands.autos.TwoFiveOpenSide;
 import frc.robot.commands.autos.TwoGamePiecesThatEngage;
+import frc.robot.commands.autos.components.ScoreThisGamePiece;
 import frc.robot.commands.finishScore;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeLimelight;
@@ -91,6 +92,7 @@ public class RobotContainer {
         "Two plus balance Blue",
         new TwoGamePiecesThatEngage(false, lift, intake, drive, lights, tagLimelight, scoreLoc));
     autonChooser.addOption("Nothing", new RunCommand(() -> {}, drive, intake));
+    autonChooser.addOption("Just Score One", new ScoreThisGamePiece(false, lift, lights));
     autonChooser.addOption(
         "Two plus balance Red",
         new TwoGamePiecesThatEngage(true, lift, intake, drive, lights, tagLimelight, scoreLoc));
@@ -116,10 +118,11 @@ public class RobotContainer {
     autonChooser.addOption(
         "1.5 return bump blue",
         new OneFiveBumpReturn(
-            false, false, lift, intake, drive, lights, intakeLimelight, scoreLoc));
+            false, false, lift, intake, drive, lights, intakeLimelight, tagLimelight, scoreLoc));
     autonChooser.addOption(
         "1.5 return bump red",
-        new OneFiveBumpReturn(true, false, lift, intake, drive, lights, intakeLimelight, scoreLoc));
+        new OneFiveBumpReturn(
+            true, false, lift, intake, drive, lights, intakeLimelight, tagLimelight, scoreLoc));
     autonChooser.addOption(
         "1.5 balance center",
         new OneFiveBalanceCenter(lift, drive, lights, scoreLoc, intakeLimelight, intake));
@@ -339,7 +342,7 @@ public class RobotContainer {
                         MathUtil.applyDeadband(-driverController.getRightX(), 0.1),
                         JoystickUtil.squareAxis(
                             MathUtil.applyDeadband(-driverController.getLeftX(), 0.05)),
-                        !driverController.getHID().getLeftBumper(),
+                        true, // always field relative
                         driverController.getHID().getPOV()),
                 drive)
             .withName("Manual Drive"));

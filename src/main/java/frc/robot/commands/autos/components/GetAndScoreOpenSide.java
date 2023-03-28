@@ -6,7 +6,6 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.FollowPathWithEvents;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -90,19 +89,6 @@ public class GetAndScoreOpenSide extends SequentialCommandGroup {
         new SwerveFollowerWrapper(drive).withTimeout(2.0),
         drive.stopDrivingCommand(),
         new WaitCommand(0.02),
-        new ConditionalCommand(
-            new ScoreThisGamePiece(fast, lift, lights),
-            new InstantCommand(),
-            () -> {
-              double yawDeg = drive.getHeadingDegrees();
-              boolean shouldScoreByYaw = Math.abs(yawDeg) < 5.0;
-              if (!shouldScoreByYaw) {
-                System.out.println("Not squared up, don't score");
-              }
-              if (!drive.generatedPath) {
-                System.out.println("Didn't drive to target");
-              }
-              return shouldScoreByYaw && drive.generatedPath;
-            }));
+        new ScoreThisGamePiece(fast, lift, lights));
   }
 }

@@ -36,6 +36,10 @@ public final class Cal {
         MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ = 3.0;
 
     /** For the purposes of trajectory constraints */
+    public static final double MEDIUM_LINEAR_SPEED_METERS_PER_SEC = 2.5,
+        MEDIUM_LINEAR_ACCELERATION_METERS_PER_SEC_SQ = 2.5;
+
+    /** For the purposes of trajectory constraints */
     public static final double SLOW_LINEAR_SPEED_METERS_PER_SEC = 2.0,
         SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ = 2.0;
 
@@ -51,7 +55,7 @@ public final class Cal {
 
     public static double SWERVE_FRONT_RIGHT_ANGULAR_OFFSET_RAD = (1.0 * Math.PI) + 1.005;
     public static double SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 0.987;
-    public static double SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 0.9075;
+    public static double SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 4.033;
 
     /**
      * Angular offsets of the modules relative to the chassis in radians. The modules form an O when
@@ -93,7 +97,7 @@ public final class Cal {
 
     /** Drive speed multipliers for teleop intaking and scoring */
     public static final double THROTTLE_FOR_INTAKING = 0.55,
-        THROTTLE_FOR_SCORING = 0.6,
+        THROTTLE_FOR_SCORING_AND_SHELF = 0.45,
         THROTTLE_FOR_SLOW_BUTTON = 0.5;
 
     public static final double IMU_PITCH_BIAS_DEG = 1.3;
@@ -105,7 +109,7 @@ public final class Cal {
 
     /** Intake positions in degrees */
     public static final double STARTING_POSITION_DEGREES = 90.0,
-        DEPLOYED_POSITION_DEGREES = 160.0,
+        DEPLOYED_POSITION_DEGREES = 185.0,
         RETRACTED_POSITION_DEGREES = 84.0;
 
     /** Past this position, the intake is free to clamp */

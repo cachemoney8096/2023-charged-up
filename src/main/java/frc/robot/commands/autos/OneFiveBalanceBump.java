@@ -38,7 +38,7 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
           "OneFivePlusBump",
           new PathConstraints(
               Cal.SwerveSubsystem.SLOW_LINEAR_SPEED_METERS_PER_SEC,
-              Cal.SwerveSubsystem.SLOW_LINEAR_SPEED_METERS_PER_SEC));
+              Cal.SwerveSubsystem.SLOW_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
   public OneFiveBalanceBump(
       boolean red,
@@ -92,7 +92,7 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
                       intake.setDesiredClamped(false);
                       intake.stopIntakingGamePiece();
                     })),
-        new SwerveToPointWrapper(red, drive, desiredPose, 2.0),
+        new SwerveToPointWrapper(red, drive, () -> desiredPose, 2.0, 2.0),
         new DriveUntilBalanced(drive, false));
   }
 }

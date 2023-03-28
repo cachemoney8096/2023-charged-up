@@ -26,6 +26,7 @@ public class IntakeLimelight extends SubsystemBase {
   private final double kImageCaptureLatency = 11.0;
 
   private final double RESOLUTION_X = 960.0;
+  private final double RESOLUTION_Y = 720.0;
 
   // Simulation functions
   private SimDevice m_simDevice;
@@ -198,6 +199,7 @@ public class IntakeLimelight extends SubsystemBase {
    * @return latency - The pipeline’s latency contribution in seconds. Add at least 11ms for image
    *     capture latency.
    */
+  // TODO double check this?
   public double getLatency() {
     if (m_simDevice != null) {
       return m_latency.get() + kImageCaptureLatency;
@@ -344,13 +346,12 @@ public class IntakeLimelight extends SubsystemBase {
     return getTargetTranslation(kTargetHeight);
   }
 
-  public Optional<Double> getXOfSmallestY() {
+  public Optional<Double> getXOfSmallestY(double[] corners) {
     // Format: x1 y1 x2 y2 x3 y3 . . .
-    double[] corners = table.getEntry("tcornxy").getDoubleArray(new double[0]);
     double minY = 10000000;
     int minYIdx = 0;
 
-    if (corners == new double[0]) {
+    if (corners.length == 0) {
       return Optional.empty();
     }
 
@@ -364,8 +365,83 @@ public class IntakeLimelight extends SubsystemBase {
     return Optional.of(corners[minYIdx - 1]);
   }
 
+  public Optional<Double> getObjectHeightPx(double[] corners) {
+    // Format: x1 y1 x2 y2 x3 y3 . . .
+    if (corners.length == 0) {
+      return Optional.empty();
+    }
+
+    double minY = Double.MAX_VALUE;
+    double maxY = Double.MIN_VALUE;
+
+    for (int i = 1; i < corners.length; i += 2) {
+      minY = Math.min(minY, corners[i]);
+      maxY = Math.max(maxY, corners[i]);
+    }
+
+    return Optional.of(maxY - minY);
+  }
+
+  public class ConeDetection {
+    public double latencySec;
+    /** Distance from camera */
+    public double distanceMeters;
+
+    /** CCW Angle */
+    public double angleDeg;
+
+    public ConeDetection(double latencySec, double distanceMeters, double angleDeg) {
+      this.latencySec = latencySec;
+      this.distanceMeters = distanceMeters;
+      this.angleDeg = angleDeg;
+    }
+  }
+
+  /**
+   * Looks for a cone
+   *
+   * @return If empty, no cone detected. First value is cone yaw in degrees (ccw), second value is
+   *     distance in meters.
+   */
+  public Optional<ConeDetection> getConePos() {
+    double[] corners = table.getEntry("tcornxy").getDoubleArray(new double[0]);
+    Optional<Double> maybeXPixels = getXOfSmallestY(corners);
+    Optional<Double> maybeYHeightPixels = getObjectHeightPx(corners);
+
+    if (!maybeXPixels.isPresent() || !maybeYHeightPixels.isPresent()) {
+      System.out.println("Didn't see cone");
+      return Optional.empty();
+    }
+
+    // Compute cone distance
+    // kinda based on the same thing as below:
+    // https://docs.limelightvision.io/en/latest/theory.html#from-pixels-to-angles
+    final double vertFovDeg = 49.7;
+    double halfResYPixels = RESOLUTION_Y / 2.0;
+    double viewplaneHeightPixels = 2.0 * Math.tan(Units.degreesToRadians(vertFovDeg / 2));
+    double yPixels = maybeYHeightPixels.get();
+    double normYPixels = (1 / halfResYPixels) * yPixels;
+    double viewplaneYPixels = viewplaneHeightPixels / 2.0 * normYPixels;
+    final double CONE_HEIGHT_METERS = Units.inchesToMeters(13.0);
+    double coneDistanceMeters = CONE_HEIGHT_METERS / viewplaneYPixels;
+
+    // Compute cone angle based on
+    // https://docs.limelightvision.io/en/latest/theory.html#from-pixels-to-angles
+    double xPixels = maybeXPixels.get();
+    double halfResXPixels = RESOLUTION_X / 2.0;
+    final double horizFovDeg = 59.6;
+    double normXPixels = (1 / halfResXPixels) * ((halfResXPixels - 0.5) - xPixels);
+    double viewplaneWidthPixels = 2.0 * Math.tan(Units.degreesToRadians(horizFovDeg / 2));
+    double viewplaneXPixels = viewplaneWidthPixels / 2.0 * normXPixels;
+    double angleXDegrees = Units.radiansToDegrees(Math.atan2(viewplaneXPixels, 1));
+    double angleAdjustDegrees = -3.0; // due to limelight yaw
+    double adjustedAngleDegrees = angleXDegrees + angleAdjustDegrees;
+    return Optional.of(new ConeDetection(getLatency(), coneDistanceMeters, adjustedAngleDegrees));
+  }
+
   public double getAngleToConeDeg() {
-    Optional<Double> maybeXPixels = getXOfSmallestY();
+    double[] corners = table.getEntry("tcornxy").getDoubleArray(new double[0]);
+    Optional<Double> maybeXPixels = getXOfSmallestY(corners);
 
     if (!maybeXPixels.isPresent()) {
       System.out.println("Didn't see cone");

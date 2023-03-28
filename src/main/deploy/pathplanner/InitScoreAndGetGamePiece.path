@@ -24,16 +24,41 @@
     },
     {
       "anchorPoint": {
-        "x": 6.87,
-        "y": 4.666606190355238
+        "x": 6.5,
+        "y": 4.64
       },
       "prevControl": {
-        "x": 6.143313900735451,
-        "y": 4.666606190355238
+        "x": 5.738295670010628,
+        "y": 4.64
       },
       "nextControl": {
-        "x": 6.143313900735451,
-        "y": 4.666606190355238
+        "x": 6.716997780756529,
+        "y": 4.64
+      },
+      "holonomicAngle": 0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": true,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 7.1,
+        "y": 4.64
+      },
+      "prevControl": {
+        "x": 6.808114271321875,
+        "y": 4.64
+      },
+      "nextControl": {
+        "x": 6.808114271321875,
+        "y": 4.64
       },
       "holonomicAngle": 0,
       "isReversal": true,
@@ -70,24 +95,15 @@
       }
     }
   ],
-  "maxVelocity": 4.0,
-  "maxAcceleration": 3.0,
-  "isReversed": null,
   "markers": [
     {
-      "position": 0.1745454545454487,
+      "position": 0.07,
       "names": [
         "deployIntake"
       ]
     },
     {
-      "position": 1.9781818181818254,
-      "names": [
-        "limelight"
-      ]
-    },
-    {
-      "position": 1.0181818181818183,
+      "position": 2.02,
       "names": [
         "retractIntake"
       ]
