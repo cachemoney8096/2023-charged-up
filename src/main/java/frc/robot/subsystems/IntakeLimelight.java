@@ -414,6 +414,8 @@ public class IntakeLimelight extends SubsystemBase {
     }
 
     // Compute cone distance
+    // kinda based on the same thing as below:
+    // https://docs.limelightvision.io/en/latest/theory.html#from-pixels-to-angles
     final double vertFovDeg = 49.7;
     double halfResYPixels = RESOLUTION_Y / 2.0;
     double viewplaneHeightPixels = 2.0 * Math.tan(Units.degreesToRadians(vertFovDeg / 2));

@@ -342,7 +342,7 @@ public class RobotContainer {
                         MathUtil.applyDeadband(-driverController.getRightX(), 0.1),
                         JoystickUtil.squareAxis(
                             MathUtil.applyDeadband(-driverController.getLeftX(), 0.05)),
-                        true,
+                        true, // always field relative
                         driverController.getHID().getPOV()),
                 drive)
             .withName("Manual Drive"));

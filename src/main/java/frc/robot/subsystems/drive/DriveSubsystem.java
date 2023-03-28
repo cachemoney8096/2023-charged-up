@@ -229,9 +229,9 @@ public class DriveSubsystem extends SubsystemBase {
     rot *= Constants.SwerveDrive.MAX_ANGULAR_SPEED_RAD_PER_SECONDS;
 
     if (throttleForLift.getAsBoolean()) {
-      xSpeed *= Cal.SwerveSubsystem.THROTTLE_FOR_SCORING;
-      ySpeed *= Cal.SwerveSubsystem.THROTTLE_FOR_SCORING;
-      rot *= Cal.SwerveSubsystem.THROTTLE_FOR_SCORING;
+      xSpeed *= Cal.SwerveSubsystem.THROTTLE_FOR_SCORING_AND_SHELF;
+      ySpeed *= Cal.SwerveSubsystem.THROTTLE_FOR_SCORING_AND_SHELF;
+      rot *= Cal.SwerveSubsystem.THROTTLE_FOR_SCORING_AND_SHELF;
     } else {
       xSpeed *= throttleMultiplier;
       ySpeed *= throttleMultiplier;
