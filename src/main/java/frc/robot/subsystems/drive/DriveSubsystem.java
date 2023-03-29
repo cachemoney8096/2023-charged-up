@@ -621,7 +621,10 @@ public class DriveSubsystem extends SubsystemBase {
         "Odometry Yaw (deg)", () -> getPose().getRotation().getDegrees(), null);
     builder.addDoubleProperty(
         "Front Left Abs Encoder (rad)", frontLeft::getEncoderAbsPositionRad, null);
-
+    builder.addDoubleProperty(
+        "Front Right Abs Encoder (rad)", frontRight::getEncoderAbsPositionRad, null);
+    builder.addDoubleProperty(
+        "Rear Left Abs Encoder (rad)", rearLeft::getEncoderAbsPositionRad, null);
     builder.addDoubleProperty(
         "Rear Right Abs Encoder (rad)", rearRight::getEncoderAbsPositionRad, null);
     builder.addDoubleProperty(

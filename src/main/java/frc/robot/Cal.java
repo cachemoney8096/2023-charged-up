@@ -51,11 +51,10 @@ public final class Cal {
      * Angular offset of the modules relative to the zeroing fixture in radians. Ideally should be
      * relative to the ficture but they are actually slightly different.
      */
-    public static double SWERVE_FRONT_LEFT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 1.036;
-
-    public static double SWERVE_FRONT_RIGHT_ANGULAR_OFFSET_RAD = (1.0 * Math.PI) + 1.005;
-    public static double SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 0.987;
-    public static double SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 4.033;
+    public static double SWERVE_FRONT_LEFT_ANGULAR_OFFSET_RAD = 5.199;
+    public static double SWERVE_FRONT_RIGHT_ANGULAR_OFFSET_RAD = 2.078;
+    public static double SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD = 6.212;
+    public static double SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD = 2.997;
 
     /**
      * Angular offsets of the modules relative to the chassis in radians. The modules form an O when
