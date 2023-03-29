@@ -108,7 +108,6 @@ public class Lift extends SubsystemBase {
   private AbsoluteEncoderChecker elevatorLeftAbsEncoderChecker = new AbsoluteEncoderChecker();
   private AbsoluteEncoderChecker elevatorRightAbsEncoderChecker = new AbsoluteEncoderChecker();
   private AbsoluteEncoderChecker armAbsoluteEncoderChecker = new AbsoluteEncoderChecker();
-
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
    * indicates the elevator position in inches and the second value indicates the arm position in
@@ -132,7 +131,7 @@ public class Lift extends SubsystemBase {
         LiftPosition.GRAB_FROM_INTAKE,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 84.0));
     liftPositionMap.put(
-        LiftPosition.SHELF, new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 185.0));
+        LiftPosition.SHELF, new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 185.0)); //1 inch + 7 degrees
     liftPositionMap.put(
         LiftPosition.SCORE_LOW,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 187.0));
@@ -691,6 +690,12 @@ public class Lift extends SubsystemBase {
       } else {
         setDesiredPosition(LiftPosition.SCORE_HIGH_CUBE);
       }
+    }
+  }
+
+  public void rePrepScoreSequence(Lights lights) {
+    if (goalPosition == LiftPosition.PRE_SCORE_HIGH_CONE || goalPosition == LiftPosition.PRE_SCORE_MID_CONE || goalPosition == LiftPosition.SCORE_MID_CUBE || goalPosition == LiftPosition.SCORE_HIGH_CUBE || goalPosition == LiftPosition.SCORE_LOW) {
+      ManualPrepScoreSequence(lights);
     }
   }
 }
