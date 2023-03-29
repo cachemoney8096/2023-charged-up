@@ -1,7 +1,5 @@
 package frc.robot.commands.autos;
 
-import java.util.Optional;
-
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -9,7 +7,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Cal;
@@ -26,6 +23,7 @@ import frc.robot.subsystems.TagLimelightV2;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreCol;
+import java.util.Optional;
 
 /**
  * Assuming the robot is starting from cone scoring position furthest from the loading zone, this
@@ -99,7 +97,7 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
             new SequentialCommandGroup(
                 drive.turnInPlace(0.6),
                 new DriveDistance(drive, NORM_SPEED_INTAKING, X_METERS_TO_CONE, 0.0, red)),
-                IntakeSequence.interruptibleIntakeSequence(intake, lift, lights)),
+            IntakeSequence.interruptibleIntakeSequence(intake, lift, lights)),
         // new DriveDistance(drive, NORM_SPEED_I NTAKING, -X_METERS_TO_CONE, 0.0, red),
         new InstantCommand(
             () -> scoringLocationUtil.setScoreCol(red ? ScoreCol.LEFT : ScoreCol.RIGHT)),

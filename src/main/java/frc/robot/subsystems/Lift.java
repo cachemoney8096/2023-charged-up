@@ -131,7 +131,9 @@ public class Lift extends SubsystemBase {
         LiftPosition.GRAB_FROM_INTAKE,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 84.0));
     liftPositionMap.put(
-        LiftPosition.SHELF, new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 185.0)); //1 inch + 7 degrees
+        LiftPosition.SHELF,
+        new Pair<Double, Double>(
+            Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 185.0)); // 1 inch + 7 degrees
     liftPositionMap.put(
         LiftPosition.SCORE_LOW,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 187.0));
@@ -694,7 +696,11 @@ public class Lift extends SubsystemBase {
   }
 
   public void rePrepScoreSequence(Lights lights) {
-    if (goalPosition == LiftPosition.PRE_SCORE_HIGH_CONE || goalPosition == LiftPosition.PRE_SCORE_MID_CONE || goalPosition == LiftPosition.SCORE_MID_CUBE || goalPosition == LiftPosition.SCORE_HIGH_CUBE || goalPosition == LiftPosition.SCORE_LOW) {
+    if (goalPosition == LiftPosition.PRE_SCORE_HIGH_CONE
+        || goalPosition == LiftPosition.PRE_SCORE_MID_CONE
+        || goalPosition == LiftPosition.SCORE_MID_CUBE
+        || goalPosition == LiftPosition.SCORE_HIGH_CUBE
+        || goalPosition == LiftPosition.SCORE_LOW) {
       ManualPrepScoreSequence(lights);
     }
   }

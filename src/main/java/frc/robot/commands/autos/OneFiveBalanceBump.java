@@ -1,7 +1,5 @@
 package frc.robot.commands.autos;
 
-import java.util.Optional;
-
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -10,9 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Cal;
 import frc.robot.commands.IntakeSequence;
 import frc.robot.commands.SwerveToPointWrapper;
@@ -25,6 +21,7 @@ import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.ScoringLocationUtil;
+import java.util.Optional;
 
 /**
  * Assuming the robot is starting from cone scoring position furthest from the loading zone, this
@@ -81,7 +78,7 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
             new SequentialCommandGroup(
                 drive.turnInPlace(0.8),
                 new DriveDistance(drive, NORM_SPEED_INTAKING, X_METERS_TO_CONE, 0.0, false)),
-              IntakeSequence.interruptibleIntakeSequence(intake, lift, lights)),
+            IntakeSequence.interruptibleIntakeSequence(intake, lift, lights)),
         new SwerveToPointWrapper(red, drive, () -> desiredPose, 2.0, 2.0),
         new DriveUntilBalanced(drive, false));
   }

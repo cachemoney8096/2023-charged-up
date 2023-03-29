@@ -59,9 +59,7 @@ public class TwoFiveOpenSide extends SequentialCommandGroup {
     }
 
     /** Events include: deploy and retract intake */
-    eventMap.put(
-        "deployIntake",
-        IntakeSequence.interruptibleIntakeSequence(intake, lift, lights));
+    eventMap.put("deployIntake", IntakeSequence.interruptibleIntakeSequence(intake, lift, lights));
     eventMap.put("retractIntake", new InstantCommand(() -> {}, lift, intake));
 
     addRequirements(lift, intake, drive, tagLimelight);

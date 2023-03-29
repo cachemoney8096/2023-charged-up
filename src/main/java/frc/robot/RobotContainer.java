@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import java.util.Optional;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.Timer;
@@ -41,6 +39,7 @@ import frc.robot.subsystems.TagLimelightV2;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.JoystickUtil;
 import frc.robot.utils.ScoringLocationUtil;
+import java.util.Optional;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -158,12 +157,15 @@ public class RobotContainer {
         new InstantCommand(drive::zeroRearRightAtCurrentPos, drive).ignoringDisable(true));
     SmartDashboard.putData(
         "Post cone yaw to dashboard",
-        new InstantCommand(() -> {
-            Optional<Double> maybeConeAngleDeg = intakeLimelight.getAngleToConeDeg();
-            double coneAngleDeg = maybeConeAngleDeg.isPresent() ? maybeConeAngleDeg.get() : 0.0;
-            SmartDashboard.putNumber("Cone yaw (deg)", coneAngleDeg);
-        }).ignoringDisable(true));
-    
+        new InstantCommand(
+                () -> {
+                  Optional<Double> maybeConeAngleDeg = intakeLimelight.getAngleToConeDeg();
+                  double coneAngleDeg =
+                      maybeConeAngleDeg.isPresent() ? maybeConeAngleDeg.get() : 0.0;
+                  SmartDashboard.putNumber("Cone yaw (deg)", coneAngleDeg);
+                })
+            .ignoringDisable(true));
+
     // Encoder offset stuff
     intake.initialize();
     lift.initialize();
@@ -282,66 +284,75 @@ public class RobotContainer {
     operatorController
         .povDown()
         .onTrue(
-            new InstantCommand(() -> {
-                scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.LOW);
-                lift.rePrepScoreSequence(lights);
-            } ).ignoringDisable(true));
+            new InstantCommand(
+                    () -> {
+                      scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.LOW);
+                      lift.rePrepScoreSequence(lights);
+                    })
+                .ignoringDisable(true));
     operatorController
         .povRight()
         .onTrue(
-            new InstantCommand(() -> {
-                scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID);
-                lift.rePrepScoreSequence(lights);
-            })
+            new InstantCommand(
+                    () -> {
+                      scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID);
+                      lift.rePrepScoreSequence(lights);
+                    })
                 .ignoringDisable(true));
     operatorController
         .povLeft()
         .onTrue(
-            new InstantCommand(() -> {
-                scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID);
-                lift.rePrepScoreSequence(lights);
-            })
+            new InstantCommand(
+                    () -> {
+                      scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID);
+                      lift.rePrepScoreSequence(lights);
+                    })
                 .ignoringDisable(true));
     operatorController
         .povUp()
         .onTrue(
-            new InstantCommand(() -> {
-                scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH);
-                lift.rePrepScoreSequence(lights);
-            })
+            new InstantCommand(
+                    () -> {
+                      scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH);
+                      lift.rePrepScoreSequence(lights);
+                    })
                 .ignoringDisable(true));
 
     operatorController
         .x()
         .onTrue(
-            new InstantCommand(() -> {
-                scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.LEFT);
-                lift.rePrepScoreSequence(lights);
-            })
+            new InstantCommand(
+                    () -> {
+                      scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.LEFT);
+                      lift.rePrepScoreSequence(lights);
+                    })
                 .ignoringDisable(true));
     operatorController
         .a()
         .onTrue(
-            new InstantCommand(() -> {
-                scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER);
-                lift.rePrepScoreSequence(lights);
-            })
+            new InstantCommand(
+                    () -> {
+                      scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER);
+                      lift.rePrepScoreSequence(lights);
+                    })
                 .ignoringDisable(true));
     operatorController
         .y()
         .onTrue(
-            new InstantCommand(() -> {
-                scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER);
-                lift.rePrepScoreSequence(lights);
-            })
+            new InstantCommand(
+                    () -> {
+                      scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER);
+                      lift.rePrepScoreSequence(lights);
+                    })
                 .ignoringDisable(true));
     operatorController
         .b()
         .onTrue(
-            new InstantCommand(() -> {
-                scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.RIGHT);
-                lift.rePrepScoreSequence(lights);
-            })
+            new InstantCommand(
+                    () -> {
+                      scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.RIGHT);
+                      lift.rePrepScoreSequence(lights);
+                    })
                 .ignoringDisable(true));
 
     operatorController

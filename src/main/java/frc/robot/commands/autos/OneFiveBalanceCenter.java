@@ -1,10 +1,7 @@
 package frc.robot.commands.autos;
 
-import java.util.Optional;
-
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.IntakeSequence;
@@ -18,6 +15,7 @@ import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.ScoringLocationUtil;
+import java.util.Optional;
 
 /**
  * Scores a game piece, drives over the charge station, gets a game piece, then back on and balances
@@ -50,7 +48,7 @@ public class OneFiveBalanceCenter extends SequentialCommandGroup {
             new SequentialCommandGroup(
                 drive.turnInPlace(0.8),
                 new DriveDistance(drive, NORM_SPEED_INTAKING, DISTANCE_TO_CONE_METERS, 0, false)),
-                IntakeSequence.interruptibleIntakeSequence(intake, lift, lights)),
+            IntakeSequence.interruptibleIntakeSequence(intake, lift, lights)),
 
         // Drive back
         new DriveDistance(drive, NORM_SPEED_BACK, DISTANCE_BACK_METERS, 0, false),

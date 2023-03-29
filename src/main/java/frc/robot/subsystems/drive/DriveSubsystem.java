@@ -554,10 +554,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   public Command turnInPlace(double timeoutSec) {
     return new RunCommand(
-      () -> {
-        rotateOrKeepHeading(0, 0, 0, true, -1);
-      })
-  .withTimeout(timeoutSec);
+            () -> {
+              rotateOrKeepHeading(0, 0, 0, true, -1);
+            })
+        .withTimeout(timeoutSec);
   }
 
   public void zeroFrontLeftAtCurrentPos() {

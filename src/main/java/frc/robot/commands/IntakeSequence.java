@@ -94,13 +94,13 @@ public class IntakeSequence extends SequentialCommandGroup {
 
   public static Command interruptibleIntakeSequence(Intake intake, Lift lift, Lights lights) {
     return new IntakeSequence(intake, lift, lights)
-    .finallyDo(
-        (boolean interrupted) -> {
-          lift.home();
-          lift.closeGrabber();
-          intake.setDesiredDeployed(false);
-          intake.setDesiredClamped(false);
-          intake.stopIntakingGamePiece();
-        });
+        .finallyDo(
+            (boolean interrupted) -> {
+              lift.home();
+              lift.closeGrabber();
+              intake.setDesiredDeployed(false);
+              intake.setDesiredClamped(false);
+              intake.stopIntakingGamePiece();
+            });
   }
 }
