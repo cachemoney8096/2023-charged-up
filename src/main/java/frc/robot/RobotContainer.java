@@ -294,43 +294,66 @@ public class RobotContainer {
     operatorController
         .povDown()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.LOW))
-                .ignoringDisable(true));
+            new InstantCommand(() -> {
+                scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.LOW);
+                lift.rePrepScoreSequence(lights);
+            } ).ignoringDisable(true));
     operatorController
         .povRight()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID))
+            new InstantCommand(() -> {
+                scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID);
+                lift.rePrepScoreSequence(lights);
+            })
                 .ignoringDisable(true));
     operatorController
         .povLeft()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID))
+            new InstantCommand(() -> {
+                scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID);
+                lift.rePrepScoreSequence(lights);
+            })
                 .ignoringDisable(true));
     operatorController
         .povUp()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH))
+            new InstantCommand(() -> {
+                scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH);
+                lift.rePrepScoreSequence(lights);
+            })
                 .ignoringDisable(true));
 
     operatorController
         .x()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.LEFT))
+            new InstantCommand(() -> {
+                scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.LEFT);
+                lift.rePrepScoreSequence(lights);
+            })
                 .ignoringDisable(true));
     operatorController
         .a()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER))
+            new InstantCommand(() -> {
+                scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER);
+                lift.rePrepScoreSequence(lights);
+            })
                 .ignoringDisable(true));
     operatorController
         .y()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER))
+            new InstantCommand(() -> {
+                scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER);
+                lift.rePrepScoreSequence(lights);
+            })
                 .ignoringDisable(true));
     operatorController
         .b()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.RIGHT))
+            new InstantCommand(() -> {
+                scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.RIGHT);
+                lift.rePrepScoreSequence(lights);
+            })
                 .ignoringDisable(true));
 
     operatorController
