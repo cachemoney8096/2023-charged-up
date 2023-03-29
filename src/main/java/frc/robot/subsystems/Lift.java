@@ -252,6 +252,8 @@ public class Lift extends SubsystemBase {
     Pair<Double, Double> newPos =
         new Pair<Double, Double>(curPos.getFirst(), curPos.getSecond() - 0.5);
     liftPositionMap.replace(desiredPosition, newPos);
+
+    armController.setGoal(newPos.getSecond());
   }
 
   public void deployArmFurther() {
@@ -259,6 +261,8 @@ public class Lift extends SubsystemBase {
     Pair<Double, Double> newPos =
         new Pair<Double, Double>(curPos.getFirst(), curPos.getSecond() + 0.5);
     liftPositionMap.replace(desiredPosition, newPos);
+
+    armController.setGoal(newPos.getSecond());
   }
 
   /**
