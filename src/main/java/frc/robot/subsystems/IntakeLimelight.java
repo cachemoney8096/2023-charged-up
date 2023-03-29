@@ -441,22 +441,6 @@ public class IntakeLimelight extends SubsystemBase {
     return Optional.of(new ConeDetection(getLatency(), coneDistanceMeters, adjustedAngleDegrees));
   }
 
-  public void resetYawToCone(boolean red, boolean bump, DriveSubsystem drive) {
-    // Defaults are for blue side, flip for red
-    final double BUMP_CONE_EXPECTED_DEG = 4.5;
-    final double OPEN_CONE_EXPECTED_DEG = -4.5;
-    double coneExpectedDeg = bump ? BUMP_CONE_EXPECTED_DEG : OPEN_CONE_EXPECTED_DEG;
-    coneExpectedDeg = red ? -coneExpectedDeg : coneExpectedDeg;
-
-    Optional<Double> coneAngleDeg = getAngleToConeDeg();
-    if (coneAngleDeg.isEmpty()) {
-      System.out.println("Cone Yaw Offset Failed");
-      return;
-    }
-
-    drive.resetYawToAngle(coneExpectedDeg - coneAngleDeg.get());
-  }
-
   public Optional<Double> getAngleToConeDeg() {
     double[] corners = table.getEntry("tcornxy").getDoubleArray(new double[0]);
     Optional<Double> maybeXPixels = getXOfSmallestY(corners);

@@ -77,10 +77,9 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
               Optional<Double> coneAngleDeg = limelight.getAngleToConeDeg();
               drive.offsetCurrentHeading(coneAngleDeg.isPresent() ? coneAngleDeg.get() : 0.0);
             }),
-        drive.turnInPlace(0.3),
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
-                new WaitCommand(0.5), // TODO is this even needed?
+                drive.turnInPlace(0.8),
                 new DriveDistance(drive, NORM_SPEED_INTAKING, X_METERS_TO_CONE, 0.0, false)),
               IntakeSequence.interruptibleIntakeSequence(intake, lift, lights)),
         new SwerveToPointWrapper(red, drive, () -> desiredPose, 2.0, 2.0),

@@ -157,18 +157,6 @@ public class RobotContainer {
         "Zero Rear Right Based on Current Pos",
         new InstantCommand(drive::zeroRearRightAtCurrentPos, drive).ignoringDisable(true));
     SmartDashboard.putData(
-        "Cone Yaw (red bump)",
-        new InstantCommand(() -> {intakeLimelight.resetYawToCone(true, true, drive);}).ignoringDisable(true));
-    SmartDashboard.putData(
-        "Cone Yaw (blue bump)",
-        new InstantCommand(() -> {intakeLimelight.resetYawToCone(false, true, drive);}).ignoringDisable(true));
-    SmartDashboard.putData(
-        "Cone Yaw (red open)",
-        new InstantCommand(() -> {intakeLimelight.resetYawToCone(true, false, drive);}).ignoringDisable(true));
-    SmartDashboard.putData(
-        "Cone Yaw (blue open)",
-        new InstantCommand(() -> {intakeLimelight.resetYawToCone(false, false, drive);}).ignoringDisable(true));
-    SmartDashboard.putData(
         "Post cone yaw to dashboard",
         new InstantCommand(() -> {
             Optional<Double> maybeConeAngleDeg = intakeLimelight.getAngleToConeDeg();
