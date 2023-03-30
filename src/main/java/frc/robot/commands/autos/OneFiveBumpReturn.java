@@ -30,7 +30,7 @@ import java.util.Optional;
  * auto drives to the nearest midfield game object, picks it up, and returns.
  */
 public class OneFiveBumpReturn extends SequentialCommandGroup {
-  private static final boolean TRY_TO_SCORE = false;
+  private static final boolean TRY_TO_SCORE = true;
   private static final double NORM_SPEED_INTAKING = 0.3;
   private static final double X_METERS_TO_CONE = 1.35;
   private PathPlannerTrajectory firstTraj =
