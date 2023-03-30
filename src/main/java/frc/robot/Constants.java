@@ -60,7 +60,8 @@ public final class Constants {
     // First number: adjustment for midwest
     // Second number: adjustment from midwest to practice field
     // Third number: adjustment from practice field to wisconsin
-    public static final double WHEEL_DIAMETER_FUDGE_FACTOR = 0.898 * 1.120 * 0.992;
+    // Fourth number: Wisconsin to Buckeye
+    public static final double WHEEL_DIAMETER_FUDGE_FACTOR = 0.898 * 1.120 * 0.992 * 1.035;
 
     /** Calculations required for driving motor conversion factors and feed forward */
     public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotor.FREE_SPEED_RPM / 60,
