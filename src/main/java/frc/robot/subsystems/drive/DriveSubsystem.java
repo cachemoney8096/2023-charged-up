@@ -506,10 +506,6 @@ public class DriveSubsystem extends SubsystemBase {
       return Optional.empty();
     }
 
-    Transform2d trajectoryTransform = targetPose.get().minus(futurePose);
-    System.out.println(
-        "Trajectory Transform: " + trajectoryTransform.getX() + " " + trajectoryTransform.getY());
-    // TODO we should probably just get rid of this guess if there's no target pose
     Pose2d finalPose = targetPose.get();
     Transform2d finalTransform =
         new Transform2d(finalPose.getTranslation(), finalPose.getRotation());
