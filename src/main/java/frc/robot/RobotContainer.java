@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -40,6 +41,7 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.JoystickUtil;
 import frc.robot.utils.ScoringLocationUtil;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -51,8 +53,24 @@ public class RobotContainer {
   // If true, this is a match with real timings
   public boolean timedMatch = false;
 
+  // Replace with CommandPS4Controller or CommandJoystick if needed
+  private final CommandXboxController driverController =
+      new CommandXboxController(RobotMap.DRIVER_CONTROLLER_PORT);
+  private final CommandXboxController operatorController =
+      new CommandXboxController(RobotMap.OPERATOR_CONTROLLER_PORT);
+
+  Command rumbleBriefly = new SequentialCommandGroup(
+    new InstantCommand(() -> {
+        driverController.getHID().setRumble(RumbleType.kBothRumble, 1.0);
+    }),
+    new WaitCommand(0.25),
+    new InstantCommand(() -> {
+        driverController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
+    })
+);
+
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
-  public final Lift lift = new Lift(scoreLoc);
+  public final Lift lift = new Lift(scoreLoc, rumbleBriefly);
   private final Lights lights = new Lights();
   public final DriveSubsystem drive =
       new DriveSubsystem(lift::throttleForLift, lights, () -> timedMatch);
@@ -67,12 +85,6 @@ public class RobotContainer {
 
   // A chooser for autonomous commands
   private SendableChooser<Command> autonChooser = new SendableChooser<>();
-
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController driverController =
-      new CommandXboxController(RobotMap.DRIVER_CONTROLLER_PORT);
-  private final CommandXboxController operatorController =
-      new CommandXboxController(RobotMap.OPERATOR_CONTROLLER_PORT);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -354,6 +366,8 @@ public class RobotContainer {
                       lift.rePrepScoreSequence(lights);
                     })
                 .ignoringDisable(true));
+
+    // operatorController.start().onTrue(new InstantCommand(() -> tagLimelight.checkForTag()).ignoringDisable(true));
 
     operatorController
         .leftTrigger()

@@ -103,6 +103,10 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
             () -> scoringLocationUtil.setScoreCol(red ? ScoreCol.LEFT : ScoreCol.RIGHT)),
         drive.followTrajectoryCommand(secondTraj, false),
         new InstantCommand(drive::setNoMove, drive),
+        new InstantCommand(() -> drive.setZeroTargetHeading()),
+        new InstantCommand(()-> drive.turnInPlace(0.75)),
+        new InstantCommand(()-> drive.setNoMove()),
+        new WaitCommand(0.1),
         new LookForTag(tagLimelight, drive, lights).withTimeout(0.05),
         new SwerveFollowerWrapper(drive)
             .finallyDo(

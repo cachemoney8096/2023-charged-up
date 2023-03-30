@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
@@ -126,8 +127,12 @@ public class Lift extends SubsystemBase {
    */
   private boolean cancelScore = false;
 
+  private Command rumbleBriefly;
+  private boolean sawObject = true;
+
   /** Creates a new Lift */
-  public Lift(ScoringLocationUtil scoreLoc) {
+  public Lift(ScoringLocationUtil scoreLoc, Command rumbleBrieflyCmd) {
+    rumbleBriefly = rumbleBrieflyCmd;
     SparkMaxUtils.initWithRetry(this::initSparks, Cal.SPARK_INIT_RETRY_ATTEMPTS);
 
     // Map of all LiftPosition with according values
@@ -139,9 +144,9 @@ public class Lift extends SubsystemBase {
         LiftPosition.SHELF,
         new Pair<Double, Double>(
             // OLD SHELF POS
-            // Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 185.0));
+            Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 185.0));
             // NEW SHELF POS
-              Cal.Lift.ELEVATOR_SHELF_POSITION_INCHES, 190.0));
+              // Cal.Lift.ELEVATOR_SHELF_POSITION_INCHES, 190.0));
     liftPositionMap.put(
         LiftPosition.SCORE_LOW,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 187.0));
@@ -343,7 +348,13 @@ public class Lift extends SubsystemBase {
   /** Returns true if the game piece sensor sees a game piece */
   public boolean seeGamePiece() {
     // Sensor is false if there's a game piece
-    return !gamePieceSensor.get();
+    boolean seeGamePieceNow = !gamePieceSensor.get();
+    if (!sawObject && seeGamePieceNow) {
+      rumbleBriefly.schedule();
+    }
+
+    sawObject = seeGamePieceNow;
+    return seeGamePieceNow;
     // return false;
   }
 
