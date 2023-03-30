@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
@@ -30,6 +31,9 @@ import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 import frc.robot.utils.SendableHelper;
 import frc.robot.utils.SparkMaxUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.TreeMap;
 
 /** Contains code for elevator, arm, and game piece grabber */
@@ -108,6 +112,7 @@ public class Lift extends SubsystemBase {
   private AbsoluteEncoderChecker elevatorLeftAbsEncoderChecker = new AbsoluteEncoderChecker();
   private AbsoluteEncoderChecker elevatorRightAbsEncoderChecker = new AbsoluteEncoderChecker();
   private AbsoluteEncoderChecker armAbsoluteEncoderChecker = new AbsoluteEncoderChecker();
+  private LiftPosition[] posToReprep = new LiftPosition[]{LiftPosition.PRE_SCORE_HIGH_CONE, LiftPosition.PRE_SCORE_MID_CONE, LiftPosition.SCORE_HIGH_CUBE, LiftPosition.SCORE_MID_CUBE, LiftPosition.SCORE_LOW};
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
    * indicates the elevator position in inches and the second value indicates the arm position in
@@ -253,6 +258,8 @@ public class Lift extends SubsystemBase {
     Pair<Double, Double> newPos =
         new Pair<Double, Double>(curPos.getFirst(), curPos.getSecond() - 0.5);
     liftPositionMap.replace(desiredPosition, newPos);
+        
+  new PrintCommand("Latest angle for " + desiredPosition + ": " + (curPos.getSecond() - 0.5));
 
     armController.setGoal(newPos.getSecond());
   }
@@ -262,6 +269,8 @@ public class Lift extends SubsystemBase {
     Pair<Double, Double> newPos =
         new Pair<Double, Double>(curPos.getFirst(), curPos.getSecond() + 0.5);
     liftPositionMap.replace(desiredPosition, newPos);
+
+    new PrintCommand("Latest angle for " + desiredPosition + ": " + (curPos.getSecond() + 0.5));
 
     armController.setGoal(newPos.getSecond());
   }
@@ -696,11 +705,8 @@ public class Lift extends SubsystemBase {
   }
 
   public void rePrepScoreSequence(Lights lights) {
-    if (goalPosition == LiftPosition.PRE_SCORE_HIGH_CONE
-        || goalPosition == LiftPosition.PRE_SCORE_MID_CONE
-        || goalPosition == LiftPosition.SCORE_MID_CUBE
-        || goalPosition == LiftPosition.SCORE_HIGH_CUBE
-        || goalPosition == LiftPosition.SCORE_LOW) {
+
+    if (Arrays.asList(posToReprep).contains(desiredPosition) && !scoringInProgress) {
       ManualPrepScoreSequence(lights);
     }
   }
