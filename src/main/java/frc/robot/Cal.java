@@ -173,7 +173,7 @@ public final class Cal {
     /**
      * Position reading from the absolute encoders when the elevator is at the start (zero) position
      */
-    public static double ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES = -11.8;
+    public static double ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES = -11.55;
 
     /** Voltage required to hold the arm in the horizontal position */
     // Stall torque: 3.36 Nm * 75 = 252 Nm
