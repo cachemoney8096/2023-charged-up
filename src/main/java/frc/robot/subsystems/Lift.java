@@ -145,7 +145,7 @@ public class Lift extends SubsystemBase {
         LiftPosition.SHELF,
         new Pair<Double, Double>(
             // OLD SHELF POS
-            Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 185.0));
+            Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 188.0));
             // NEW SHELF POS
               // Cal.Lift.ELEVATOR_SHELF_POSITION_INCHES, 190.0));
     liftPositionMap.put(
@@ -724,8 +724,8 @@ public class Lift extends SubsystemBase {
   }
 
   public void rePrepScoreSequence(Lights lights) {
-
-    if (Arrays.asList(posToReprep).contains(desiredPosition) && !scoringInProgress) {
+    boolean isPreScorePos = (desiredPosition == LiftPosition.PRE_SCORE_HIGH_CONE || desiredPosition == LiftPosition.PRE_SCORE_MID_CONE || desiredPosition == LiftPosition.SCORE_HIGH_CUBE || desiredPosition == LiftPosition.SCORE_MID_CUBE || desiredPosition == LiftPosition.SCORE_LOW);
+    if (isPreScorePos && !scoringInProgress) {
       ManualPrepScoreSequence(lights);
     }
   }
