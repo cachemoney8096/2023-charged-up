@@ -345,9 +345,9 @@ public class DriveSubsystem extends SubsystemBase {
   public int convertCardinalDirections(int povAngleDeg) {
     // change d-pad values for left and right to specified angle
     if (povAngleDeg == 270) {
-      povAngleDeg += 80;
+      povAngleDeg += 77;
     } else if (povAngleDeg == 90) {
-      povAngleDeg -= 80  ;
+      povAngleDeg -= 77  ;
     }
     // targetHeadingDegrees is counterclockwise so need to flip povAngle
     povAngleDeg = 360 - povAngleDeg;
