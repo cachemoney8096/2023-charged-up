@@ -51,11 +51,10 @@ public final class Cal {
      * Angular offset of the modules relative to the zeroing fixture in radians. Ideally should be
      * relative to the ficture but they are actually slightly different.
      */
-    public static double SWERVE_FRONT_LEFT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 1.036;
-
-    public static double SWERVE_FRONT_RIGHT_ANGULAR_OFFSET_RAD = (1.0 * Math.PI) + 1.005;
-    public static double SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 0.987;
-    public static double SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 4.033;
+    public static double SWERVE_FRONT_LEFT_ANGULAR_OFFSET_RAD = 5.199;
+    public static double SWERVE_FRONT_RIGHT_ANGULAR_OFFSET_RAD = 2.078;
+    public static double SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD = 6.212;
+    public static double SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD = 2.997;
 
     /**
      * Angular offsets of the modules relative to the chassis in radians. The modules form an O when
@@ -174,7 +173,7 @@ public final class Cal {
     /**
      * Position reading from the absolute encoders when the elevator is at the start (zero) position
      */
-    public static double ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES = -11.8;
+    public static double ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES = -11.55;
 
     /** Voltage required to hold the arm in the horizontal position */
     // Stall torque: 3.36 Nm * 75 = 252 Nm
@@ -231,7 +230,8 @@ public final class Cal {
                 ));
 
     public static final double ELEVATOR_LOW_POSITION_INCHES = 0.0,
-        ELEVATOR_HIGH_POSITION_INCHES = 22.0;
+        ELEVATOR_HIGH_POSITION_INCHES = 22.0,
+        ELEVATOR_SHELF_POSITION_INCHES = 1.0;
 
     /** Sets the min and max positions that the elevator and arm motors will be allowed to reach */
     public static final float ELEVATOR_POSITIVE_LIMIT_INCHES = 22.0f,

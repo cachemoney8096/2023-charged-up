@@ -2,7 +2,6 @@ package frc.robot.commands.autos;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.IntakeSequence;
@@ -16,6 +15,7 @@ import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.ScoringLocationUtil;
+import java.util.Optional;
 
 /**
  * Scores a game piece, drives over the charge station, gets a game piece, then back on and balances
@@ -41,36 +41,21 @@ public class OneFiveBalanceCenter extends SequentialCommandGroup {
         // Turn to cone, intake it
         new InstantCommand(
             () -> {
-              drive.offsetCurrentHeading(limelight.getAngleToConeDeg());
+              Optional<Double> coneAngleDeg = limelight.getAngleToConeDeg();
+              drive.offsetCurrentHeading(coneAngleDeg.isPresent() ? coneAngleDeg.get() : 0.0);
             }),
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
-                new RunCommand(
-                        () -> {
-                          drive.rotateOrKeepHeading(0, 0, 0, true, -1);
-                        })
-                    .withTimeout(0.8),
+                drive.turnInPlace(0.8),
                 new DriveDistance(drive, NORM_SPEED_INTAKING, DISTANCE_TO_CONE_METERS, 0, false)),
-            new IntakeSequence(intake, lift, lights)
-                .finallyDo(
-                    (boolean interrupted) -> {
-                      lift.home();
-                      lift.closeGrabber();
-                      intake.setDesiredDeployed(false);
-                      intake.setDesiredClamped(false);
-                      intake.stopIntakingGamePiece();
-                    })),
+            IntakeSequence.interruptibleIntakeSequence(intake, lift, lights)),
 
         // Drive back
         new DriveDistance(drive, NORM_SPEED_BACK, DISTANCE_BACK_METERS, 0, false),
 
         // Turn towards charge station and drive on
         new InstantCommand(drive::setZeroTargetHeading),
-        new RunCommand(
-                () -> {
-                  drive.rotateOrKeepHeading(0, 0, 0, true, -1);
-                })
-            .withTimeout(0.25),
+        drive.turnInPlace(0.25),
         new DriveUntilBalanced(drive, false));
   }
 }

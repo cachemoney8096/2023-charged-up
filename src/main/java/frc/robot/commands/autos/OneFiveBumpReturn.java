@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Cal;
@@ -24,15 +23,16 @@ import frc.robot.subsystems.TagLimelightV2;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreCol;
+import java.util.Optional;
 
 /**
  * Assuming the robot is starting from cone scoring position furthest from the loading zone, this
  * auto drives to the nearest midfield game object, picks it up, and returns.
  */
 public class OneFiveBumpReturn extends SequentialCommandGroup {
-  private final boolean TRY_TO_SCORE = false;
+  private static final boolean TRY_TO_SCORE = true;
   private static final double NORM_SPEED_INTAKING = 0.3;
-  private final double X_METERS_TO_CONE = 1.35;
+  private static final double X_METERS_TO_CONE = 1.35;
   private PathPlannerTrajectory firstTraj =
       PathPlanner.loadPath(
           "OneFivePlusBump",
@@ -90,30 +90,23 @@ public class OneFiveBumpReturn extends SequentialCommandGroup {
         // Turn to cone, intake it
         new InstantCommand(
             () -> {
-              drive.offsetCurrentHeading(limelight.getAngleToConeDeg());
+              Optional<Double> coneAngleDeg = limelight.getAngleToConeDeg();
+              drive.offsetCurrentHeading(coneAngleDeg.isPresent() ? coneAngleDeg.get() : 0.0);
             }),
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
-                new RunCommand(
-                        () -> {
-                          drive.rotateOrKeepHeading(0, 0, 0, true, -1);
-                        })
-                    .withTimeout(0.6),
+                drive.turnInPlace(0.6),
                 new DriveDistance(drive, NORM_SPEED_INTAKING, X_METERS_TO_CONE, 0.0, red)),
-            new IntakeSequence(intake, lift, lights)
-                .finallyDo(
-                    (boolean interrupted) -> {
-                      lift.home();
-                      lift.closeGrabber();
-                      intake.setDesiredDeployed(false);
-                      intake.setDesiredClamped(false);
-                      intake.stopIntakingGamePiece();
-                    })),
+            IntakeSequence.interruptibleIntakeSequence(intake, lift, lights)),
         // new DriveDistance(drive, NORM_SPEED_I NTAKING, -X_METERS_TO_CONE, 0.0, red),
         new InstantCommand(
             () -> scoringLocationUtil.setScoreCol(red ? ScoreCol.LEFT : ScoreCol.RIGHT)),
         drive.followTrajectoryCommand(secondTraj, false),
         new InstantCommand(drive::setNoMove, drive),
+        new InstantCommand(() -> drive.setZeroTargetHeading()),
+        new InstantCommand(()-> drive.turnInPlace(0.75)),
+        new InstantCommand(()-> drive.setNoMove()),
+        new WaitCommand(0.1),
         new LookForTag(tagLimelight, drive, lights).withTimeout(0.05),
         new SwerveFollowerWrapper(drive)
             .finallyDo(
