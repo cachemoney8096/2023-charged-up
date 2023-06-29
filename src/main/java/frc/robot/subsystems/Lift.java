@@ -55,7 +55,8 @@ public class Lift extends SubsystemBase {
     POST_SCORE_HIGH,
     OUTTAKING,
     STARTING,
-    ALT_HOME
+    ALT_HOME,
+    BOOT_UP
   }
 
   /** Position of the lift relative to to the start position */
@@ -66,9 +67,9 @@ public class Lift extends SubsystemBase {
   }
 
   // Actuators
-  private CANSparkMax elevatorLeft =
+  public CANSparkMax elevatorLeft =
       new CANSparkMax(RobotMap.ELEVATOR_MOTOR_LEFT_CAN_ID, MotorType.kBrushless);
-  private CANSparkMax elevatorRight =
+  public CANSparkMax elevatorRight =
       new CANSparkMax(RobotMap.ELEVATOR_MOTOR_RIGHT_CAN_ID, MotorType.kBrushless);
 
   /** Input in, output Volts */
@@ -90,7 +91,7 @@ public class Lift extends SubsystemBase {
               Cal.Lift.ARM_MAX_VELOCITY_DEG_PER_SECOND,
               Cal.Lift.ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED));
 
-  private CANSparkMax armMotor = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
+  public CANSparkMax armMotor = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
   private Solenoid grabber =
       new Solenoid(PneumaticsModuleType.REVPH, RobotMap.LIFT_GRABBING_CHANNEL);
 
@@ -105,9 +106,9 @@ public class Lift extends SubsystemBase {
   private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
 
   // Members
-  private LiftPosition latestPosition = LiftPosition.ALT_HOME;
-  private LiftPosition desiredPosition = LiftPosition.ALT_HOME;
-  private LiftPosition goalPosition = LiftPosition.ALT_HOME;
+  private LiftPosition latestPosition = LiftPosition.BOOT_UP;
+  private LiftPosition desiredPosition = LiftPosition.BOOT_UP;
+  private LiftPosition goalPosition = LiftPosition.BOOT_UP;
   private boolean desiredGrabberClosed = true;
   public ScoringLocationUtil scoreLoc;
   private boolean scoringInProgress = false;
@@ -174,10 +175,13 @@ public class Lift extends SubsystemBase {
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 183.0));
     liftPositionMap.put(
         LiftPosition.STARTING,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 148.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 153.0));
     liftPositionMap.put(
         LiftPosition.ALT_HOME,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 148.0));
+    liftPositionMap.put(
+      LiftPosition.BOOT_UP,
+      new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 148.0));
 
     this.scoreLoc = scoreLoc;
   }
@@ -297,8 +301,8 @@ public class Lift extends SubsystemBase {
     if (goalPosition != pos) {
       goalPosition = pos;
       elevatorController.setGoal(liftPositionMap.get(pos).getFirst());
-      armController.setGoal(liftPositionMap.get(pos).getSecond());
     }
+    armController.setGoal(liftPositionMap.get(pos).getSecond());
     
     double elevatorDemandVolts = elevatorController.calculate(elevatorLeftEncoder.getPosition());
     elevatorDemandVolts +=
@@ -369,6 +373,7 @@ public class Lift extends SubsystemBase {
 
   public void initialize() {
     rezeroLift();
+    liftPositionMap.put(LiftPosition.BOOT_UP, new Pair<Double, Double>(elevatorLeftEncoder.getPosition(), armEncoder.getPosition()));
   }
 
   public void rezeroLift() {

@@ -84,7 +84,7 @@ public final class Constants {
     public static final double TURNING_ENCODER_POSITION_PID_MAX_INPUT_RADIANS =
         2 * Math.PI; // radians
 
-    public static final IdleMode DRIVING_MOTOR_IDLE_MODE = IdleMode.kBrake;
+    public static final IdleMode DRIVING_MOTOR_IDLE_MODE = IdleMode.kCoast;
     public static final IdleMode TURNING_MOTOR_IDLE_MODE = IdleMode.kBrake;
 
     public static final int DRIVING_MOTOR_CURRENT_LIMIT_AMPS = 50; // amps
