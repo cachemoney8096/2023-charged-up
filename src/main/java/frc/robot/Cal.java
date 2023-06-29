@@ -163,7 +163,7 @@ public final class Cal {
     public static final double ELEVATOR_P = 2.0, ELEVATOR_I = 0.0, ELEVATOR_D = 0.0;
 
     /** Input deg, output Volts */
-    public static final double ARM_P = 0.07, ARM_I = 0.0, ARM_D = Cal.PLACEHOLDER_DOUBLE;
+    public static final double ARM_P = 0.10, ARM_I = 0.0, ARM_D = Cal.PLACEHOLDER_DOUBLE;
 
     /** Absolute encoder position when the arm is at 0 degrees */
     // 30.0 is the kickstand offset from 180 aka vertically up
@@ -251,7 +251,7 @@ public final class Cal {
     public static final double ELEVATOR_MARGIN_INCHES = 1.5,
         ARM_MARGIN_DEGREES = 5.0,
         ELEVATOR_START_MARGIN_INCHES = 1.5,
-        ARM_START_MARGIN_DEGREES = 8.0;
+        ARM_START_MARGIN_DEGREES = 5.0;
 
     /** Zone where the grabber must be closed, in degrees. Bottom is closer to intake. */
     public static final double GRABBER_CLOSED_ZONE_BOTTOM_DEGREES = PLACEHOLDER_DOUBLE,

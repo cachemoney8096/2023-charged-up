@@ -45,25 +45,25 @@ public class DriveSubsystem extends SubsystemBase {
   private Lights lights;
 
   // Create SwerveModules
-  private final SwerveModule frontLeft =
+  public final SwerveModule frontLeft =
       new SwerveModule(
           RobotMap.FRONT_LEFT_DRIVING_CAN_ID,
           RobotMap.FRONT_LEFT_TURNING_CAN_ID,
           Cal.SwerveSubsystem.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET_RAD);
 
-  private final SwerveModule frontRight =
+  public final SwerveModule frontRight =
       new SwerveModule(
           RobotMap.FRONT_RIGHT_DRIVING_CAN_ID,
           RobotMap.FRONT_RIGHT_TURNING_CAN_ID,
           Cal.SwerveSubsystem.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET_RAD);
 
-  private final SwerveModule rearLeft =
+  public final SwerveModule rearLeft =
       new SwerveModule(
           RobotMap.REAR_LEFT_DRIVING_CAN_ID,
           RobotMap.REAR_LEFT_TURNING_CAN_ID,
           Cal.SwerveSubsystem.BACK_LEFT_CHASSIS_ANGULAR_OFFSET_RAD);
 
-  private final SwerveModule rearRight =
+  public final SwerveModule rearRight =
       new SwerveModule(
           RobotMap.REAR_RIGHT_DRIVING_CAN_ID,
           RobotMap.REAR_RIGHT_TURNING_CAN_ID,
