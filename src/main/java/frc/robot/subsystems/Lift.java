@@ -20,6 +20,9 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
@@ -30,6 +33,7 @@ import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 import frc.robot.utils.SendableHelper;
 import frc.robot.utils.SparkMaxUtils;
+import java.util.Arrays;
 import java.util.TreeMap;
 
 /** Contains code for elevator, arm, and game piece grabber */
@@ -49,7 +53,8 @@ public class Lift extends SubsystemBase {
     POST_SCORE_HIGH,
     OUTTAKING,
     STARTING,
-    ALT_HOME
+    ALT_HOME,
+    BOOT_UP
   }
 
   /** Position of the lift relative to to the start position */
@@ -60,9 +65,9 @@ public class Lift extends SubsystemBase {
   }
 
   // Actuators
-  private CANSparkMax elevatorLeft =
+  public CANSparkMax elevatorLeft =
       new CANSparkMax(RobotMap.ELEVATOR_MOTOR_LEFT_CAN_ID, MotorType.kBrushless);
-  private CANSparkMax elevatorRight =
+  public CANSparkMax elevatorRight =
       new CANSparkMax(RobotMap.ELEVATOR_MOTOR_RIGHT_CAN_ID, MotorType.kBrushless);
 
   /** Input in, output Volts */
@@ -84,7 +89,7 @@ public class Lift extends SubsystemBase {
               Cal.Lift.ARM_MAX_VELOCITY_DEG_PER_SECOND,
               Cal.Lift.ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED));
 
-  private CANSparkMax armMotor = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
+  public CANSparkMax armMotor = new CANSparkMax(RobotMap.ARM_MOTOR_CAN_ID, MotorType.kBrushless);
   private Solenoid grabber =
       new Solenoid(PneumaticsModuleType.REVPH, RobotMap.LIFT_GRABBING_CHANNEL);
 
@@ -99,16 +104,23 @@ public class Lift extends SubsystemBase {
   private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
 
   // Members
-  private LiftPosition latestPosition = LiftPosition.ALT_HOME;
-  private LiftPosition desiredPosition = LiftPosition.ALT_HOME;
-  private LiftPosition goalPosition = LiftPosition.ALT_HOME;
+  private LiftPosition latestPosition = LiftPosition.BOOT_UP;
+  private LiftPosition desiredPosition = LiftPosition.BOOT_UP;
+  private LiftPosition goalPosition = LiftPosition.BOOT_UP;
   private boolean desiredGrabberClosed = true;
   public ScoringLocationUtil scoreLoc;
   private boolean scoringInProgress = false;
   private AbsoluteEncoderChecker elevatorLeftAbsEncoderChecker = new AbsoluteEncoderChecker();
   private AbsoluteEncoderChecker elevatorRightAbsEncoderChecker = new AbsoluteEncoderChecker();
   private AbsoluteEncoderChecker armAbsoluteEncoderChecker = new AbsoluteEncoderChecker();
-
+  private LiftPosition[] posToReprep =
+      new LiftPosition[] {
+        LiftPosition.PRE_SCORE_HIGH_CONE,
+        LiftPosition.PRE_SCORE_MID_CONE,
+        LiftPosition.SCORE_HIGH_CUBE,
+        LiftPosition.SCORE_MID_CUBE,
+        LiftPosition.SCORE_LOW
+      };
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
    * indicates the elevator position in inches and the second value indicates the arm position in
@@ -122,8 +134,12 @@ public class Lift extends SubsystemBase {
    */
   private boolean cancelScore = false;
 
+  private Command rumbleBriefly;
+  private boolean sawObject = true;
+
   /** Creates a new Lift */
-  public Lift(ScoringLocationUtil scoreLoc) {
+  public Lift(ScoringLocationUtil scoreLoc, Command rumbleBrieflyCmd) {
+    rumbleBriefly = rumbleBrieflyCmd;
     SparkMaxUtils.initWithRetry(this::initSparks, Cal.SPARK_INIT_RETRY_ATTEMPTS);
 
     // Map of all LiftPosition with according values
@@ -132,7 +148,7 @@ public class Lift extends SubsystemBase {
         LiftPosition.GRAB_FROM_INTAKE,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 84.0));
     liftPositionMap.put(
-        LiftPosition.SHELF, new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 185.0));
+        LiftPosition.SHELF, new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 188.0));
     liftPositionMap.put(
         LiftPosition.SCORE_LOW,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 187.0));
@@ -150,10 +166,10 @@ public class Lift extends SubsystemBase {
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 213.0));
     liftPositionMap.put(
         LiftPosition.PRE_SCORE_MID_CONE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 196.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 193.0));
     liftPositionMap.put(
         LiftPosition.PRE_SCORE_HIGH_CONE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 196.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 193.0));
     liftPositionMap.put(
         LiftPosition.POST_SCORE_HIGH,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_HIGH_POSITION_INCHES, 180.0));
@@ -162,9 +178,12 @@ public class Lift extends SubsystemBase {
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 183.0));
     liftPositionMap.put(
         LiftPosition.STARTING,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 148.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 153.0));
     liftPositionMap.put(
         LiftPosition.ALT_HOME,
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 148.0));
+    liftPositionMap.put(
+        LiftPosition.BOOT_UP,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 148.0));
 
     this.scoreLoc = scoreLoc;
@@ -252,6 +271,10 @@ public class Lift extends SubsystemBase {
     Pair<Double, Double> newPos =
         new Pair<Double, Double>(curPos.getFirst(), curPos.getSecond() - 0.5);
     liftPositionMap.replace(desiredPosition, newPos);
+
+    new PrintCommand("Latest angle for " + desiredPosition + ": " + (curPos.getSecond() - 0.5));
+
+    armController.setGoal(newPos.getSecond());
   }
 
   public void deployArmFurther() {
@@ -259,6 +282,10 @@ public class Lift extends SubsystemBase {
     Pair<Double, Double> newPos =
         new Pair<Double, Double>(curPos.getFirst(), curPos.getSecond() + 0.5);
     liftPositionMap.replace(desiredPosition, newPos);
+
+    new PrintCommand("Latest angle for " + desiredPosition + ": " + (curPos.getSecond() + 0.5));
+
+    armController.setGoal(newPos.getSecond());
   }
 
   /**
@@ -277,18 +304,23 @@ public class Lift extends SubsystemBase {
     if (goalPosition != pos) {
       goalPosition = pos;
       elevatorController.setGoal(liftPositionMap.get(pos).getFirst());
-      armController.setGoal(liftPositionMap.get(pos).getSecond());
     }
+    armController.setGoal(liftPositionMap.get(pos).getSecond());
 
     double elevatorDemandVolts = elevatorController.calculate(elevatorLeftEncoder.getPosition());
     elevatorDemandVolts +=
         Cal.Lift.ELEVATOR_FEEDFORWARD.calculate(elevatorController.getSetpoint().velocity);
     elevatorLeft.setVoltage(elevatorDemandVolts);
 
-    double armDemandVolts = armController.calculate(armEncoder.getPosition());
-    armDemandVolts += Cal.Lift.ARM_FEEDFORWARD.calculate(armController.getSetpoint().velocity);
-    armDemandVolts += Cal.Lift.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle();
-    armMotor.setVoltage(armDemandVolts);
+    double armDemandVoltsA = armController.calculate(armEncoder.getPosition());
+    double armDemandVoltsB =
+        Cal.Lift.ARM_FEEDFORWARD.calculate(armController.getSetpoint().velocity);
+    double armDemandVoltsC = Cal.Lift.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle();
+    armMotor.setVoltage(armDemandVoltsA + armDemandVoltsB + armDemandVoltsC);
+
+    SmartDashboard.putNumber("Arm PID", armDemandVoltsA);
+    SmartDashboard.putNumber("Arm FF", armDemandVoltsB);
+    SmartDashboard.putNumber("Arm Gravity", armDemandVoltsC);
   }
 
   public void closeGrabber() {
@@ -326,7 +358,13 @@ public class Lift extends SubsystemBase {
   /** Returns true if the game piece sensor sees a game piece */
   public boolean seeGamePiece() {
     // Sensor is false if there's a game piece
-    return !gamePieceSensor.get();
+    boolean seeGamePieceNow = !gamePieceSensor.get();
+    if (!sawObject && seeGamePieceNow) {
+      rumbleBriefly.schedule();
+    }
+
+    sawObject = seeGamePieceNow;
+    return seeGamePieceNow;
     // return false;
   }
 
@@ -339,6 +377,9 @@ public class Lift extends SubsystemBase {
 
   public void initialize() {
     rezeroLift();
+    liftPositionMap.put(
+        LiftPosition.BOOT_UP,
+        new Pair<Double, Double>(elevatorLeftEncoder.getPosition(), armEncoder.getPosition()));
   }
 
   public void rezeroLift() {
@@ -687,6 +728,13 @@ public class Lift extends SubsystemBase {
       } else {
         setDesiredPosition(LiftPosition.SCORE_HIGH_CUBE);
       }
+    }
+  }
+
+  public void rePrepScoreSequence(Lights lights) {
+    boolean isPreScorePos = Arrays.asList(posToReprep).contains(desiredPosition);
+    if (isPreScorePos && !scoringInProgress) {
+      ManualPrepScoreSequence(lights);
     }
   }
 }

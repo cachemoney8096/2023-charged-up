@@ -439,13 +439,13 @@ public class IntakeLimelight extends SubsystemBase {
     return Optional.of(new ConeDetection(getLatency(), coneDistanceMeters, adjustedAngleDegrees));
   }
 
-  public double getAngleToConeDeg() {
+  public Optional<Double> getAngleToConeDeg() {
     double[] corners = table.getEntry("tcornxy").getDoubleArray(new double[0]);
     Optional<Double> maybeXPixels = getXOfSmallestY(corners);
 
     if (!maybeXPixels.isPresent()) {
       System.out.println("Didn't see cone");
-      return 0;
+      return Optional.empty();
     }
 
     double xPixels = maybeXPixels.get();
@@ -465,7 +465,7 @@ public class IntakeLimelight extends SubsystemBase {
 
     System.out.println("Cone at " + adjustedAngleDegrees);
 
-    return adjustedAngleDegrees;
+    return Optional.of(adjustedAngleDegrees);
   }
 
   @Override

@@ -38,7 +38,7 @@ import java.util.function.BooleanSupplier;
  */
 public class Intake extends SubsystemBase {
   // Actuators
-  private CANSparkMax deployMotor =
+  public CANSparkMax deployMotor =
       new CANSparkMax(RobotMap.INTAKE_DEPLOY_MOTOR_CAN_ID, MotorType.kBrushless);
 
   /** Input deg, output Volts */

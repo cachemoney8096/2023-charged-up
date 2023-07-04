@@ -45,25 +45,25 @@ public class DriveSubsystem extends SubsystemBase {
   private Lights lights;
 
   // Create SwerveModules
-  private final SwerveModule frontLeft =
+  public final SwerveModule frontLeft =
       new SwerveModule(
           RobotMap.FRONT_LEFT_DRIVING_CAN_ID,
           RobotMap.FRONT_LEFT_TURNING_CAN_ID,
           Cal.SwerveSubsystem.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET_RAD);
 
-  private final SwerveModule frontRight =
+  public final SwerveModule frontRight =
       new SwerveModule(
           RobotMap.FRONT_RIGHT_DRIVING_CAN_ID,
           RobotMap.FRONT_RIGHT_TURNING_CAN_ID,
           Cal.SwerveSubsystem.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET_RAD);
 
-  private final SwerveModule rearLeft =
+  public final SwerveModule rearLeft =
       new SwerveModule(
           RobotMap.REAR_LEFT_DRIVING_CAN_ID,
           RobotMap.REAR_LEFT_TURNING_CAN_ID,
           Cal.SwerveSubsystem.BACK_LEFT_CHASSIS_ANGULAR_OFFSET_RAD);
 
-  private final SwerveModule rearRight =
+  public final SwerveModule rearRight =
       new SwerveModule(
           RobotMap.REAR_RIGHT_DRIVING_CAN_ID,
           RobotMap.REAR_RIGHT_TURNING_CAN_ID,
@@ -154,15 +154,23 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions(), pose);
+    // Just update the translation, not the yaw
+    Pose2d resetPose = new Pose2d(pose.getTranslation(), Rotation2d.fromDegrees(gyro.getYaw()));
+    odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions(), resetPose);
+  }
+
+  public void resetYawToAngle(double yawDeg) {
+    double curYawDeg = gyro.getYaw();
+    double offsetToTargetDeg = targetHeadingDegrees - curYawDeg;
+    gyro.setYaw(yawDeg);
+    Pose2d curPose = getPose();
+    Pose2d resetPose = new Pose2d(curPose.getTranslation(), Rotation2d.fromDegrees(yawDeg));
+    odometry.resetPosition(Rotation2d.fromDegrees(yawDeg), getModulePositions(), resetPose);
+    targetHeadingDegrees = yawDeg + offsetToTargetDeg;
   }
 
   public void resetYaw() {
-    gyro.reset();
-    Pose2d curPose = getPose();
-    Pose2d resetPose = new Pose2d(curPose.getTranslation(), Rotation2d.fromDegrees(0));
-    odometry.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(), resetPose);
-    targetHeadingDegrees = 0.0;
+    resetYawToAngle(0.0);
   }
 
   /**
@@ -335,11 +343,11 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public int convertCardinalDirections(int povAngleDeg) {
-    // change d-pad values for left and right to 20 degree angles
+    // change d-pad values for left and right to specified angle
     if (povAngleDeg == 270) {
-      povAngleDeg += 70;
+      povAngleDeg += 77;
     } else if (povAngleDeg == 90) {
-      povAngleDeg -= 70;
+      povAngleDeg -= 77;
     }
     // targetHeadingDegrees is counterclockwise so need to flip povAngle
     povAngleDeg = 360 - povAngleDeg;
@@ -498,10 +506,6 @@ public class DriveSubsystem extends SubsystemBase {
       return Optional.empty();
     }
 
-    Transform2d trajectoryTransform = targetPose.get().minus(futurePose);
-    System.out.println(
-        "Trajectory Transform: " + trajectoryTransform.getX() + " " + trajectoryTransform.getY());
-    // TODO we should probably just get rid of this guess if there's no target pose
     Pose2d finalPose = targetPose.get();
     Transform2d finalTransform =
         new Transform2d(finalPose.getTranslation(), finalPose.getRotation());
@@ -542,6 +546,14 @@ public class DriveSubsystem extends SubsystemBase {
 
   public Command stopDrivingCommand() {
     return new InstantCommand(this::stopDriving, this);
+  }
+
+  public Command turnInPlace(double timeoutSec) {
+    return new RunCommand(
+            () -> {
+              rotateOrKeepHeading(0, 0, 0, true, -1);
+            })
+        .withTimeout(timeoutSec);
   }
 
   public void zeroFrontLeftAtCurrentPos() {
@@ -605,7 +617,10 @@ public class DriveSubsystem extends SubsystemBase {
         "Odometry Yaw (deg)", () -> getPose().getRotation().getDegrees(), null);
     builder.addDoubleProperty(
         "Front Left Abs Encoder (rad)", frontLeft::getEncoderAbsPositionRad, null);
-
+    builder.addDoubleProperty(
+        "Front Right Abs Encoder (rad)", frontRight::getEncoderAbsPositionRad, null);
+    builder.addDoubleProperty(
+        "Rear Left Abs Encoder (rad)", rearLeft::getEncoderAbsPositionRad, null);
     builder.addDoubleProperty(
         "Rear Right Abs Encoder (rad)", rearRight::getEncoderAbsPositionRad, null);
     builder.addDoubleProperty(

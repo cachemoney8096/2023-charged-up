@@ -51,11 +51,11 @@ public final class Cal {
      * Angular offset of the modules relative to the zeroing fixture in radians. Ideally should be
      * relative to the ficture but they are actually slightly different.
      */
-    public static double SWERVE_FRONT_LEFT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 1.036;
+    public static double SWERVE_FRONT_LEFT_ANGULAR_OFFSET_RAD = 5.199;
 
-    public static double SWERVE_FRONT_RIGHT_ANGULAR_OFFSET_RAD = (1.0 * Math.PI) + 1.005;
-    public static double SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 0.987;
-    public static double SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD = (2.0 * Math.PI) + 4.033;
+    public static double SWERVE_FRONT_RIGHT_ANGULAR_OFFSET_RAD = 2.078;
+    public static double SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD = 6.212;
+    public static double SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD = 2.997;
 
     /**
      * Angular offsets of the modules relative to the chassis in radians. The modules form an O when
@@ -164,7 +164,7 @@ public final class Cal {
     public static final double ELEVATOR_P = 2.0, ELEVATOR_I = 0.0, ELEVATOR_D = 0.0;
 
     /** Input deg, output Volts */
-    public static final double ARM_P = 0.07, ARM_I = 0.0, ARM_D = Cal.PLACEHOLDER_DOUBLE;
+    public static final double ARM_P = 0.10, ARM_I = 0.0, ARM_D = Cal.PLACEHOLDER_DOUBLE;
 
     /** Absolute encoder position when the arm is at 0 degrees */
     // 30.0 is the kickstand offset from 180 aka vertically up
@@ -174,7 +174,7 @@ public final class Cal {
     /**
      * Position reading from the absolute encoders when the elevator is at the start (zero) position
      */
-    public static double ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES = -11.8;
+    public static double ELEVATOR_ABS_ENCODER_POS_AT_START_INCHES = -11.55;
 
     /** Voltage required to hold the arm in the horizontal position */
     // Stall torque: 3.36 Nm * 75 = 252 Nm
@@ -231,7 +231,8 @@ public final class Cal {
                 ));
 
     public static final double ELEVATOR_LOW_POSITION_INCHES = 0.0,
-        ELEVATOR_HIGH_POSITION_INCHES = 22.0;
+        ELEVATOR_HIGH_POSITION_INCHES = 22.0,
+        ELEVATOR_SHELF_POSITION_INCHES = 1.0;
 
     /** Sets the min and max positions that the elevator and arm motors will be allowed to reach */
     public static final float ELEVATOR_POSITIVE_LIMIT_INCHES = 22.0f,
@@ -251,7 +252,7 @@ public final class Cal {
     public static final double ELEVATOR_MARGIN_INCHES = 1.5,
         ARM_MARGIN_DEGREES = 5.0,
         ELEVATOR_START_MARGIN_INCHES = 1.5,
-        ARM_START_MARGIN_DEGREES = 8.0;
+        ARM_START_MARGIN_DEGREES = 5.0;
 
     /** Zone where the grabber must be closed, in degrees. Bottom is closer to intake. */
     public static final double GRABBER_CLOSED_ZONE_BOTTOM_DEGREES = PLACEHOLDER_DOUBLE,

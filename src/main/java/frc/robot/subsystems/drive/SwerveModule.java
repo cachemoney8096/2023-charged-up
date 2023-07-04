@@ -6,7 +6,6 @@ package frc.robot.subsystems.drive;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
@@ -23,8 +22,8 @@ import frc.robot.utils.AbsoluteEncoderChecker;
 import frc.robot.utils.SparkMaxUtils;
 
 public class SwerveModule implements Sendable {
-  private final CANSparkMax drivingSparkMax;
-  private final CANSparkMax turningSparkMax;
+  public final CANSparkMax drivingSparkMax;
+  public final CANSparkMax turningSparkMax;
 
   private final RelativeEncoder drivingEncoder;
   private final AbsoluteEncoder turningEncoder;
@@ -106,8 +105,6 @@ public class SwerveModule implements Sendable {
             turningSparkMax.setSmartCurrentLimit(
                 Constants.SwerveModule.TURNING_MOTOR_CURRENT_LIMIT_AMPS));
 
-    errors += SparkMaxUtils.check(turningSparkMax.setIdleMode(IdleMode.kBrake));
-
     errors +=
         SparkMaxUtils.check(
             turningSparkMax.setSmartCurrentLimit(Cal.SwerveSubsystem.STEER_CURRENT_LIMIT_AMPS));
@@ -151,8 +148,6 @@ public class SwerveModule implements Sendable {
         SparkMaxUtils.check(
             drivingSparkMax.setSmartCurrentLimit(
                 Constants.SwerveModule.DRIVING_MOTOR_CURRENT_LIMIT_AMPS));
-
-    errors += SparkMaxUtils.check(drivingSparkMax.setIdleMode(IdleMode.kCoast));
 
     errors +=
         SparkMaxUtils.check(

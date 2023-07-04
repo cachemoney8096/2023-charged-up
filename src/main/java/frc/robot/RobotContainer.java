@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -39,6 +40,7 @@ import frc.robot.subsystems.TagLimelightV2;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.JoystickUtil;
 import frc.robot.utils.ScoringLocationUtil;
+import java.util.Optional;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -50,10 +52,28 @@ public class RobotContainer {
   // If true, this is a match with real timings
   public boolean timedMatch = false;
 
+  // Replace with CommandPS4Controller or CommandJoystick if needed
+  private final CommandXboxController driverController =
+      new CommandXboxController(RobotMap.DRIVER_CONTROLLER_PORT);
+  private final CommandXboxController operatorController =
+      new CommandXboxController(RobotMap.OPERATOR_CONTROLLER_PORT);
+
+  Command rumbleBriefly =
+      new SequentialCommandGroup(
+          new InstantCommand(
+              () -> {
+                driverController.getHID().setRumble(RumbleType.kBothRumble, 1.0);
+              }),
+          new WaitCommand(0.25),
+          new InstantCommand(
+              () -> {
+                driverController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
+              }));
+
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
-  public final Lift lift = new Lift(scoreLoc);
+  public final Lift lift = new Lift(scoreLoc, rumbleBriefly);
   private final Lights lights = new Lights();
-  private final DriveSubsystem drive =
+  public final DriveSubsystem drive =
       new DriveSubsystem(lift::throttleForLift, lights, () -> timedMatch);
   public final Intake intake = new Intake(lift::clearOfIntakeZone);
   private final IntakeLimelight intakeLimelight =
@@ -66,12 +86,6 @@ public class RobotContainer {
 
   // A chooser for autonomous commands
   private SendableChooser<Command> autonChooser = new SendableChooser<>();
-
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController driverController =
-      new CommandXboxController(RobotMap.DRIVER_CONTROLLER_PORT);
-  private final CommandXboxController operatorController =
-      new CommandXboxController(RobotMap.OPERATOR_CONTROLLER_PORT);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -154,6 +168,16 @@ public class RobotContainer {
     SmartDashboard.putData(
         "Zero Rear Right Based on Current Pos",
         new InstantCommand(drive::zeroRearRightAtCurrentPos, drive).ignoringDisable(true));
+    SmartDashboard.putData(
+        "Post cone yaw to dashboard",
+        new InstantCommand(
+                () -> {
+                  Optional<Double> maybeConeAngleDeg = intakeLimelight.getAngleToConeDeg();
+                  double coneAngleDeg =
+                      maybeConeAngleDeg.isPresent() ? maybeConeAngleDeg.get() : 0.0;
+                  SmartDashboard.putNumber("Cone yaw (deg)", coneAngleDeg);
+                })
+            .ignoringDisable(true));
 
     // Encoder offset stuff
     intake.initialize();
@@ -247,7 +271,7 @@ public class RobotContainer {
     driverController
         .leftTrigger()
         .whileTrue(
-            new IntakeSequence(intake, lift, lights)
+            IntakeSequence.interruptibleIntakeSequence(intake, lift, lights)
                 .beforeStarting(
                     new InstantCommand(
                         () -> {
@@ -256,11 +280,6 @@ public class RobotContainer {
                 .finallyDo(
                     (boolean interrupted) -> {
                       drive.throttle(1.0);
-                      lift.closeGrabber();
-                      lift.home();
-                      intake.stopIntakingGamePiece();
-                      intake.setDesiredDeployed(false);
-                      intake.setDesiredClamped(false);
                     }));
     driverController.rightTrigger().onTrue(new InstantCommand(lift::startScore, lift));
     driverController
@@ -278,43 +297,75 @@ public class RobotContainer {
     operatorController
         .povDown()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.LOW))
+            new InstantCommand(
+                    () -> {
+                      scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.LOW);
+                      lift.rePrepScoreSequence(lights);
+                    })
                 .ignoringDisable(true));
     operatorController
         .povRight()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID))
+            new InstantCommand(
+                    () -> {
+                      scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID);
+                      lift.rePrepScoreSequence(lights);
+                    })
                 .ignoringDisable(true));
     operatorController
         .povLeft()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID))
+            new InstantCommand(
+                    () -> {
+                      scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.MID);
+                      lift.rePrepScoreSequence(lights);
+                    })
                 .ignoringDisable(true));
     operatorController
         .povUp()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH))
+            new InstantCommand(
+                    () -> {
+                      scoreLoc.setScoreHeight(ScoringLocationUtil.ScoreHeight.HIGH);
+                      lift.rePrepScoreSequence(lights);
+                    })
                 .ignoringDisable(true));
 
     operatorController
         .x()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.LEFT))
+            new InstantCommand(
+                    () -> {
+                      scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.LEFT);
+                      lift.rePrepScoreSequence(lights);
+                    })
                 .ignoringDisable(true));
     operatorController
         .a()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER))
+            new InstantCommand(
+                    () -> {
+                      scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER);
+                      lift.rePrepScoreSequence(lights);
+                    })
                 .ignoringDisable(true));
     operatorController
         .y()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER))
+            new InstantCommand(
+                    () -> {
+                      scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.CENTER);
+                      lift.rePrepScoreSequence(lights);
+                    })
                 .ignoringDisable(true));
     operatorController
         .b()
         .onTrue(
-            new InstantCommand(() -> scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.RIGHT))
+            new InstantCommand(
+                    () -> {
+                      scoreLoc.setScoreCol(ScoringLocationUtil.ScoreCol.RIGHT);
+                      lift.rePrepScoreSequence(lights);
+                    })
                 .ignoringDisable(true));
 
     operatorController

@@ -8,9 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Cal;
 import frc.robot.commands.IntakeSequence;
 import frc.robot.commands.SwerveToPointWrapper;
@@ -23,6 +21,7 @@ import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.ScoringLocationUtil;
+import java.util.Optional;
 
 /**
  * Assuming the robot is starting from cone scoring position furthest from the loading zone, this
@@ -70,28 +69,16 @@ public class OneFiveBalanceBump extends SequentialCommandGroup {
         new ScoreThisGamePiece(fast, lift, lights),
         drive.followTrajectoryCommand(firstTraj, true),
         // Turn to cone, intake it
-        new InstantCommand(
+        new InstantCommand( // TODO this command is used a number of times, clean up after Buckeye
             () -> {
-              drive.offsetCurrentHeading(limelight.getAngleToConeDeg());
+              Optional<Double> coneAngleDeg = limelight.getAngleToConeDeg();
+              drive.offsetCurrentHeading(coneAngleDeg.isPresent() ? coneAngleDeg.get() : 0.0);
             }),
-        new RunCommand(
-                () -> {
-                  drive.rotateOrKeepHeading(0, 0, 0, true, -1);
-                })
-            .withTimeout(0.3),
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
-                new WaitCommand(0.5), // TODO is this even needed?
+                drive.turnInPlace(0.8),
                 new DriveDistance(drive, NORM_SPEED_INTAKING, X_METERS_TO_CONE, 0.0, false)),
-            new IntakeSequence(intake, lift, lights)
-                .finallyDo(
-                    (boolean interrupted) -> {
-                      lift.home();
-                      lift.closeGrabber();
-                      intake.setDesiredDeployed(false);
-                      intake.setDesiredClamped(false);
-                      intake.stopIntakingGamePiece();
-                    })),
+            IntakeSequence.interruptibleIntakeSequence(intake, lift, lights)),
         new SwerveToPointWrapper(red, drive, () -> desiredPose, 2.0, 2.0),
         new DriveUntilBalanced(drive, false));
   }

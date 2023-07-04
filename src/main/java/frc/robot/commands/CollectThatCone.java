@@ -62,14 +62,6 @@ public class CollectThatCone extends SequentialCommandGroup {
                     (boolean interrupted) -> {
                       drive.stopDriving();
                     }),
-            new IntakeSequence(intake, lift, lights)
-                .finallyDo(
-                    (boolean interrupted) -> {
-                      lift.home();
-                      lift.closeGrabber();
-                      intake.setDesiredDeployed(false);
-                      intake.setDesiredClamped(false);
-                      intake.stopIntakingGamePiece();
-                    })));
+            IntakeSequence.interruptibleIntakeSequence(intake, lift, lights)));
   }
 }

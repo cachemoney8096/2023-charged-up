@@ -39,7 +39,10 @@ public class TagLimelightV2 extends SubsystemBase {
      */
     Translation2d translation =
         new Translation2d(botPoseTargetSpace.getZ(), botPoseTargetSpace.getX());
-    Rotation2d rot = Rotation2d.fromDegrees(-botPoseTargetSpace.getRotation().getY());
+    // Rotation2d rot = Rotation2d.fromDegrees(-botPoseTargetSpace.getRotation().getY());
+
+    Rotation2d rot = Rotation2d.fromDegrees(0);
+    System.out.println("Tag at " + -botPoseTargetSpace.getRotation().getY() + " deg");
     return new Transform2d(translation, rot);
   }
 

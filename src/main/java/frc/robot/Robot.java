@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -65,6 +66,14 @@ public class Robot extends TimedRobot {
 
     // Just to get network tables ready and everything initialized
     m_robotContainer.tagLimelight.checkForTag();
+
+    m_robotContainer.intake.deployMotor.setIdleMode(IdleMode.kCoast);
+    m_robotContainer.lift.elevatorLeft.setIdleMode(IdleMode.kCoast);
+    m_robotContainer.lift.elevatorRight.setIdleMode(IdleMode.kCoast);
+    m_robotContainer.drive.frontLeft.turningSparkMax.setIdleMode(IdleMode.kCoast);
+    m_robotContainer.drive.frontRight.turningSparkMax.setIdleMode(IdleMode.kCoast);
+    m_robotContainer.drive.rearLeft.turningSparkMax.setIdleMode(IdleMode.kCoast);
+    m_robotContainer.drive.rearRight.turningSparkMax.setIdleMode(IdleMode.kCoast);
   }
 
   @Override
@@ -95,6 +104,17 @@ public class Robot extends TimedRobot {
     } else {
       m_robotContainer.timedMatch = false;
     }
+    m_robotContainer.intake.deployMotor.setIdleMode(IdleMode.kBrake);
+    m_robotContainer.lift.elevatorLeft.setIdleMode(IdleMode.kBrake);
+    m_robotContainer.lift.elevatorRight.setIdleMode(IdleMode.kBrake);
+    m_robotContainer.drive.frontLeft.turningSparkMax.setIdleMode(
+        Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
+    m_robotContainer.drive.frontRight.turningSparkMax.setIdleMode(
+        Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
+    m_robotContainer.drive.rearLeft.turningSparkMax.setIdleMode(
+        Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
+    m_robotContainer.drive.rearRight.turningSparkMax.setIdleMode(
+        Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
   }
 
   /** This function is called periodically during autonomous. */
@@ -111,11 +131,25 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
 
+    // Never heading lock at start of teleop
+    m_robotContainer.drive.offsetCurrentHeading(0.0);
+
     if (DriverStation.getMatchTime() > 1.0) {
       m_robotContainer.timedMatch = true;
     } else {
       m_robotContainer.timedMatch = false;
     }
+    m_robotContainer.intake.deployMotor.setIdleMode(IdleMode.kBrake);
+    m_robotContainer.lift.elevatorLeft.setIdleMode(IdleMode.kBrake);
+    m_robotContainer.lift.elevatorRight.setIdleMode(IdleMode.kBrake);
+    m_robotContainer.drive.frontLeft.turningSparkMax.setIdleMode(
+        Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
+    m_robotContainer.drive.frontRight.turningSparkMax.setIdleMode(
+        Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
+    m_robotContainer.drive.rearLeft.turningSparkMax.setIdleMode(
+        Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
+    m_robotContainer.drive.rearRight.turningSparkMax.setIdleMode(
+        Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
   }
 
   /** This function is called periodically during operator control. */
