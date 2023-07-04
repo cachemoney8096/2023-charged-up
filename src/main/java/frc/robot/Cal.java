@@ -52,6 +52,7 @@ public final class Cal {
      * relative to the ficture but they are actually slightly different.
      */
     public static double SWERVE_FRONT_LEFT_ANGULAR_OFFSET_RAD = 5.199;
+
     public static double SWERVE_FRONT_RIGHT_ANGULAR_OFFSET_RAD = 2.078;
     public static double SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD = 6.212;
     public static double SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD = 2.997;

@@ -33,8 +33,6 @@ import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 import frc.robot.utils.SendableHelper;
 import frc.robot.utils.SparkMaxUtils;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.TreeMap;
 
@@ -115,7 +113,14 @@ public class Lift extends SubsystemBase {
   private AbsoluteEncoderChecker elevatorLeftAbsEncoderChecker = new AbsoluteEncoderChecker();
   private AbsoluteEncoderChecker elevatorRightAbsEncoderChecker = new AbsoluteEncoderChecker();
   private AbsoluteEncoderChecker armAbsoluteEncoderChecker = new AbsoluteEncoderChecker();
-  private LiftPosition[] posToReprep = new LiftPosition[]{LiftPosition.PRE_SCORE_HIGH_CONE, LiftPosition.PRE_SCORE_MID_CONE, LiftPosition.SCORE_HIGH_CUBE, LiftPosition.SCORE_MID_CUBE, LiftPosition.SCORE_LOW};
+  private LiftPosition[] posToReprep =
+      new LiftPosition[] {
+        LiftPosition.PRE_SCORE_HIGH_CONE,
+        LiftPosition.PRE_SCORE_MID_CONE,
+        LiftPosition.SCORE_HIGH_CUBE,
+        LiftPosition.SCORE_MID_CUBE,
+        LiftPosition.SCORE_LOW
+      };
   /**
    * Indicates the elevator and arm positions at each position of the lift. The first value
    * indicates the elevator position in inches and the second value indicates the arm position in
@@ -143,9 +148,7 @@ public class Lift extends SubsystemBase {
         LiftPosition.GRAB_FROM_INTAKE,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 84.0));
     liftPositionMap.put(
-        LiftPosition.SHELF,
-        new Pair<Double, Double>(
-            Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 188.0));
+        LiftPosition.SHELF, new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 188.0));
     liftPositionMap.put(
         LiftPosition.SCORE_LOW,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 187.0));
@@ -180,8 +183,8 @@ public class Lift extends SubsystemBase {
         LiftPosition.ALT_HOME,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 148.0));
     liftPositionMap.put(
-      LiftPosition.BOOT_UP,
-      new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 148.0));
+        LiftPosition.BOOT_UP,
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 148.0));
 
     this.scoreLoc = scoreLoc;
   }
@@ -268,7 +271,7 @@ public class Lift extends SubsystemBase {
     Pair<Double, Double> newPos =
         new Pair<Double, Double>(curPos.getFirst(), curPos.getSecond() - 0.5);
     liftPositionMap.replace(desiredPosition, newPos);
-        
+
     new PrintCommand("Latest angle for " + desiredPosition + ": " + (curPos.getSecond() - 0.5));
 
     armController.setGoal(newPos.getSecond());
@@ -303,14 +306,15 @@ public class Lift extends SubsystemBase {
       elevatorController.setGoal(liftPositionMap.get(pos).getFirst());
     }
     armController.setGoal(liftPositionMap.get(pos).getSecond());
-    
+
     double elevatorDemandVolts = elevatorController.calculate(elevatorLeftEncoder.getPosition());
     elevatorDemandVolts +=
         Cal.Lift.ELEVATOR_FEEDFORWARD.calculate(elevatorController.getSetpoint().velocity);
     elevatorLeft.setVoltage(elevatorDemandVolts);
 
     double armDemandVoltsA = armController.calculate(armEncoder.getPosition());
-    double armDemandVoltsB = Cal.Lift.ARM_FEEDFORWARD.calculate(armController.getSetpoint().velocity);
+    double armDemandVoltsB =
+        Cal.Lift.ARM_FEEDFORWARD.calculate(armController.getSetpoint().velocity);
     double armDemandVoltsC = Cal.Lift.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle();
     armMotor.setVoltage(armDemandVoltsA + armDemandVoltsB + armDemandVoltsC);
 
@@ -373,7 +377,9 @@ public class Lift extends SubsystemBase {
 
   public void initialize() {
     rezeroLift();
-    liftPositionMap.put(LiftPosition.BOOT_UP, new Pair<Double, Double>(elevatorLeftEncoder.getPosition(), armEncoder.getPosition()));
+    liftPositionMap.put(
+        LiftPosition.BOOT_UP,
+        new Pair<Double, Double>(elevatorLeftEncoder.getPosition(), armEncoder.getPosition()));
   }
 
   public void rezeroLift() {

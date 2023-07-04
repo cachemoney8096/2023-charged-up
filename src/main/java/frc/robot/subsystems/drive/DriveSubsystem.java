@@ -347,7 +347,7 @@ public class DriveSubsystem extends SubsystemBase {
     if (povAngleDeg == 270) {
       povAngleDeg += 77;
     } else if (povAngleDeg == 90) {
-      povAngleDeg -= 77  ;
+      povAngleDeg -= 77;
     }
     // targetHeadingDegrees is counterclockwise so need to flip povAngle
     povAngleDeg = 360 - povAngleDeg;

@@ -5,7 +5,6 @@
 package frc.robot;
 
 import com.revrobotics.CANSparkMax.IdleMode;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -108,10 +107,14 @@ public class Robot extends TimedRobot {
     m_robotContainer.intake.deployMotor.setIdleMode(IdleMode.kBrake);
     m_robotContainer.lift.elevatorLeft.setIdleMode(IdleMode.kBrake);
     m_robotContainer.lift.elevatorRight.setIdleMode(IdleMode.kBrake);
-    m_robotContainer.drive.frontLeft.turningSparkMax.setIdleMode(Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
-    m_robotContainer.drive.frontRight.turningSparkMax.setIdleMode(Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
-    m_robotContainer.drive.rearLeft.turningSparkMax.setIdleMode(Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
-    m_robotContainer.drive.rearRight.turningSparkMax.setIdleMode(Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
+    m_robotContainer.drive.frontLeft.turningSparkMax.setIdleMode(
+        Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
+    m_robotContainer.drive.frontRight.turningSparkMax.setIdleMode(
+        Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
+    m_robotContainer.drive.rearLeft.turningSparkMax.setIdleMode(
+        Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
+    m_robotContainer.drive.rearRight.turningSparkMax.setIdleMode(
+        Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
   }
 
   /** This function is called periodically during autonomous. */
@@ -139,10 +142,14 @@ public class Robot extends TimedRobot {
     m_robotContainer.intake.deployMotor.setIdleMode(IdleMode.kBrake);
     m_robotContainer.lift.elevatorLeft.setIdleMode(IdleMode.kBrake);
     m_robotContainer.lift.elevatorRight.setIdleMode(IdleMode.kBrake);
-    m_robotContainer.drive.frontLeft.turningSparkMax.setIdleMode(Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
-    m_robotContainer.drive.frontRight.turningSparkMax.setIdleMode(Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
-    m_robotContainer.drive.rearLeft.turningSparkMax.setIdleMode(Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
-    m_robotContainer.drive.rearRight.turningSparkMax.setIdleMode(Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
+    m_robotContainer.drive.frontLeft.turningSparkMax.setIdleMode(
+        Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
+    m_robotContainer.drive.frontRight.turningSparkMax.setIdleMode(
+        Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
+    m_robotContainer.drive.rearLeft.turningSparkMax.setIdleMode(
+        Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
+    m_robotContainer.drive.rearRight.turningSparkMax.setIdleMode(
+        Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
   }
 
   /** This function is called periodically during operator control. */
