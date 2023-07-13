@@ -6,6 +6,7 @@ import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.math.estimator.AngleStatistics;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -16,17 +17,28 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+
 import java.util.Optional;
 
 /** Limelight for the intake to identify game pieces */
 public class IntakeLimelight extends SubsystemBase {
+
+  private static final double RESOLUTION_X = 960.0;
+  private static final double HALF_RES_X_PIXELS = RESOLUTION_X / 2.0;
+
+  private static final double RESOLUTION_Y = 720.0;
+  private static final double HALF_RES_Y_PIXELS = RESOLUTION_Y / 2.0;
+
+  private static final double HORIZ_FOV_DEG = 59.6;
+  private static final double VERT_FOV_DEG = 49.7;
+
+  private static final double CONE_HEIGHT_METERS = Units.inchesToMeters(12.8125);
+
   private final double kCameraAngleDegrees;
   private final double kCameraHeight;
   private final double kTargetHeight;
   private final double kImageCaptureLatency = 11.0;
-
-  private final double RESOLUTION_X = 960.0;
-  private final double RESOLUTION_Y = 720.0;
 
   // Simulation functions
   private SimDevice m_simDevice;
@@ -348,7 +360,7 @@ public class IntakeLimelight extends SubsystemBase {
 
   public Optional<Double> getXOfSmallestY(double[] corners) {
     // Format: x1 y1 x2 y2 x3 y3 . . .
-    double minY = 10000000;
+    double minY = Double.MAX_VALUE;
     int minYIdx = 0;
 
     if (corners.length == 0) {
@@ -365,8 +377,115 @@ public class IntakeLimelight extends SubsystemBase {
     return Optional.of(corners[minYIdx - 1]);
   }
 
+  public Optional<double[]> getNecessaryPoints(double[] corners) {
+
+    // Format: corners = [x1, y1, x2, y2, x3, y3, . . .]
+    if (corners.length == 0) {
+      return Optional.empty();
+    }
+
+    double minY = Double.MAX_VALUE;
+    double maxY = Double.MIN_VALUE;
+
+    for (int i = 1; i < corners.length; i += 2) {
+      minY = Math.min(minY, corners[i]);
+      maxY = Math.max(maxY, corners[i]);
+    }
+
+    double[] necessaryPoints = {minY, maxY, getXOfSmallestY(corners).get()};
+
+    return Optional.of(necessaryPoints);
+  }
+
+  public Optional<double[]> getNormalizedPoints(double[] necessaryPoints) {
+    // Format: necessaryPoints = [smallestY, largestY, xOfSmallestY]
+    if (necessaryPoints.length == 0) {
+      return Optional.empty();
+    }
+    
+    double halfwayYValue = (RESOLUTION_Y / 2) - 0.5;
+    double halfwayXValue = (RESOLUTION_X / 2) - 0.5;
+
+    double[] normalizednecessaryPoints = new double[necessaryPoints.length];
+    normalizednecessaryPoints[0] = (necessaryPoints[0] - halfwayYValue) / HALF_RES_Y_PIXELS;
+    normalizednecessaryPoints[1] = (necessaryPoints[1] - halfwayYValue) / HALF_RES_Y_PIXELS;
+    normalizednecessaryPoints[2] = (necessaryPoints[2] - halfwayXValue) / HALF_RES_X_PIXELS;
+
+    return Optional.of(normalizednecessaryPoints);
+  }
+
+  public Optional<double[]> getViewPlaneDimensions(double[] normalizednecessaryPoints) {
+    if (normalizednecessaryPoints.length == 0) {
+      return Optional.empty();
+    }
+
+    double viewPlaneWidth = 2.0 * Math.tan(HORIZ_FOV_DEG / 2.0);
+    double viewPlaneHeight = 2.0 * Math.tan(VERT_FOV_DEG / 2.0);
+
+    double[] viewPlaneDimensions = {viewPlaneWidth, viewPlaneHeight};
+
+    return Optional.of(viewPlaneDimensions);
+  }
+
+  public Optional<double[]> getViewPlanePoints(double[] normalizednecessaryPoints) {
+    if (normalizednecessaryPoints.length == 0) {
+      return Optional.empty();
+    }
+
+    // Format: [view plane width, view plane height]
+    double[] viewPlaneDimensions = getViewPlaneDimensions(normalizednecessaryPoints).get();
+
+    double[] viewPlanenecessaryPoints = new double[normalizednecessaryPoints.length];
+    viewPlanenecessaryPoints[0] = viewPlaneDimensions[1] / 2.0 * normalizednecessaryPoints[0];
+    viewPlanenecessaryPoints[1] = viewPlaneDimensions[1] / 2.0 * normalizednecessaryPoints[1];
+    viewPlanenecessaryPoints[2] = viewPlaneDimensions[0] / 2.0 * normalizednecessaryPoints[2];
+
+    return Optional.of(viewPlanenecessaryPoints);
+  }
+
+  public Optional<double[]> getAnglesToConers(double[] viewPlanenecessaryPoints) {
+    if (viewPlanenecessaryPoints.length == 0) {
+      return Optional.empty();
+    }
+
+    double[] anglesTonecessaryPoints = new double[viewPlanenecessaryPoints.length];
+    anglesTonecessaryPoints[0] = Math.atan2(1.0, viewPlanenecessaryPoints[0]) + Constants.INTAKE_LIMELIGHT_PITCH_DEGREES;
+    anglesTonecessaryPoints[1] = Math.atan2(1.0, viewPlanenecessaryPoints[1]) + Constants.INTAKE_LIMELIGHT_PITCH_DEGREES;
+    // do we add the pitch degrees to the angle of the x of smallest y as well?
+    anglesTonecessaryPoints[2] = Math.atan2(1.0, viewPlanenecessaryPoints[2]) + Constants.INTAKE_LIMELIGHT_PITCH_DEGREES;
+
+    return Optional.of(anglesTonecessaryPoints);
+  }
+
+  public Optional<Double> getCameraDepthFromCone(double[] anglesTonecessaryPoints) {
+    if (anglesTonecessaryPoints.length == 0) {
+      return Optional.empty();
+    }
+
+    // mulitplied by -1.0 in order to fix the direction
+    // - [tan(largestYAngle) + tan(smallestYAngle)]
+     double tanSum = -1.0 * (Math.tan(anglesTonecessaryPoints[0]) + Math.tan(anglesTonecessaryPoints[1]));
+     double cameraDepthFromCone = CONE_HEIGHT_METERS / tanSum;
+
+      return Optional.of(cameraDepthFromCone);
+  }
+
+  public Optional<double[]> getRobotXAndYFromDepth(double[] corners) {
+    double[] necessaryPoints = getNecessaryPoints(corners).get();
+    double[] normalizednecessaryPoints = getNormalizedPoints(necessaryPoints).get();
+    double[] viewPlanenecessaryPoints = getViewPlanePoints(normalizednecessaryPoints).get();
+    double[] anglesTonecessaryPoints = getAnglesToConers(viewPlanenecessaryPoints).get();
+    double cameraDepthFromCone = getCameraDepthFromCone(anglesTonecessaryPoints).get();
+
+    double robotX = cameraDepthFromCone * Math.sin(anglesTonecessaryPoints[2]);
+    double robotY = cameraDepthFromCone * Math.cos(anglesTonecessaryPoints[2]);
+
+    double[] robotXAndY = {robotX, robotY};
+    return Optional.of(robotXAndY);
+  }
+
   public Optional<Double> getObjectHeightPx(double[] corners) {
-    // Format: x1 y1 x2 y2 x3 y3 . . .
+    // Format: corners = [x1, y1, x2, y2, x3, y3, . . .]
     if (corners.length == 0) {
       return Optional.empty();
     }
