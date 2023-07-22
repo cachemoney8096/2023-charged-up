@@ -6,7 +6,6 @@ import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.math.estimator.AngleStatistics;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -18,7 +17,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-
 import java.util.Optional;
 
 /** Limelight for the intake to identify game pieces */
@@ -402,7 +400,7 @@ public class IntakeLimelight extends SubsystemBase {
     if (necessaryPoints.length == 0) {
       return Optional.empty();
     }
-    
+
     double halfwayYValue = (RESOLUTION_Y / 2) - 0.5;
     double halfwayXValue = (RESOLUTION_X / 2) - 0.5;
 
@@ -449,10 +447,13 @@ public class IntakeLimelight extends SubsystemBase {
     }
 
     double[] anglesTonecessaryPoints = new double[viewPlanenecessaryPoints.length];
-    anglesTonecessaryPoints[0] = Math.atan2(1.0, viewPlanenecessaryPoints[0]) + Constants.INTAKE_LIMELIGHT_PITCH_DEGREES;
-    anglesTonecessaryPoints[1] = Math.atan2(1.0, viewPlanenecessaryPoints[1]) + Constants.INTAKE_LIMELIGHT_PITCH_DEGREES;
+    anglesTonecessaryPoints[0] =
+        Math.atan2(1.0, viewPlanenecessaryPoints[0]) + Constants.INTAKE_LIMELIGHT_PITCH_DEGREES;
+    anglesTonecessaryPoints[1] =
+        Math.atan2(1.0, viewPlanenecessaryPoints[1]) + Constants.INTAKE_LIMELIGHT_PITCH_DEGREES;
     // do we add the pitch degrees to the angle of the x of smallest y as well?
-    anglesTonecessaryPoints[2] = Math.atan2(1.0, viewPlanenecessaryPoints[2]) + Constants.INTAKE_LIMELIGHT_PITCH_DEGREES;
+    anglesTonecessaryPoints[2] =
+        Math.atan2(1.0, viewPlanenecessaryPoints[2]) + Constants.INTAKE_LIMELIGHT_PITCH_DEGREES;
 
     return Optional.of(anglesTonecessaryPoints);
   }
@@ -464,10 +465,11 @@ public class IntakeLimelight extends SubsystemBase {
 
     // mulitplied by -1.0 in order to fix the direction
     // - [tan(largestYAngle) + tan(smallestYAngle)]
-     double tanSum = -1.0 * (Math.tan(anglesTonecessaryPoints[0]) + Math.tan(anglesTonecessaryPoints[1]));
-     double cameraDepthFromCone = CONE_HEIGHT_METERS / tanSum;
+    double tanSum =
+        -1.0 * (Math.tan(anglesTonecessaryPoints[0]) + Math.tan(anglesTonecessaryPoints[1]));
+    double cameraDepthFromCone = CONE_HEIGHT_METERS / tanSum;
 
-      return Optional.of(cameraDepthFromCone);
+    return Optional.of(cameraDepthFromCone);
   }
 
   public Optional<double[]> getRobotXAndYFromDepth(double[] corners) {
