@@ -483,6 +483,10 @@ public class IntakeLimelight extends SubsystemBase {
     double robotY = cameraDepthFromCone * Math.cos(anglesTonecessaryPoints[2]);
 
     double[] robotXAndY = {robotX, robotY};
+
+    SmartDashboard.putNumber("Robot depth to cone", cameraDepthFromCone);
+    SmartDashboard.putNumber("Robot X to cone", robotX);
+    SmartDashboard.putNumber("Robot Y to cone", robotY);
     return Optional.of(robotXAndY);
   }
 
