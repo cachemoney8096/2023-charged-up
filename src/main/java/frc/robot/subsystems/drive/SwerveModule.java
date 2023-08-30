@@ -105,10 +105,6 @@ public class SwerveModule implements Sendable {
             turningSparkMax.setSmartCurrentLimit(
                 Constants.SwerveModule.TURNING_MOTOR_CURRENT_LIMIT_AMPS));
 
-    errors +=
-        SparkMaxUtils.check(
-            turningSparkMax.setSmartCurrentLimit(Cal.SwerveSubsystem.STEER_CURRENT_LIMIT_AMPS));
-
     return errors == 0;
   }
 
@@ -148,10 +144,6 @@ public class SwerveModule implements Sendable {
         SparkMaxUtils.check(
             drivingSparkMax.setSmartCurrentLimit(
                 Constants.SwerveModule.DRIVING_MOTOR_CURRENT_LIMIT_AMPS));
-
-    errors +=
-        SparkMaxUtils.check(
-            drivingSparkMax.setSmartCurrentLimit(Cal.SwerveSubsystem.DRIVE_CURRENT_LIMIT_AMPS));
 
     return errors == 0;
   }
