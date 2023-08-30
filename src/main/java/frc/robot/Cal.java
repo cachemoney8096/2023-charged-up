@@ -90,11 +90,6 @@ public final class Cal {
     /** If the desired chassis rotation is below this value in [0,1], it is ignored */
     public static final double ROTATION_DEADBAND_THRESHOLD = 0.04;
 
-    /** Current limits for swerveSubsystem sparksmax in amps */
-    public static final int DRIVE_CURRENT_LIMIT_AMPS = 50;
-
-    public static final int STEER_CURRENT_LIMIT_AMPS = 20;
-
     /** Drive speed multipliers for teleop intaking and scoring */
     public static final double THROTTLE_FOR_INTAKING = 0.55,
         THROTTLE_FOR_SCORING_AND_SHELF = 0.45,
