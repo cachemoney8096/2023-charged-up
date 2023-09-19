@@ -181,7 +181,7 @@ public class Lift extends SubsystemBase {
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 153.0));
     liftPositionMap.put(
         LiftPosition.ALT_HOME,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 148.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 150.0));
     liftPositionMap.put(
         LiftPosition.BOOT_UP,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 148.0));
@@ -673,6 +673,12 @@ public class Lift extends SubsystemBase {
         "Goal position",
         () -> {
           return goalPosition.toString();
+        },
+        null);
+    builder.addDoubleProperty(
+        "Arm controller goal",
+        () -> {
+          return armController.getGoal().position;
         },
         null);
     builder.addDoubleProperty("Arm output", armMotor::get, null);
