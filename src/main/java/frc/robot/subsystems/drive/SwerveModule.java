@@ -202,6 +202,9 @@ public class SwerveModule implements Sendable {
         SwerveModuleState.optimize(
             correctedDesiredState, new Rotation2d(turningEncoder.getPosition()));
 
+    // Setting global desiredState to be optimized for the shuffleboard
+    this.desiredState = optimizedDesiredState;
+
     // Command driving and turning SPARKS MAX towards their respective setpoints.
     drivingPIDController.setReference(
         optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
