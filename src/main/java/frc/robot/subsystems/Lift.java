@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Cal;
 import frc.robot.Constants;
@@ -104,9 +103,9 @@ public class Lift extends SubsystemBase {
   private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
 
   // Members
-  private LiftPosition latestPosition = LiftPosition.BOOT_UP;
-  private LiftPosition desiredPosition = LiftPosition.BOOT_UP;
-  private LiftPosition goalPosition = LiftPosition.BOOT_UP;
+  private LiftPosition latestPosition = LiftPosition.ALT_HOME;
+  private LiftPosition desiredPosition = LiftPosition.ALT_HOME;
+  private LiftPosition goalPosition = LiftPosition.ALT_HOME;
   private boolean desiredGrabberClosed = true;
   public ScoringLocationUtil scoreLoc;
   private boolean scoringInProgress = false;
@@ -146,9 +145,9 @@ public class Lift extends SubsystemBase {
     liftPositionMap = new TreeMap<LiftPosition, Pair<Double, Double>>();
     liftPositionMap.put(
         LiftPosition.GRAB_FROM_INTAKE,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 84.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 85.0));
     liftPositionMap.put(
-        LiftPosition.SHELF, new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 188.0));
+        LiftPosition.SHELF, new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 190.0));
     liftPositionMap.put(
         LiftPosition.SCORE_LOW,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 187.0));
@@ -181,7 +180,7 @@ public class Lift extends SubsystemBase {
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 153.0));
     liftPositionMap.put(
         LiftPosition.ALT_HOME,
-        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 148.0));
+        new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 150.0));
     liftPositionMap.put(
         LiftPosition.BOOT_UP,
         new Pair<Double, Double>(Cal.Lift.ELEVATOR_LOW_POSITION_INCHES, 148.0));
@@ -272,7 +271,7 @@ public class Lift extends SubsystemBase {
         new Pair<Double, Double>(curPos.getFirst(), curPos.getSecond() - 0.5);
     liftPositionMap.replace(desiredPosition, newPos);
 
-    new PrintCommand("Latest angle for " + desiredPosition + ": " + (curPos.getSecond() - 0.5));
+    System.out.println("Latest angle for " + desiredPosition + ": " + (curPos.getSecond() - 0.5));
 
     armController.setGoal(newPos.getSecond());
   }
@@ -283,7 +282,7 @@ public class Lift extends SubsystemBase {
         new Pair<Double, Double>(curPos.getFirst(), curPos.getSecond() + 0.5);
     liftPositionMap.replace(desiredPosition, newPos);
 
-    new PrintCommand("Latest angle for " + desiredPosition + ": " + (curPos.getSecond() + 0.5));
+    System.out.println("Latest angle for " + desiredPosition + ": " + (curPos.getSecond() + 0.5));
 
     armController.setGoal(newPos.getSecond());
   }
@@ -673,6 +672,12 @@ public class Lift extends SubsystemBase {
         "Goal position",
         () -> {
           return goalPosition.toString();
+        },
+        null);
+    builder.addDoubleProperty(
+        "Arm controller goal",
+        () -> {
+          return armController.getGoal().position;
         },
         null);
     builder.addDoubleProperty("Arm output", armMotor::get, null);
