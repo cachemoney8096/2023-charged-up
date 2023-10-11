@@ -104,12 +104,13 @@ public final class Constants {
         MAX_ANGULAR_SPEED_RAD_PER_SECONDS = 2 * Math.PI; // radians per second
 
     /** Chassis configuration */
-    public static final double TRACK_WIDTH_METERS = Units.inchesToMeters(20.48);
 
     /** Distance between centers of right and left wheels on robot */
-    public static final double WHEEL_BASE_METERS = Units.inchesToMeters(20.48);
+    public static final double TRACK_WIDTH_METERS = Units.inchesToMeters(20.48);
 
     /** Distance between front and back wheels on robot */
+    public static final double WHEEL_BASE_METERS = Units.inchesToMeters(20.48);
+
     public static final SwerveDriveKinematics DRIVE_KINEMATICS =
         new SwerveDriveKinematics(
             new Translation2d(WHEEL_BASE_METERS / 2, TRACK_WIDTH_METERS / 2),
