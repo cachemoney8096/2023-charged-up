@@ -161,10 +161,11 @@ public final class Cal {
     /** Input deg, output Volts */
     public static final double ARM_P = 0.10, ARM_I = 0.0, ARM_D = Cal.PLACEHOLDER_DOUBLE;
 
-    /** Absolute encoder position when the arm is at 0 degrees */
-    // 30.0 is the kickstand offset from 180 aka vertically up
-    // so 120 is the encoder value on the kickstand
-    public static double ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG = 120.0 + 30.0 + 180.0;
+    /**
+     * Absolute encoder position when the arm is in the starting position Measured before the abs
+     * encoder was removed at rootbeer
+     */
+    public static double ARM_ABSOLUTE_ENCODER_START_POS_DEG = 120.213;
 
     /**
      * Position reading from the absolute encoders when the elevator is at the start (zero) position

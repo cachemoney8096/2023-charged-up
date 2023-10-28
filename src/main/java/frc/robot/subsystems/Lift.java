@@ -99,7 +99,6 @@ public class Lift extends SubsystemBase {
   private final AbsoluteEncoder elevatorRightAbsEncoder =
       elevatorRight.getAbsoluteEncoder(Type.kDutyCycle);
   private final RelativeEncoder armEncoder = armMotor.getEncoder();
-  private final AbsoluteEncoder armAbsoluteEncoder = armMotor.getAbsoluteEncoder(Type.kDutyCycle);
   private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
 
   // Members
@@ -111,7 +110,6 @@ public class Lift extends SubsystemBase {
   private boolean scoringInProgress = false;
   private AbsoluteEncoderChecker elevatorLeftAbsEncoderChecker = new AbsoluteEncoderChecker();
   private AbsoluteEncoderChecker elevatorRightAbsEncoderChecker = new AbsoluteEncoderChecker();
-  private AbsoluteEncoderChecker armAbsoluteEncoderChecker = new AbsoluteEncoderChecker();
   private LiftPosition[] posToReprep =
       new LiftPosition[] {
         LiftPosition.PRE_SCORE_HIGH_CONE,
@@ -199,7 +197,6 @@ public class Lift extends SubsystemBase {
     errors += SparkMaxUtils.check(elevatorRight.follow(elevatorLeft, true));
 
     // inverting stuff
-    errors += SparkMaxUtils.check(armAbsoluteEncoder.setInverted(true));
     errors += SparkMaxUtils.check(elevatorLeftAbsEncoder.setInverted(false));
     armMotor.setInverted(false);
 
@@ -224,9 +221,6 @@ public class Lift extends SubsystemBase {
         SparkMaxUtils.check(
             SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(
                 armEncoder, Constants.Lift.ARM_MOTOR_GEAR_RATIO));
-    errors +=
-        SparkMaxUtils.check(
-            SparkMaxUtils.UnitConversions.setDegreesFromGearRatio(armAbsoluteEncoder, 1.0));
 
     errors +=
         SparkMaxUtils.check(
@@ -382,10 +376,8 @@ public class Lift extends SubsystemBase {
   }
 
   public void rezeroLift() {
-    // Set arm encoder position from absolute
-    armEncoder.setPosition(
-        AngleUtil.wrapAngle(
-            armAbsoluteEncoderChecker.getMedian() - Cal.Lift.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG));
+    // Set arm encoder position from measured absolute value (before abs encoder removal)
+    armEncoder.setPosition(AngleUtil.wrapAngle(Cal.Lift.ARM_ABSOLUTE_ENCODER_START_POS_DEG));
 
     // Set elevator encoder position from absolute encoders
     double elevatorDutyCycleEncodersDifferenceDegrees =
@@ -403,11 +395,6 @@ public class Lift extends SubsystemBase {
     elevatorController.setTolerance(Cal.Lift.ELEVATOR_ALLOWED_CLOSED_LOOP_ERROR_IN);
     elevatorController.reset(elevatorLeftEncoder.getPosition());
     elevatorController.setGoal(elevatorLeftEncoder.getPosition());
-  }
-
-  public void zeroArmAtCurrentPos() {
-    Cal.Lift.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG = armAbsoluteEncoder.getPosition();
-    System.out.println("New Zero for Arm: " + Cal.Lift.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG);
   }
 
   public void zeroElevatorAtCurrentPos() {
@@ -580,7 +567,6 @@ public class Lift extends SubsystemBase {
     controlPosition(desiredPosition);
     elevatorLeftAbsEncoderChecker.addReading(elevatorLeftAbsEncoder.getPosition());
     elevatorRightAbsEncoderChecker.addReading(elevatorRightAbsEncoder.getPosition());
-    armAbsoluteEncoderChecker.addReading(armAbsoluteEncoder.getPosition());
 
     // // If the grabber is set to open and it is safe to open, open the grabber (drop). Otherwise,
     // // close it (grab).
@@ -642,8 +628,6 @@ public class Lift extends SubsystemBase {
         null);
     builder.addBooleanProperty("Clear of intake", this::clearOfIntakeZone, null);
     builder.addDoubleProperty(
-        "Arm Abs Position (deg)", armAbsoluteEncoder::getPosition, armEncoder::setPosition);
-    builder.addDoubleProperty(
         "Arm Position (deg)", armEncoder::getPosition, armEncoder::setPosition);
     builder.addDoubleProperty("Arm Vel (deg/s)", armEncoder::getVelocity, null);
     builder.addBooleanProperty("See Game Piece", this::seeGamePiece, null);
@@ -703,8 +687,6 @@ public class Lift extends SubsystemBase {
         "Elevator Left encoder connected", elevatorLeftAbsEncoderChecker::encoderConnected, null);
     builder.addBooleanProperty(
         "Elevator Right encoder connected", elevatorRightAbsEncoderChecker::encoderConnected, null);
-    builder.addBooleanProperty(
-        "Arm encoder connected", armAbsoluteEncoderChecker::encoderConnected, null);
   }
 
   /**
