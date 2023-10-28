@@ -150,9 +150,6 @@ public class RobotContainer {
         new InstantCommand(intake::zeroIntakeAtCurrentPos, intake).ignoringDisable(true));
 
     SmartDashboard.putData(
-        "Zero Arm Based on Current Pos",
-        new InstantCommand(lift::zeroArmAtCurrentPos, lift).ignoringDisable(true));
-    SmartDashboard.putData(
         "Zero Elevator Based on Current Pos",
         new InstantCommand(lift::zeroElevatorAtCurrentPos, lift).ignoringDisable(true));
 
