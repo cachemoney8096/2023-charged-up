@@ -79,7 +79,6 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {
     m_robotContainer.intake.rezeroIntake();
-    m_robotContainer.lift.rezeroLift();
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
@@ -92,6 +91,11 @@ public class Robot extends TimedRobot {
                 () -> {
                   m_robotContainer.lift.closeGrabber();
                 }),
+            new InstantCommand(
+              () -> {
+                m_robotContainer.lift.rezeroLift();
+              }
+            ),
             m_robotContainer.getAutonomousCommand());
 
     // schedule the autonomous command (example)
