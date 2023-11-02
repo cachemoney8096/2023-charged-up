@@ -92,10 +92,9 @@ public class Robot extends TimedRobot {
                   m_robotContainer.lift.closeGrabber();
                 }),
             new InstantCommand(
-              () -> {
-                m_robotContainer.lift.rezeroLift();
-              }
-            ),
+                () -> {
+                  m_robotContainer.lift.rezeroLift();
+                }),
             m_robotContainer.getAutonomousCommand());
 
     // schedule the autonomous command (example)
