@@ -380,6 +380,7 @@ public class Lift extends SubsystemBase {
     armEncoder.setPosition(AngleUtil.wrapAngle(Cal.Lift.ARM_ABSOLUTE_ENCODER_START_POS_DEG));
 
     // Set elevator encoder position
+    // TODO: actually fix this issue
     elevatorLeftEncoder.setPosition(0.0);
 
     armController.setTolerance(Cal.Lift.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG);
